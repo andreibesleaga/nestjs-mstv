@@ -1,0 +1,7 @@
+
+apiVersion: v2
+name: nest-ddd-chart
+description: Helm chart for NestJS DDD template
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

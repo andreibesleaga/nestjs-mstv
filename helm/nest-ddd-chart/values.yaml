@@ -1,0 +1,12 @@
+
+replicaCount: 1
+image:
+  repository: your-repo/nest-ddd
+  tag: latest
+service:
+  type: ClusterIP
+  port: 3000
+env:
+  DATABASE_URL: ""
+  REDIS_URL: ""
+  KAFKA_BROKERS: ""

@@ -1,0 +1,43 @@
+
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: dev
+    volumes:
+      - db-data:/var/lib/postgresql/data
+  redis:
+    image: redis:7
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  kafka:
+    image: confluentinc/cp-kafka:7.4.1
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+  api:
+    build: .
+    command: pnpm start:dev
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+      - redis
+      - kafka
+  worker:
+    build: .
+    command: node dist/apps/worker/src/worker.js
+    depends_on:
+      - redis
+      - kafka
+volumes:
+  db-data:

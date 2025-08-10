@@ -1,0 +1,19 @@
+
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2022",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@packages/*": ["packages/*/src"],
+      "@modules/*": ["modules/*/src"]
+    }
+  },
+  "include": ["apps/**/*", "packages/**/*", "modules/**/*", "prisma/**/*", "test/**/*"]
+}
