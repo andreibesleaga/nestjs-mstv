@@ -1,4 +1,4 @@
-# NestJS Clean Architecture Template
+# NestJS Microservice Clean Architecture Template
 
 A production-ready NestJS microservice template implementing Clean Architecture/DDD principles with comprehensive features:
 
