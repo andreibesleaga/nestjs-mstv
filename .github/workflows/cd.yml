@@ -24,11 +24,15 @@ jobs:
         with:
           push: true
           tags: ghcr.io/${{ github.repository }}:latest
-      - name: Helm Deploy
-        uses: deliverybot/helm@v2
+      - name: Install Helm
+        uses: azure/setup-helm@v3
         with:
-          args: upgrade --install nest-ddd ./helm/nest-ddd-chart -f ./helm/nest-ddd-chart/values.yaml --wait --timeout=10m
-        continue-on-error: false
+          version: 'latest'
+      - name: Helm Deploy
+        run: |
+          helm upgrade --install nest-ddd ./helm/nest-ddd-chart \
+            -f ./helm/nest-ddd-chart/values.yaml \
+            --wait --timeout=10m
       - name: Notify on failure
         if: failure()
         run: |
