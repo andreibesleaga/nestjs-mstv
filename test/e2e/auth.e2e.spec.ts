@@ -23,16 +23,17 @@ describe('Auth E2E', () => {
 
   describe('POST /auth/register', () => {
     it('should register a new user', () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
       return request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: 'test@example.com',
+          email: uniqueEmail,
           password: 'password123',
           name: 'Test User',
         })
         .expect(201)
         .expect((res) => {
-          expect(res.body.email).toBe('test@example.com');
+          expect(res.body.email).toBe(uniqueEmail);
           expect(res.body.name).toBe('Test User');
           expect(res.body.role).toBe('user');
           expect(res.body.id).toBeDefined();
@@ -63,34 +64,40 @@ describe('Auth E2E', () => {
   });
 
   describe('POST /auth/login', () => {
-    beforeEach(async () => {
+    it('should login with valid credentials', async () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
       await request(app.getHttpServer()).post('/auth/register').send({
-        email: 'test@example.com',
+        email: uniqueEmail,
         password: 'password123',
         name: 'Test User',
       });
-    });
 
-    it('should login with valid credentials', () => {
       return request(app.getHttpServer())
         .post('/auth/login')
         .send({
-          email: 'test@example.com',
+          email: uniqueEmail,
           password: 'password123',
         })
         .expect(201)
         .expect((res) => {
           expect(res.body.access_token).toBeDefined();
           expect(res.body.refresh_token).toBeDefined();
-          expect(res.body.user.email).toBe('test@example.com');
+          expect(res.body.user.email).toBe(uniqueEmail);
         });
     });
 
-    it('should fail with invalid credentials', () => {
+    it('should fail with invalid credentials', async () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: uniqueEmail,
+        password: 'password123',
+        name: 'Test User',
+      });
+
       return request(app.getHttpServer())
         .post('/auth/login')
         .send({
-          email: 'test@example.com',
+          email: uniqueEmail,
           password: 'wrongpassword',
         })
         .expect(401);
@@ -98,24 +105,21 @@ describe('Auth E2E', () => {
   });
 
   describe('POST /auth/refresh', () => {
-    let refreshToken: string;
-
-    beforeEach(async () => {
+    it('should refresh token with valid refresh token', async () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
       await request(app.getHttpServer()).post('/auth/register').send({
-        email: 'test@example.com',
+        email: uniqueEmail,
         password: 'password123',
         name: 'Test User',
       });
 
       const loginRes = await request(app.getHttpServer()).post('/auth/login').send({
-        email: 'test@example.com',
+        email: uniqueEmail,
         password: 'password123',
       });
 
-      refreshToken = loginRes.body.refresh_token;
-    });
+      const refreshToken = loginRes.body.refresh_token;
 
-    it('should refresh token with valid refresh token', () => {
       return request(app.getHttpServer())
         .post('/auth/refresh')
         .send({ refresh_token: refreshToken })
@@ -127,24 +131,21 @@ describe('Auth E2E', () => {
   });
 
   describe('POST /auth/logout', () => {
-    let refreshToken: string;
-
-    beforeEach(async () => {
+    it('should logout successfully', async () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
       await request(app.getHttpServer()).post('/auth/register').send({
-        email: 'test@example.com',
+        email: uniqueEmail,
         password: 'password123',
         name: 'Test User',
       });
 
       const loginRes = await request(app.getHttpServer()).post('/auth/login').send({
-        email: 'test@example.com',
+        email: uniqueEmail,
         password: 'password123',
       });
 
-      refreshToken = loginRes.body.refresh_token;
-    });
+      const refreshToken = loginRes.body.refresh_token;
 
-    it('should logout successfully', () => {
       return request(app.getHttpServer())
         .post('/auth/logout')
         .send({ refresh_token: refreshToken })

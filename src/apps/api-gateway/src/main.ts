@@ -20,7 +20,7 @@ async function bootstrap() {
     new FastifyAdapter({
       logger: true,
       trustProxy: true,
-      bodyLimit: parseInt(process.env.BODY_LIMIT || '1048576'),
+      bodyLimit: parseInt(process.env.BODY_LIMIT || '1048576', 10),
     })
   );
 
@@ -38,8 +38,8 @@ async function bootstrap() {
 
   // Rate limiting
   await app.register(require('@fastify/rate-limit'), {
-    max: parseInt(process.env.RATE_LIMIT_MAX || '100'),
-    timeWindow: parseInt(process.env.RATE_LIMIT_WINDOW || '60000'),
+    max: parseInt(process.env.RATE_LIMIT_MAX || '100', 10),
+    timeWindow: parseInt(process.env.RATE_LIMIT_WINDOW || '60000', 10),
     skipOnError: true,
     keyGenerator: (req) => req.ip,
   });

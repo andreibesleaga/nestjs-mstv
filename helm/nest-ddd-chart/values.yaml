@@ -2,7 +2,7 @@
 replicaCount: 1
 image:
   repository: your-repo/nest-ddd
-  tag: latest
+  tag: "1.0.0"
 service:
   type: ClusterIP
   port: 3000

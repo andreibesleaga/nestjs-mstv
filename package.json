@@ -19,11 +19,11 @@
     "prisma:seed": "ts-node prisma/seed.ts"
   },
   "lint-staged": {
-    "*.{ts}": [
+    "*.ts": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{js}": [
+    "*.js": [
       "prettier --write"
     ],
     "*.{json,md}": [

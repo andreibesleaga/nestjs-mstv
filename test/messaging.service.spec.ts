@@ -30,7 +30,7 @@ describe('KafkaService', () => {
 
     await service.publishUserLoggedIn('user123');
 
-    expect(spy).toHaveBeenCalledWith('auth.events', {
+    expect(spy).toHaveBeenCalledWith('user.events', {
       event: 'user.logged_in',
       userId: 'user123',
       timestamp: expect.any(String),

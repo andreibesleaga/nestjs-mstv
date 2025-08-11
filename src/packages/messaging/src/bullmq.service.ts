@@ -27,7 +27,9 @@ export class BullMQService implements OnModuleInit {
     this.emailWorker = new Worker(
       'email',
       async (job: Job<EmailJobData>) => {
-        console.log(`Processing email job ${job.id}:`, job.data);
+        console.log(
+          `Processing email job ${job.id} for recipient: ${job.data.to.replace(/(.{3}).*@/, '$1***@')}`
+        );
 
         // Simulate email sending
         await this.sendEmail(job.data);
@@ -77,7 +79,12 @@ export class BullMQService implements OnModuleInit {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // In real implementation, you would use a service like SendGrid, Mailgun, etc.
-    console.log('📧 Email sent:', data);
+    console.log(
+      '📧 Email sent to:',
+      data.to.replace(/(.{3}).*@/, '$1***@'),
+      'Subject:',
+      data.subject
+    );
   }
 
   async getQueueStats() {

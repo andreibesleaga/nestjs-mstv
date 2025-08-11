@@ -34,7 +34,26 @@ jest.mock('@prisma/client', () => {
 
 describe('AuthService', () => {
   const redis = new RedisClient();
-  const svc = new AuthService(redis);
+  const mockUser = {
+    id: '1',
+    email: 'u@example.com',
+    name: 'U',
+    password: 'hashedPassword',
+    role: 'user',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  const mockPrisma = {
+    user: {
+      findUnique: jest.fn().mockResolvedValue(null),
+      create: jest.fn().mockResolvedValue(mockUser),
+    },
+    refreshToken: {
+      create: jest.fn().mockResolvedValue({ id: 'token123', token: 'refresh123' }),
+    },
+  } as any;
+  const svc = new AuthService(redis, mockPrisma);
 
   it('should register a user', async () => {
     const user = await svc.register('u@example.com', 'password123', 'U');
@@ -42,7 +61,7 @@ describe('AuthService', () => {
   });
 
   it('should sign and verify tokens', async () => {
-    const token = await svc.signAccessToken({ sub: 'u1' });
+    const token = await svc.signAccessToken({ sub: 'u1', email: 'test@example.com', role: 'user' });
     expect(typeof token).toBe('string');
   });
 });

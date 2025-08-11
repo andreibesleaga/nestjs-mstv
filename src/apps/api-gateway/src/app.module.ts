@@ -17,7 +17,7 @@ import { SchemasController } from './schemas.controller';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schemas/schema.gql'),
       playground: process.env.NODE_ENV === 'development',
-      introspection: true,
+      introspection: process.env.NODE_ENV !== 'production',
       context: ({ req }) => ({ req }),
       formatError: (error) => {
         return {

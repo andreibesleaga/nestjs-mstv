@@ -37,7 +37,7 @@ export class HealthController {
     },
   })
   getReadiness() {
-    return { status: 'ready' };
+    return this.getHealthStatus('ready');
   }
 
   @Get('live')
@@ -53,6 +53,10 @@ export class HealthController {
     },
   })
   getLiveness() {
-    return { status: 'alive' };
+    return this.getHealthStatus('alive');
+  }
+
+  private getHealthStatus(status: string) {
+    return { status, timestamp: new Date().toISOString() };
   }
 }

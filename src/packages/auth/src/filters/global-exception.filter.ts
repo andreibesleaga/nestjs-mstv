@@ -84,6 +84,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }),
     };
 
-    response.status(status).send(errorResponse);
+    // Sanitize error response to prevent XSS
+    const sanitizedResponse = {
+      ...errorResponse,
+      error: {
+        ...errorResponse.error,
+        message: errorResponse.error.message.replace(/<[^>]*>/g, ''),
+        path: errorResponse.error.path.replace(/<[^>]*>/g, ''),
+      },
+    };
+    response.status(status).send(sanitizedResponse);
   }
 }

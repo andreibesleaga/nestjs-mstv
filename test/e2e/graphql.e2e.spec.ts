@@ -23,10 +23,11 @@ describe('GraphQL E2E', () => {
 
   describe('register mutation', () => {
     it('should register a new user', () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
       const mutation = `
         mutation {
           register(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "password123"
             name: "Test User"
           }) {
@@ -43,7 +44,7 @@ describe('GraphQL E2E', () => {
         .send({ query: mutation })
         .expect(200)
         .expect((res) => {
-          expect(res.body.data.register.email).toBe('test@example.com');
+          expect(res.body.data.register.email).toBe(uniqueEmail);
           expect(res.body.data.register.name).toBe('Test User');
           expect(res.body.data.register.role).toBe('user');
         });
@@ -76,11 +77,12 @@ describe('GraphQL E2E', () => {
   });
 
   describe('login mutation', () => {
-    beforeEach(async () => {
-      const mutation = `
+    it('should login with valid credentials', async () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
+      const registerMutation = `
         mutation {
           register(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "password123"
             name: "Test User"
           }) {
@@ -89,14 +91,12 @@ describe('GraphQL E2E', () => {
         }
       `;
 
-      await request(app.getHttpServer()).post('/graphql').send({ query: mutation });
-    });
+      await request(app.getHttpServer()).post('/graphql').send({ query: registerMutation });
 
-    it('should login with valid credentials', () => {
-      const mutation = `
+      const loginMutation = `
         mutation {
           login(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "password123"
           }) {
             access_token
@@ -113,20 +113,35 @@ describe('GraphQL E2E', () => {
 
       return request(app.getHttpServer())
         .post('/graphql')
-        .send({ query: mutation })
+        .send({ query: loginMutation })
         .expect(200)
         .expect((res) => {
           expect(res.body.data.login.access_token).toBeDefined();
           expect(res.body.data.login.refresh_token).toBeDefined();
-          expect(res.body.data.login.user.email).toBe('test@example.com');
+          expect(res.body.data.login.user.email).toBe(uniqueEmail);
         });
     });
 
-    it('should fail with invalid credentials', () => {
-      const mutation = `
+    it('should fail with invalid credentials', async () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
+      const registerMutation = `
+        mutation {
+          register(input: {
+            email: "${uniqueEmail}"
+            password: "password123"
+            name: "Test User"
+          }) {
+            id
+          }
+        }
+      `;
+
+      await request(app.getHttpServer()).post('/graphql').send({ query: registerMutation });
+
+      const loginMutation = `
         mutation {
           login(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "wrongpassword"
           }) {
             access_token
@@ -141,7 +156,7 @@ describe('GraphQL E2E', () => {
 
       return request(app.getHttpServer())
         .post('/graphql')
-        .send({ query: mutation })
+        .send({ query: loginMutation })
         .expect(200)
         .expect((res) => {
           expect(res.body.errors).toBeDefined();
@@ -150,13 +165,12 @@ describe('GraphQL E2E', () => {
   });
 
   describe('refreshToken mutation', () => {
-    let refreshToken: string;
-
-    beforeEach(async () => {
+    it('should refresh token with valid refresh token', async () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
       const registerMutation = `
         mutation {
           register(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "password123"
             name: "Test User"
           }) {
@@ -170,7 +184,7 @@ describe('GraphQL E2E', () => {
       const loginMutation = `
         mutation {
           login(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "password123"
           }) {
             refresh_token
@@ -182,10 +196,8 @@ describe('GraphQL E2E', () => {
         .post('/graphql')
         .send({ query: loginMutation });
 
-      refreshToken = loginRes.body.data.login.refresh_token;
-    });
+      const refreshToken = loginRes.body.data.login.refresh_token;
 
-    it('should refresh token with valid refresh token', () => {
       const mutation = `
         mutation {
           refreshToken(input: {
@@ -207,13 +219,12 @@ describe('GraphQL E2E', () => {
   });
 
   describe('logout mutation', () => {
-    let refreshToken: string;
-
-    beforeEach(async () => {
+    it('should logout successfully', async () => {
+      const uniqueEmail = `test-${Date.now()}@example.com`;
       const registerMutation = `
         mutation {
           register(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "password123"
             name: "Test User"
           }) {
@@ -227,7 +238,7 @@ describe('GraphQL E2E', () => {
       const loginMutation = `
         mutation {
           login(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "password123"
           }) {
             refresh_token
@@ -239,10 +250,8 @@ describe('GraphQL E2E', () => {
         .post('/graphql')
         .send({ query: loginMutation });
 
-      refreshToken = loginRes.body.data.login.refresh_token;
-    });
+      const refreshToken = loginRes.body.data.login.refresh_token;
 
-    it('should logout successfully', () => {
       const mutation = `
         mutation {
           logout(input: {

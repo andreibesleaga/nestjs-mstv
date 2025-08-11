@@ -39,7 +39,7 @@ services:
       DATABASE_URL: postgresql://dev:dev@db:5432/dev
       REDIS_URL: redis://redis:6379
       KAFKA_BROKERS: kafka:9092
-      JWT_SECRET: changeme
+      JWT_SECRET: ${JWT_SECRET:-development-secret-change-in-production}
       NODE_ENV: development
     depends_on:
       - db

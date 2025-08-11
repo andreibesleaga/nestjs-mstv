@@ -24,8 +24,9 @@ describe('Users E2E', () => {
   describe('GET /users/:id', () => {
     it('should get user by id', async () => {
       // Create a user first
+      const uniqueEmail = `test-${Date.now()}@example.com`;
       const registerRes = await request(app.getHttpServer()).post('/auth/register').send({
-        email: 'test@example.com',
+        email: uniqueEmail,
         password: 'password123',
         name: 'Test User',
       });
@@ -37,7 +38,7 @@ describe('Users E2E', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.id).toBe(userId);
-          expect(res.body.email).toBe('test@example.com');
+          expect(res.body.email).toBe(uniqueEmail);
           expect(res.body.name).toBe('Test User');
         });
     });

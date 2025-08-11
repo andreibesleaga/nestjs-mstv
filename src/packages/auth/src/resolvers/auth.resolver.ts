@@ -21,68 +21,88 @@ export class AuthResolver {
 
   @Mutation(() => User)
   async register(@Args('input') input: RegisterInput): Promise<User> {
-    this.logger.log(`GraphQL register attempt for: ${input.email}`);
-    const user = await this.authService.register(input.email, input.password, input.name);
-    return {
-      id: user.id.toString(),
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
-  }
-
-  @Mutation(() => AuthPayload)
-  async login(@Args('input') input: LoginInput): Promise<AuthPayload> {
-    this.logger.log(`GraphQL login attempt for: ${input.email}`);
-    const user = await this.authService.validateUser(input.email, input.password);
-
-    const access_token = await this.authService.signAccessToken({
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    });
-    const refresh_token = await this.authService.signRefreshToken(user.id.toString());
-
-    return {
-      access_token,
-      refresh_token,
-      user: {
+    try {
+      this.logger.log(`GraphQL register attempt`);
+      const user = await this.authService.register(input.email, input.password, input.name);
+      return {
         id: user.id.toString(),
         email: user.email,
         name: user.name,
         role: user.role,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
-      },
-    };
+      };
+    } catch (error) {
+      this.logger.error('GraphQL register failed:', error);
+      throw error;
+    }
+  }
+
+  @Mutation(() => AuthPayload)
+  async login(@Args('input') input: LoginInput): Promise<AuthPayload> {
+    try {
+      this.logger.log(`GraphQL login attempt`);
+      const user = await this.authService.validateUser(input.email, input.password);
+
+      const access_token = await this.authService.signAccessToken({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      });
+      const refresh_token = await this.authService.signRefreshToken(user.id.toString());
+
+      return {
+        access_token,
+        refresh_token,
+        user: {
+          id: user.id.toString(),
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
+      };
+    } catch (error) {
+      this.logger.error('GraphQL login failed:', error);
+      throw error;
+    }
   }
 
   @Mutation(() => RefreshPayload)
   async refreshToken(@Args('input') input: RefreshTokenInput): Promise<RefreshPayload> {
-    this.logger.log(`GraphQL refresh token attempt`);
-    const isRevoked = await this.authService.isRevoked(input.refresh_token);
-    if (isRevoked) {
-      throw new Error('Token has been revoked');
+    try {
+      this.logger.log(`GraphQL refresh token attempt`);
+      const isRevoked = await this.authService.isRevoked(input.refresh_token);
+      if (isRevoked) {
+        throw new Error('Token has been revoked');
+      }
+
+      // In a real implementation, you would decode the refresh token to get user info
+      // For now, we'll return a placeholder
+      const access_token = await this.authService.signAccessToken({
+        sub: 'placeholder',
+        email: 'placeholder@example.com',
+        role: 'user',
+      });
+
+      return { access_token };
+    } catch (error) {
+      this.logger.error('GraphQL refresh token failed:', error);
+      throw error;
     }
-
-    // In a real implementation, you would decode the refresh token to get user info
-    // For now, we'll return a placeholder
-    const access_token = await this.authService.signAccessToken({
-      sub: 'placeholder',
-      email: 'placeholder@example.com',
-      role: 'user',
-    });
-
-    return { access_token };
   }
 
   @Mutation(() => LogoutPayload)
   async logout(@Args('input') input: RefreshTokenInput): Promise<LogoutPayload> {
-    this.logger.log(`GraphQL logout attempt`);
-    await this.authService.revokeRefreshToken(input.refresh_token);
-    return { message: 'Successfully logged out' };
+    try {
+      this.logger.log(`GraphQL logout attempt`);
+      await this.authService.revokeRefreshToken(input.refresh_token);
+      return { message: 'Successfully logged out' };
+    } catch (error) {
+      this.logger.error('GraphQL logout failed:', error);
+      throw error;
+    }
   }
 
   @UseGuards(PoliciesGuard)
