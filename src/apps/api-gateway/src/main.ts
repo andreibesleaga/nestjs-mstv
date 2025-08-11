@@ -5,6 +5,14 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from '../../../packages/auth/src/filters/global-exception.filter';
+import {
+  UserSchema,
+  LoginResponseSchema,
+  RefreshResponseSchema,
+  LogoutResponseSchema,
+  HealthResponseSchema,
+  ErrorResponseSchema,
+} from '../../schemas/openapi.schemas';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -35,7 +43,16 @@ async function bootstrap() {
   const { swaggerConfig } = await import('./openapi.config');
   const config = swaggerConfig;
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, config, {
+    extraModels: [
+      UserSchema,
+      LoginResponseSchema,
+      RefreshResponseSchema,
+      LogoutResponseSchema,
+      HealthResponseSchema,
+      ErrorResponseSchema,
+    ],
+  });
   await app.register(require('@fastify/swagger'), {
     swagger: document,
   });
@@ -54,5 +71,8 @@ async function bootstrap() {
   console.log(`🚀 API Gateway (Fastify) running on port ${port}`);
   console.log(`📖 REST API Documentation: http://localhost:${port}/api`);
   console.log(`🚀 GraphQL Playground: http://localhost:${port}/graphql`);
+  console.log(`📋 OpenAPI JSON: http://localhost:${port}/api-json`);
+  console.log(`📊 GraphQL Schema: Auto-generated from resolvers`);
+  console.log(`📨 Kafka Schemas: Available in /src/schemas/kafka.schemas.ts`);
 }
 bootstrap();

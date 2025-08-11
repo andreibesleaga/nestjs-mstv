@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { HealthResponseSchema } from '../../schemas/openapi.schemas';
 
 @ApiTags('Health')
 @Controller('health')
@@ -12,14 +13,7 @@ export class HealthController {
   @ApiResponse({
     status: 200,
     description: 'Application is healthy',
-    schema: {
-      example: {
-        status: 'ok',
-        timestamp: '2023-01-01T00:00:00.000Z',
-        uptime: 12345,
-        version: '1.0.0',
-      },
-    },
+    type: HealthResponseSchema,
   })
   getHealth() {
     return {
