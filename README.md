@@ -11,6 +11,7 @@ This repo contains a full scaffold implementing:
 - **Full REST + GraphQL APIs** - Unified Fastify-based API gateway with both REST endpoints and GraphQL resolvers
 - **OpenAPI/Swagger documentation** - Complete API documentation with interactive UI
 - **Comprehensive test suites** - Unit and integration tests with proper mocking
+- **Pre-commit hooks** - Husky with ESLint, Prettier, and automated testing
 - **Helm chart + GitHub Actions CD** - Ready for AWS/EKS or Azure/AKS deployment
 
 ## Contents & Quick Start
@@ -38,6 +39,22 @@ This repo contains a full scaffold implementing:
    ```bash
    pnpm test
    ```
+
+## Development Workflow
+
+### Code Quality
+
+- **Linting**: `pnpm lint` - ESLint with TypeScript support
+- **Formatting**: `pnpm format` - Prettier code formatting
+- **Pre-commit hooks**: Automatically run linting, formatting, and unit tests
+- **Pre-push hooks**: Run full test suite before pushing
+
+### Testing
+
+- **Unit tests**: `pnpm test:unit`
+- **Integration tests**: `pnpm test:integration`
+- **E2E tests**: `pnpm test:e2e`
+- **All tests**: `pnpm test:all`
 
 ## Auth flows
 
