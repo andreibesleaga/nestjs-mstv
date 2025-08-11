@@ -7,6 +7,23 @@ import { UsersModule } from '../../../modules/users/src/interface/users.module';
 import { AuthModule } from '../../../packages/auth/src/auth.module';
 import { HealthController } from './health.controller';
 import { SchemasController } from './schemas.controller';
+import { HealthService } from '../../../common/health.service';
+import { PrismaService } from '../../../common/prisma.service';
+import { MongoDbService } from '../../../common/mongodb.service';
+import { RedisClient } from '../../../packages/auth/src/redis.client';
+import { DatabaseConfig } from '../../../common/database.config';
+import { ConsulService } from '../../../common/consul.service';
+import { JaegerService } from '../../../common/jaeger.service';
+import { MicroserviceConfig } from '../../../common/microservice.config';
+import { TracingInterceptor } from '../../../common/tracing.interceptor';
+import { PerformanceInterceptor } from '../../../common/performance.interceptor';
+import { CircuitBreakerService } from '../../../common/circuit-breaker.service';
+import { CacheService } from '../../../common/cache.service';
+import { ProtocolsModule } from '../../../protocols/protocols.module';
+
+const databaseProviders = DatabaseConfig.isMongoDb() 
+  ? [MongoDbService] 
+  : [PrismaService];
 
 @Module({
   imports: [
@@ -30,7 +47,20 @@ import { SchemasController } from './schemas.controller';
     }),
     AuthModule,
     UsersModule,
+    ProtocolsModule,
   ],
   controllers: [HealthController, SchemasController],
+  providers: [
+    HealthService, 
+    RedisClient, 
+    MicroserviceConfig,
+    ConsulService,
+    JaegerService,
+    TracingInterceptor,
+    PerformanceInterceptor,
+    CircuitBreakerService,
+    CacheService,
+    ...databaseProviders
+  ],
 })
 export class AppModule {}

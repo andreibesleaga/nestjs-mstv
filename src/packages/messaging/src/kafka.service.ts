@@ -1,13 +1,17 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { Kafka, Producer, Consumer } from 'kafkajs';
 
 @Injectable()
 export class KafkaService implements OnModuleInit {
+  private readonly logger = new Logger(KafkaService.name);
   private kafka: Kafka;
   private producer: Producer;
   private consumer: Consumer;
 
   constructor() {
+    // Suppress Kafka partitioner warning
+    process.env.KAFKAJS_NO_PARTITIONER_WARNING = '1';
+    
     this.kafka = new Kafka({
       clientId: 'nestjs-app',
       brokers: process.env.KAFKA_BROKERS?.split(',') || ['localhost:9092'],
@@ -18,6 +22,11 @@ export class KafkaService implements OnModuleInit {
   }
 
   async onModuleInit() {
+    if (process.env.NODE_ENV === 'test') {
+      this.logger.warn('Kafka disabled in test environment');
+      return;
+    }
+
     try {
       await this.producer.connect();
       await this.consumer.connect();
@@ -32,25 +41,33 @@ export class KafkaService implements OnModuleInit {
           try {
             const messageValue = message.value?.toString();
             const parsedMessage = messageValue ? JSON.parse(messageValue) : null;
-            console.log(`Received message on ${topic}:`, {
+            this.logger.log(`Received message on ${topic}:`, {
               partition,
               offset: message.offset,
               event: parsedMessage?.event,
               timestamp: parsedMessage?.timestamp,
             });
           } catch (error) {
-            console.error(`Failed to process message from ${topic}:`, error);
+            this.logger.error(`Failed to process message from ${topic}:`, error);
           }
         },
       });
-      console.log('Kafka service initialized successfully');
+      this.logger.log('Kafka service initialized successfully');
     } catch (error) {
-      console.error('Failed to initialize Kafka service:', error);
-      throw error;
+      this.logger.error('Failed to initialize Kafka service:', error.message);
+      // Don't throw in production - allow app to start without Kafka
+      if (process.env.NODE_ENV === 'production') {
+        this.logger.warn('Kafka unavailable - continuing without messaging');
+      }
     }
   }
 
   async publishMessage(topic: string, message: Record<string, any>) {
+    if (process.env.NODE_ENV === 'test' || !this.producer) {
+      this.logger.warn(`Kafka unavailable - message to ${topic} skipped`);
+      return;
+    }
+
     try {
       await this.producer.send({
         topic,
@@ -60,41 +77,124 @@ export class KafkaService implements OnModuleInit {
           },
         ],
       });
-      console.log(`Message published to ${topic}:`, {
+      this.logger.log(`Message published to ${topic}:`, {
         event: message.event,
         timestamp: message.timestamp,
       });
     } catch (error) {
-      console.error(`Failed to publish message to ${topic}:`, error);
-      throw error;
+      this.logger.error(`Failed to publish message to ${topic}:`, error.message);
+      // Don't throw in production - log and continue
     }
   }
 
-  async publishUserEvent(event: string, userId: string, additionalData: Record<string, any> = {}) {
-    const topic = event.startsWith('user.') ? 'user.events' : 'auth.events';
-    await this.publishMessage(topic, {
-      event,
+  // User Events
+  async publishUserRegistered(userId: string, email: string, name?: string, role = 'user') {
+    await this.publishMessage('user.events', {
+      event: 'user.registered',
       userId,
-      ...additionalData,
+      email,
+      name,
+      role,
       timestamp: new Date().toISOString(),
     });
   }
 
-  async publishUserRegistered(userId: string, email: string) {
-    await this.publishUserEvent('user.registered', userId, { email });
+  async publishUserUpdated(userId: string, changes: Record<string, any>) {
+    await this.publishMessage('user.events', {
+      event: 'user.updated',
+      userId,
+      changes,
+      timestamp: new Date().toISOString(),
+    });
   }
 
-  async publishUserLoggedIn(userId: string) {
-    await this.publishUserEvent('user.logged_in', userId);
+  async publishUserDeleted(userId: string, email: string, deletedBy?: string) {
+    await this.publishMessage('user.events', {
+      event: 'user.deleted',
+      userId,
+      email,
+      deletedBy,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  // Auth Events
+  async publishUserLoggedIn(userId: string, sessionId?: string, ipAddress?: string, userAgent?: string) {
+    await this.publishMessage('auth.events', {
+      event: 'user.logged_in',
+      userId,
+      sessionId,
+      ipAddress,
+      userAgent,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  async publishUserLoggedOut(userId: string, sessionId?: string) {
+    await this.publishMessage('auth.events', {
+      event: 'user.logged_out',
+      userId,
+      sessionId,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  async publishTokenRefreshed(userId: string, tokenId?: string) {
+    await this.publishMessage('auth.events', {
+      event: 'token.refreshed',
+      userId,
+      tokenId,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  // Email Events
+  async publishEmailWelcome(userId: string, email: string, name?: string) {
+    await this.publishMessage('email.events', {
+      event: 'email.welcome',
+      userId,
+      email,
+      name,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  async publishEmailPasswordReset(userId: string, email: string, resetToken: string, expiresAt: string) {
+    await this.publishMessage('email.events', {
+      event: 'email.password_reset',
+      userId,
+      email,
+      resetToken,
+      expiresAt,
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  async publishEmailVerification(userId: string, email: string, verificationToken: string) {
+    await this.publishMessage('email.events', {
+      event: 'email.verification',
+      userId,
+      email,
+      verificationToken,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   async onModuleDestroy() {
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
+
     try {
-      await this.producer.disconnect();
-      await this.consumer.disconnect();
-      console.log('Kafka service disconnected successfully');
+      if (this.producer) {
+        await this.producer.disconnect();
+      }
+      if (this.consumer) {
+        await this.consumer.disconnect();
+      }
+      this.logger.log('Kafka service disconnected successfully');
     } catch (error) {
-      console.error('Failed to disconnect Kafka service:', error);
+      this.logger.error('Failed to disconnect Kafka service:', error.message);
     }
   }
 }

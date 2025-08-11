@@ -1,9 +1,11 @@
-import { Controller, Post, Body, UseGuards, Get, Request, ValidationPipe } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Request, ValidationPipe, UsePipes } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CheckPolicies, PoliciesGuard } from './policies.guard';
 import { AppAbility } from './abilities/user.ability';
-import { RegisterInput, LoginInput, RefreshTokenInput } from './dto/auth.dto';
+import { RegisterInput, LoginInput, RefreshTokenInput, User } from './dto/auth.dto';
+import { ZodValidationPipe } from '../../../common/zod-validation.pipe';
+import { UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema } from '../../../common/validation.schemas';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -11,6 +13,7 @@ export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
   @Post('register')
+  @UsePipes(new ZodValidationPipe(UserRegistrationSchema))
   @ApiOperation({
     summary: 'Register a new user',
     description: 'Creates a new user account with email, password, and optional name',
@@ -37,7 +40,8 @@ export class AuthController {
         success: false,
         error: {
           code: 'VALIDATION_ERROR',
-          message: 'Validation failed for email: Invalid email format',
+          message: 'Input validation failed',
+          details: ['email: Invalid email format', 'password: Password must be at least 6 characters'],
           statusCode: 400,
           timestamp: '2023-01-01T00:00:00.000Z',
           path: '/auth/register',
@@ -62,7 +66,7 @@ export class AuthController {
     },
   })
   @ApiBody({ type: RegisterInput })
-  async register(@Body(ValidationPipe) body: RegisterInput) {
+  async register(@Body() body: RegisterInput) {
     const user = await this.auth.register(body.email, body.password, body.name);
     return {
       id: user.id.toString(),
@@ -75,6 +79,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @UsePipes(new ZodValidationPipe(UserLoginSchema))
   @ApiOperation({
     summary: 'User login',
     description: 'Authenticates user and returns access and refresh tokens',
@@ -114,7 +119,7 @@ export class AuthController {
     },
   })
   @ApiBody({ type: LoginInput })
-  async login(@Body(ValidationPipe) body: LoginInput) {
+  async login(@Body() body: LoginInput) {
     const user = await this.auth.validateUser(body.email, body.password);
     const access_token = await this.auth.signAccessToken({
       sub: user.id,
@@ -138,6 +143,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @UsePipes(new ZodValidationPipe(RefreshTokenSchema))
   @ApiOperation({
     summary: 'Refresh access token',
     description: 'Uses refresh token to generate a new access token',
@@ -166,21 +172,13 @@ export class AuthController {
     },
   })
   @ApiBody({ type: RefreshTokenInput })
-  async refresh(@Body(ValidationPipe) body: RefreshTokenInput) {
-    const valid = await this.auth.isRevoked(body.refresh_token);
-    if (valid) {
-      throw new Error('Token has been revoked');
-    }
-    // In real implementation, decode and validate the refresh token
-    const access_token = await this.auth.signAccessToken({
-      sub: 'placeholder',
-      email: 'placeholder@example.com',
-      role: 'user',
-    });
+  async refresh(@Body() body: RefreshTokenInput) {
+    const access_token = await this.auth.refreshAccessToken(body.refresh_token);
     return { access_token };
   }
 
   @Post('logout')
+  @UsePipes(new ZodValidationPipe(RefreshTokenSchema))
   @ApiOperation({
     summary: 'User logout',
     description: 'Revokes the refresh token to log out the user',
@@ -209,7 +207,7 @@ export class AuthController {
     },
   })
   @ApiBody({ type: RefreshTokenInput })
-  async logout(@Body(ValidationPipe) body: RefreshTokenInput) {
+  async logout(@Body() body: RefreshTokenInput) {
     await this.auth.revokeRefreshToken(body.refresh_token);
     return { message: 'Successfully logged out' };
   }
@@ -286,48 +284,11 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     description: 'Users retrieved successfully',
-    schema: {
-      example: [
-        {
-          id: '1',
-          email: 'user1@example.com',
-          name: 'User One',
-          role: 'user',
-          createdAt: '2023-01-01T00:00:00.000Z',
-          updatedAt: '2023-01-01T00:00:00.000Z',
-        },
-        {
-          id: '2',
-          email: 'admin@example.com',
-          name: 'Admin User',
-          role: 'admin',
-          createdAt: '2023-01-01T00:00:00.000Z',
-          updatedAt: '2023-01-01T00:00:00.000Z',
-        },
-      ],
-    },
+    type: [User],
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   async getUsers() {
-    // This would typically fetch from database
-    return [
-      {
-        id: '1',
-        email: 'user1@example.com',
-        name: 'User One',
-        role: 'user',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: '2',
-        email: 'admin@example.com',
-        name: 'Admin User',
-        role: 'admin',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ];
+    return this.auth.getAllUsers();
   }
 }

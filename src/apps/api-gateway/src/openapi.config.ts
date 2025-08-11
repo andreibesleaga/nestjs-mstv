@@ -32,8 +32,12 @@ export const swaggerConfig = new DocumentBuilder()
   .addTag('Authentication', 'User authentication and authorization endpoints')
   .addTag('Users', 'User management operations')
   .addTag('Health', 'Application health and status endpoints')
-  .addServer('http://localhost:3000', 'Development server')
-  .addServer('https://api.example.com', 'Production server')
+  .addServer(
+    process.env.NODE_ENV === 'production' 
+      ? process.env.API_BASE_URL || 'https://api.yourdomain.com'
+      : `http://localhost:${process.env.PORT || 3000}`,
+    process.env.NODE_ENV === 'production' ? 'Production server' : 'Development server'
+  )
   .setContact('API Support', 'https://example.com/support', 'support@example.com')
   .setLicense('MIT', 'https://opensource.org/licenses/MIT')
   .build();

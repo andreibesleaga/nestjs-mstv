@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { sign } from 'jsonwebtoken';
 import { RedisClient } from './redis.client';
 import * as bcrypt from 'bcrypt';
@@ -9,6 +9,8 @@ import {
   ValidationError,
 } from './exceptions/auth.exceptions';
 import { PrismaService } from '../../../common/prisma.service';
+import { KafkaService } from '../../messaging/src/kafka.service';
+import { BullMQService } from '../../messaging/src/bullmq.service';
 
 @Injectable()
 export class AuthService {
@@ -16,8 +18,9 @@ export class AuthService {
 
   constructor(
     private readonly redis: RedisClient,
-    private readonly prisma: PrismaService
-    // Optionally inject messaging services when they are available
+    private readonly prisma: PrismaService,
+    @Optional() private readonly kafkaService?: KafkaService,
+    @Optional() private readonly bullMQService?: BullMQService
   ) {}
 
   private jwtSecret(): string {
@@ -78,9 +81,14 @@ export class AuthService {
 
       this.logger.log(`User registered successfully: ${user.id}`);
 
-      // Note: Kafka and BullMQ services can be injected when messaging is enabled
-      // Example: await this.kafkaService?.publishUserRegistered(user.id, user.email);
-      // Example: await this.bullMQService?.sendWelcomeEmail(user.email, user.name);
+      // Publish events
+      try {
+        await this.kafkaService?.publishUserRegistered(user.id, user.email, user.name, user.role);
+        await this.kafkaService?.publishEmailWelcome(user.id, user.email, user.name);
+        await this.bullMQService?.sendWelcomeEmail(user.email, user.name);
+      } catch (error) {
+        this.logger.warn('Failed to publish user registration events:', error);
+      }
 
       return user;
     } catch (error) {
@@ -112,6 +120,14 @@ export class AuthService {
       }
 
       this.logger.log(`User validated successfully: ${user.id}`);
+      
+      // Publish login event
+      try {
+        await this.kafkaService?.publishUserLoggedIn(user.id);
+      } catch (error) {
+        this.logger.warn('Failed to publish login event:', error);
+      }
+      
       return user;
     } catch (error) {
       if (error instanceof InvalidCredentialsError) {
@@ -135,22 +151,40 @@ export class AuthService {
     try {
       const exp = new Date();
       exp.setDate(exp.getDate() + this.refreshExpDays());
-      // Generate a temporary token string to store
       const tempToken = sign({ userId, timestamp: Date.now() }, this.jwtSecret());
       const refreshToken = await this.prisma.refreshToken.create({
         data: { userId, token: tempToken, expiresAt: exp },
       });
-      return sign({ tokenId: refreshToken.id }, this.jwtSecret());
+      
+      const token = sign({ tokenId: refreshToken.id }, this.jwtSecret());
+      
+      // Publish token refresh event
+      try {
+        await this.kafkaService?.publishTokenRefreshed(userId, refreshToken.id);
+      } catch (error) {
+        this.logger.warn('Failed to publish token refresh event:', error);
+      }
+      
+      return token;
     } catch (error) {
       this.logger.error('Failed to create refresh token:', error);
       throw new InvalidTokenError('Failed to create refresh token');
     }
   }
 
-  async revokeRefreshToken(token: string) {
+  async revokeRefreshToken(token: string, userId?: string) {
     try {
       await this.redis.set(`revoked_${token}`, 'true');
       this.logger.log(`Refresh token revoked: ${token.substring(0, 10)}...`);
+      
+      // Publish logout event if userId provided
+      if (userId) {
+        try {
+          await this.kafkaService?.publishUserLoggedOut(userId);
+        } catch (error) {
+          this.logger.warn('Failed to publish logout event:', error);
+        }
+      }
     } catch (error) {
       this.logger.error('Failed to revoke token:', error);
       throw new InvalidTokenError('Failed to revoke token');
@@ -164,6 +198,62 @@ export class AuthService {
     } catch (error) {
       this.logger.error('Failed to check token revocation:', error);
       return false;
+    }
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    try {
+      const isRevoked = await this.isRevoked(refreshToken);
+      if (isRevoked) {
+        throw new InvalidTokenError('Token has been revoked');
+      }
+
+      // Find refresh token in database
+      const tokenRecord = await this.prisma.refreshToken.findFirst({
+        where: { token: refreshToken, revoked: false },
+        include: { user: true },
+      });
+
+      if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
+        throw new InvalidTokenError('Invalid or expired refresh token');
+      }
+
+      const access_token = await this.signAccessToken({
+        sub: tokenRecord.user.id,
+        email: tokenRecord.user.email,
+        role: tokenRecord.user.role,
+      });
+
+      // Publish token refresh event
+      try {
+        await this.kafkaService?.publishTokenRefreshed(tokenRecord.user.id, tokenRecord.id);
+      } catch (error) {
+        this.logger.warn('Failed to publish token refresh event:', error);
+      }
+
+      return access_token;
+    } catch (error) {
+      this.logger.error('Failed to refresh access token:', error);
+      throw error;
+    }
+  }
+
+  async getAllUsers() {
+    try {
+      const users = await this.prisma.user.findMany({
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+      return users;
+    } catch (error) {
+      this.logger.error('Failed to get all users:', error);
+      throw error;
     }
   }
 }

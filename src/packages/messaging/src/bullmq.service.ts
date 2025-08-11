@@ -1,6 +1,6 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { Queue, Worker, Job } from 'bullmq';
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 
 export interface EmailJobData {
   to: string;
@@ -10,47 +10,68 @@ export interface EmailJobData {
 
 @Injectable()
 export class BullMQService implements OnModuleInit {
+  private readonly logger = new Logger(BullMQService.name);
   private redis: Redis;
   private emailQueue: Queue;
   private emailWorker: Worker;
 
   constructor() {
-    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+    if (process.env.NODE_ENV === 'test') {
+      this.logger.warn('BullMQ disabled in test environment');
+      return;
+    }
 
-    this.emailQueue = new Queue('email', {
-      connection: this.redis,
-    });
+    try {
+      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+      this.emailQueue = new Queue('email', {
+        connection: this.redis,
+      });
+    } catch (error) {
+      this.logger.error('Failed to initialize BullMQ:', error.message);
+    }
   }
 
   async onModuleInit() {
-    // Create worker to process email jobs
-    this.emailWorker = new Worker(
-      'email',
-      async (job: Job<EmailJobData>) => {
-        console.log(
-          `Processing email job ${job.id} for recipient: ${job.data.to.replace(/(.{3}).*@/, '$1***@')}`
-        );
+    if (process.env.NODE_ENV === 'test' || !this.redis) {
+      return;
+    }
 
-        // Simulate email sending
-        await this.sendEmail(job.data);
+    try {
+      // Create worker to process email jobs
+      this.emailWorker = new Worker(
+        'email',
+        async (job: Job<EmailJobData>) => {
+          this.logger.log(
+            `Processing email job ${job.id} for recipient: ${job.data.to.replace(/(.{3}).*@/, '$1***@')}`
+          );
 
-        console.log(`Email job ${job.id} completed`);
-      },
-      {
-        connection: this.redis,
-      }
-    );
+          // Simulate email sending
+          await this.sendEmail(job.data);
 
-    this.emailWorker.on('completed', (job) => {
-      console.log(`Email job ${job.id} has completed`);
-    });
+          this.logger.log(`Email job ${job.id} completed`);
+        },
+        {
+          connection: this.redis,
+        }
+      );
 
-    this.emailWorker.on('failed', (job, err) => {
-      console.log(`Email job ${job?.id} has failed with error:`, err.message);
-    });
+      this.emailWorker.on('completed', (job) => {
+        this.logger.log(`Email job ${job.id} has completed`);
+      });
+
+      this.emailWorker.on('failed', (job, err) => {
+        this.logger.error(`Email job ${job?.id} has failed with error:`, err.message);
+      });
+    } catch (error) {
+      this.logger.error('Failed to initialize BullMQ worker:', error.message);
+    }
   }
 
   async addEmailJob(emailData: EmailJobData, delay?: number) {
+    if (!this.emailQueue) {
+      this.logger.warn('Email queue not available - email job skipped');
+      return null;
+    }
     return this.emailQueue.add('send-email', emailData, {
       delay,
       removeOnComplete: 100,
@@ -74,17 +95,25 @@ export class BullMQService implements OnModuleInit {
     });
   }
 
+  async sendVerificationEmail(email: string, verificationToken: string) {
+    return this.addEmailJob({
+      to: email,
+      subject: 'Email Verification',
+      body: `Click here to verify your email: /verify-email?token=${verificationToken}`,
+    });
+  }
+
   private async sendEmail(data: EmailJobData) {
     // Simulate email sending delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // In real implementation, you would use a service like SendGrid, Mailgun, etc.
-    console.log(
-      '📧 Email sent to:',
-      data.to.replace(/(.{3}).*@/, '$1***@'),
-      'Subject:',
-      data.subject
+    // Email service integration point - configure with SendGrid, Mailgun, SES, etc.
+    this.logger.log(
+      `📧 Email processed: ${data.to.replace(/(.{3}).*@/, '$1***@')} - ${data.subject}`
     );
+    
+    // TODO: Replace with actual email service implementation
+    // Example: await this.emailProvider.send(data);
   }
 
   async getQueueStats() {

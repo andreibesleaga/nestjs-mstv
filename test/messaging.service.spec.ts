@@ -15,12 +15,14 @@ describe('KafkaService', () => {
   it('should publish user registered event', async () => {
     const spy = jest.spyOn(service, 'publishMessage').mockResolvedValue(undefined);
 
-    await service.publishUserRegistered('user123', 'test@example.com');
+    await service.publishUserRegistered('user123', 'test@example.com', 'Test User', 'user');
 
     expect(spy).toHaveBeenCalledWith('user.events', {
       event: 'user.registered',
       userId: 'user123',
       email: 'test@example.com',
+      name: 'Test User',
+      role: 'user',
       timestamp: expect.any(String),
     });
   });
@@ -30,9 +32,12 @@ describe('KafkaService', () => {
 
     await service.publishUserLoggedIn('user123');
 
-    expect(spy).toHaveBeenCalledWith('user.events', {
+    expect(spy).toHaveBeenCalledWith('auth.events', {
       event: 'user.logged_in',
       userId: 'user123',
+      sessionId: undefined,
+      ipAddress: undefined,
+      userAgent: undefined,
       timestamp: expect.any(String),
     });
   });

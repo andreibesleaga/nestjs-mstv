@@ -34,7 +34,8 @@ type Query {
   me: User!
   users: [User!]!
   getAllUsers: [User!]!
-  getUser(id: ID!): User
+  getUser(id: String!): User
+  user(id: String!): User
 }
 
 type Mutation {
@@ -42,7 +43,7 @@ type Mutation {
   login(input: LoginInput!): AuthPayload!
   refreshToken(input: RefreshTokenInput!): RefreshPayload!
   logout(input: RefreshTokenInput!): LogoutPayload!
-  deleteUser(id: ID!): Boolean!
+  deleteUser(id: String!): Boolean!
 }
 
 input RegisterInput {

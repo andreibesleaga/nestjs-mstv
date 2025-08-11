@@ -1,10 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { HealthResponseSchema } from '../../../schemas/openapi.schemas';
+import { HealthService } from '../../../common/health.service';
 
 @ApiTags('Health')
 @Controller('health')
 export class HealthController {
+  constructor(private readonly healthService: HealthService) {}
+
   @Get()
   @ApiOperation({
     summary: 'Health check',
@@ -15,13 +18,8 @@ export class HealthController {
     description: 'Application is healthy',
     type: HealthResponseSchema,
   })
-  getHealth() {
-    return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      version: process.env.npm_package_version || '1.0.0',
-    };
+  async getHealth() {
+    return this.healthService.getDetailedHealth();
   }
 
   @Get('ready')

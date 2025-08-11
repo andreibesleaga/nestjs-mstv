@@ -1,4 +1,3 @@
-
 version: '3.8'
 services:
   db:
@@ -11,25 +10,28 @@ services:
       - '5432:5432'
     volumes:
       - db-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dev"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
+  mongodb:
+    image: mongo:7
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: dev
+      MONGO_INITDB_ROOT_PASSWORD: dev
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+
   redis:
     image: redis:7
     ports:
       - '6379:6379'
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.1
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+
   kafka:
     image: confluentinc/cp-kafka:7.4.1
     environment:
@@ -38,26 +40,46 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
+    ports:
+      - '9092:9092'
+
+  consul:
+    image: consul:1.15
+    ports:
+      - '8500:8500'
+    command: consul agent -dev -client=0.0.0.0
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.45
+    ports:
+      - '16686:16686'
+      - '14268:14268'
+    environment:
+      COLLECTOR_OTLP_ENABLED: true
+
   api:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    command: pnpm start:dev
     ports:
       - '3000:3000'
     environment:
       DATABASE_URL: postgresql://dev:dev@db:5432/dev
+      MONGODB_URL: mongodb://dev:dev@mongodb:27017/nestjs-app
       REDIS_URL: redis://redis:6379
       KAFKA_BROKERS: kafka:9092
-      JWT_SECRET: ${JWT_SECRET:-development-secret-change-in-production}
+      CONSUL_HOST: consul
+      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
+      JWT_SECRET: ${JWT_SECRET:-development-secret}
       NODE_ENV: development
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      kafka:
-        condition: service_started
+      - db
+      - mongodb
+      - redis
+      - kafka
+      - consul
+      - jaeger
 
 volumes:
   db-data:
+  mongo-data:

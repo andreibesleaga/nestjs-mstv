@@ -5,6 +5,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from '../../../packages/auth/src/filters/global-exception.filter';
+import { HttpsService } from '../../../protocols/https.service';
 import {
   UserSchema,
   LoginResponseSchema,
@@ -15,12 +16,16 @@ import {
 } from '../../../schemas/openapi.schemas';
 
 async function bootstrap() {
+  const httpsService = new HttpsService();
+  const httpsOptions = httpsService.getHttpsOptions();
+  
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({
       logger: true,
       trustProxy: true,
       bodyLimit: parseInt(process.env.BODY_LIMIT || '1048576', 10),
+      https: httpsOptions,
     })
   );
 
@@ -131,10 +136,27 @@ async function bootstrap() {
   const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
   await app.listen(port, host);
 
-  console.log(`🚀 API Gateway (Fastify) running on port ${port}`);
-  console.log(`📖 REST API Documentation: http://localhost:${port}/api`);
-  console.log(`🚀 GraphQL Playground: http://localhost:${port}/graphql`);
-  console.log(`📋 OpenAPI JSON: http://localhost:${port}/api-json`);
+  // Graceful shutdown
+  process.on('SIGTERM', async () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    await app.close();
+    process.exit(0);
+  });
+
+  process.on('SIGINT', async () => {
+    console.log('SIGINT received, shutting down gracefully');
+    await app.close();
+    process.exit(0);
+  });
+
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? process.env.API_BASE_URL || `https://api.yourdomain.com`
+    : `http://${host}:${port}`;
+    
+  console.log(`🚀 API Gateway (Fastify) running on ${host}:${port}`);
+  console.log(`📖 REST API Documentation: ${baseUrl}/api`);
+  console.log(`🚀 GraphQL Playground: ${baseUrl}/graphql`);
+  console.log(`📋 OpenAPI JSON: ${baseUrl}/api-json`);
   console.log(`📊 GraphQL Schema: Auto-generated from resolvers`);
   console.log(`📨 Kafka Schemas: Available in /src/schemas/kafka.schemas.ts`);
 }
