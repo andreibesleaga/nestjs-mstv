@@ -6,6 +6,7 @@ import { UpdateUserCommand } from '../commands/update-user.command';
 import { UserUpdatedEvent } from '../events/user-updated.event';
 import { IUserRepository } from '../../../../../packages/packs/src/repositories/user.repository';
 import { User } from '../../domain/user.entity';
+import { Email } from '../../domain/value-objects';
 
 @Injectable()
 @CommandHandler(UpdateUserCommand)
@@ -16,8 +17,8 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand, Use
   ) {}
 
   async execute(command: UpdateUserCommand): Promise<User> {
-    const updateData: Partial<User> = {};
-    if (command.email) updateData.email = command.email;
+    const updateData: any = {};
+    if (command.email) updateData.email = new Email(command.email);
     if (command.name !== undefined) updateData.name = command.name;
     if (command.role) updateData.role = command.role;
 
