@@ -6,7 +6,7 @@ let prisma: PrismaClient;
 
 beforeAll(async () => {
   process.env.NODE_ENV = 'test';
-  process.env.DATABASE_URL = 'file:./test-e2e.db';
+  process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
   process.env.JWT_SECRET = 'test-jwt-secret-e2e';
   process.env.REDIS_URL = 'redis://localhost:6379';
 

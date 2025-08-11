@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { UsersModule } from '../../../modules/users/src/interface/users.module';
 import { AuthModule } from '../../../packages/auth/src/auth.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -29,5 +30,6 @@ import { AuthModule } from '../../../packages/auth/src/auth.module';
     AuthModule,
     UsersModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}

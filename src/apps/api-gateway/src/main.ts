@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from '../../../packages/auth/src/filters/global-exception.filter';
 
 async function bootstrap() {
@@ -12,7 +12,7 @@ async function bootstrap() {
     new FastifyAdapter({ logger: true })
   );
 
-  await app.register(import('@fastify/cors'), {
+  await app.register(require('@fastify/cors'), {
     origin: true,
   });
 
@@ -32,32 +32,14 @@ async function bootstrap() {
   app.useGlobalFilters(new GlobalExceptionFilter());
 
   // Swagger/OpenAPI setup
-  const config = new DocumentBuilder()
-    .setTitle('NestJS DDD Template API')
-    .setDescription('Full-featured NestJS API with DDD, Clean Architecture, GraphQL, and REST')
-    .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT token',
-        in: 'header',
-      },
-      'JWT-auth'
-    )
-    .addTag('Authentication', 'User authentication and authorization')
-    .addTag('Users', 'User management operations')
-    .addServer('http://localhost:3000', 'Development server')
-    .addServer('https://api.example.com', 'Production server')
-    .build();
+  const { swaggerConfig } = await import('./openapi.config');
+  const config = swaggerConfig;
 
   const document = SwaggerModule.createDocument(app, config);
-  await app.register(import('@fastify/swagger'), {
+  await app.register(require('@fastify/swagger'), {
     swagger: document,
   });
-  await app.register(import('@fastify/swagger-ui'), {
+  await app.register(require('@fastify/swagger-ui'), {
     routePrefix: '/api',
     uiConfig: {
       persistAuthorization: true,
