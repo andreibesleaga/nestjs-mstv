@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { HealthResponseSchema } from '../schemas/openapi.schemas';
+import { HealthResponseSchema } from '../../schemas/openapi.schemas';
 
 @ApiTags('Health')
 @Controller('health')
