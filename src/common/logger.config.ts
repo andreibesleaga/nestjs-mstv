@@ -1,5 +1,5 @@
 import { LoggerService } from '@nestjs/common';
-import * as pino from 'pino';
+import pino from 'pino';
 
 export class CustomLogger implements LoggerService {
   private logger: pino.Logger;
