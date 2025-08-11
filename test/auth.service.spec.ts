@@ -1,17 +1,23 @@
+import { AuthService } from '../src/packages/auth/src/auth.service';
+import { RedisClient } from '../src/packages/auth/src/redis.client';
 
-import { AuthService } from '../packages/auth/src/auth.service';
-import { RedisClient } from '../packages/auth/src/redis.client';
+// Mock bcrypt
+jest.mock('bcrypt', () => ({
+  hash: jest.fn().mockResolvedValue('hashedPassword'),
+  compare: jest.fn().mockResolvedValue(true),
+}));
 
 jest.mock('@prisma/client', () => {
   const mockUser = {
     id: '1',
     email: 'u@example.com',
     name: 'U',
-    passwordHash: 'hashedPassword',
+    password: 'hashedPassword',
+    role: 'user',
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  
+
   const m = {
     user: {
       findUnique: jest.fn().mockResolvedValue(null),

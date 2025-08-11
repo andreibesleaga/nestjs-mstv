@@ -1,0 +1,7 @@
+packages:
+  - src/apps/*
+  - src/packages/*
+  - src/modules/*
+
+onlyBuiltDependencies:
+  - bcrypt

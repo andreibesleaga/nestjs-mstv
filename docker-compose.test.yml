@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  db-test:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    ports:
+      - '5433:5432'
+    volumes:
+      - test-db-data:/var/lib/postgresql/data
+  
+  redis-test:
+    image: redis:7
+    ports:
+      - '6380:6379'
+  
+  app-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://test:test@db-test:5432/test
+      REDIS_URL: redis://redis-test:6379
+      JWT_SECRET: test-secret
+      NODE_ENV: test
+    ports:
+      - '3001:3000'
+    depends_on:
+      - db-test
+      - redis-test
+    command: >
+      sh -c "
+        pnpm prisma:generate &&
+        pnpm prisma migrate deploy &&
+        pnpm test:e2e
+      "
+
+volumes:
+  test-db-data:

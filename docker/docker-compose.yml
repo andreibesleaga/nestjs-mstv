@@ -25,7 +25,9 @@ services:
     depends_on:
       - zookeeper
   api:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     command: pnpm start:dev
     ports:
       - '3000:3000'
@@ -34,8 +36,10 @@ services:
       - redis
       - kafka
   worker:
-    build: .
-    command: node dist/apps/worker/src/worker.js
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: node dist/src/apps/worker/src/worker.js
     depends_on:
       - redis
       - kafka

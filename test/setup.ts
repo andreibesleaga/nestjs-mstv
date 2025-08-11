@@ -7,11 +7,12 @@ jest.mock('@prisma/client', () => {
     id: '1',
     email: 'test@example.com',
     name: 'Test User',
-    passwordHash: 'hashedPassword',
+    password: 'hashedPassword',
+    role: 'user',
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  
+
   const mockPrisma = {
     user: {
       findUnique: jest.fn().mockResolvedValue(null),
@@ -25,7 +26,7 @@ jest.mock('@prisma/client', () => {
     },
     $disconnect: jest.fn(),
   };
-  
+
   return { PrismaClient: jest.fn(() => mockPrisma) };
 });
 
@@ -75,3 +76,8 @@ jest.mock('ioredis', () => {
     quit: jest.fn(),
   }));
 });
+
+jest.mock('bcrypt', () => ({
+  hash: jest.fn().mockResolvedValue('hashedPassword'),
+  compare: jest.fn().mockResolvedValue(true),
+}));

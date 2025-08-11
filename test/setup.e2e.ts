@@ -1,13 +1,13 @@
-import { PrismaClient } from '@prisma/client';
+import 'reflect-metadata';
 import { execSync } from 'child_process';
+import { PrismaClient } from '@prisma/client';
 
 let prisma: PrismaClient;
 
 beforeAll(async () => {
-  // Setup test environment
   process.env.NODE_ENV = 'test';
-  process.env.DATABASE_URL = 'file:./test.db';
-  process.env.JWT_SECRET = 'test-jwt-secret';
+  process.env.DATABASE_URL = 'file:./test-e2e.db';
+  process.env.JWT_SECRET = 'test-jwt-secret-e2e';
   process.env.REDIS_URL = 'redis://localhost:6379';
 
   // Initialize Prisma client for tests
@@ -44,5 +44,5 @@ afterAll(async () => {
   await prisma.$disconnect();
 });
 
-// Export for use in integration tests
+// Export for use in e2e tests
 export { prisma };

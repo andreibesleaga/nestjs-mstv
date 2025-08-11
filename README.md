@@ -1,17 +1,17 @@
-# NestJS DDD + Clean Architecture Template
+# NestJS Clean Architecture Template
 
 This repo contains a full scaffold implementing:
+
 - **DDD/Clean Architecture structure** - Domain entities, value objects, repositories
 - **Prisma persistence for Users** - With migrations and seed scripts
 - **Complete Auth flows** - register, login, refresh, logout with Redis revocation and hashed passwords
 - **CASL-based authorization** - Policies and guard hooks for role-based access control
 - **Kafka producer/consumer stubs** - Message publishing for user events
 - **BullMQ worker** - Background job processing for emails
-- **Full REST + GraphQL APIs** - Unified API gateway with both REST endpoints and GraphQL resolvers
+- **Full REST + GraphQL APIs** - Unified Fastify-based API gateway with both REST endpoints and GraphQL resolvers
 - **OpenAPI/Swagger documentation** - Complete API documentation with interactive UI
 - **Comprehensive test suites** - Unit and integration tests with proper mocking
 - **Helm chart + GitHub Actions CD** - Ready for AWS/EKS or Azure/AKS deployment
-
 
 ## Contents & Quick Start
 
@@ -51,11 +51,13 @@ Tokens are JWT signed. Refresh tokens are stored on client; revocation is implem
 ## API Access
 
 ### REST API
+
 - **Base URL**: `http://localhost:3000`
 - **Documentation**: `http://localhost:3000/api` (Swagger UI)
 - **OpenAPI Spec**: `http://localhost:3000/api-json`
 
-### GraphQL API  
+### GraphQL API
+
 - **Endpoint**: `http://localhost:3000/graphql`
 - **Playground**: `http://localhost:3000/graphql` (development mode)
 - **Schema**: Auto-generated from resolvers
@@ -63,6 +65,7 @@ Tokens are JWT signed. Refresh tokens are stored on client; revocation is implem
 ## API Examples
 
 ### REST Endpoints
+
 ```bash
 # Register user
 curl -X POST http://localhost:3000/auth/register \
@@ -80,14 +83,11 @@ curl -X GET http://localhost:3000/auth/profile \
 ```
 
 ### GraphQL Queries
+
 ```graphql
 # Register user
 mutation {
-  register(input: {
-    email: "user@example.com"
-    password: "password123"
-    name: "John Doe"
-  }) {
+  register(input: { email: "user@example.com", password: "password123", name: "John Doe" }) {
     id
     email
     name
@@ -97,10 +97,7 @@ mutation {
 
 # Login
 mutation {
-  login(input: {
-    email: "user@example.com"
-    password: "password123"
-  }) {
+  login(input: { email: "user@example.com", password: "password123" }) {
     access_token
     refresh_token
     user {
@@ -133,4 +130,3 @@ query {
   }
 }
 ```
-
