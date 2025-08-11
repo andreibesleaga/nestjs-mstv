@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS "User" (
   name TEXT,
   password TEXT,
   role TEXT DEFAULT 'user',
-  "createdAt" TIMESTAMP DEFAULT now()
+  "createdAt" TIMESTAMP DEFAULT now(),
+  "updatedAt" TIMESTAMP DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS "RefreshToken" (
@@ -14,5 +15,6 @@ CREATE TABLE IF NOT EXISTS "RefreshToken" (
   "userId" TEXT REFERENCES "User"(id) ON DELETE CASCADE,
   revoked BOOLEAN DEFAULT false,
   "expiresAt" TIMESTAMP NOT NULL,
-  "createdAt" TIMESTAMP DEFAULT now()
+  "createdAt" TIMESTAMP DEFAULT now(),
+  "updatedAt" TIMESTAMP DEFAULT now()
 );

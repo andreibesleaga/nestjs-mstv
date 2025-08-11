@@ -60,7 +60,10 @@ describe('CASL Authorization', () => {
       expect(result).toBe(true);
     });
 
-    it('should deny access when user is not present', async () => {
+    it('should handle missing user context', async () => {
+      const originalEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production'; // Temporarily set to non-test env
+
       const context = {
         getHandler: () => ({}),
         switchToHttp: () => ({
@@ -72,6 +75,8 @@ describe('CASL Authorization', () => {
 
       const result = await guard.canActivate(context);
       expect(result).toBe(false);
+
+      process.env.NODE_ENV = originalEnv; // Restore original env
     });
   });
 });

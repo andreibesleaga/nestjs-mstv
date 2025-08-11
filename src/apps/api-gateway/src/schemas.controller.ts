@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { GraphQLSchemaDocumentation } from '../../schemas/graphql.schemas';
-import { KafkaMessageSchemas } from '../../schemas/kafka.schemas';
-import { SchemaEndpoints } from '../../schemas';
+import { GraphQLSchemaDocumentation } from '../../../schemas/graphql.schemas';
+import { KafkaMessageSchemas } from '../../../schemas/kafka.schemas';
+import { SchemaEndpoints } from '../../../schemas';
 
 @ApiTags('Schemas')
 @Controller('schemas')

@@ -6,6 +6,7 @@ import { join } from 'path';
 import { UsersModule } from '../../../modules/users/src/interface/users.module';
 import { AuthModule } from '../../../packages/auth/src/auth.module';
 import { HealthController } from './health.controller';
+import { SchemasController } from './schemas.controller';
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { HealthController } from './health.controller';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: join(process.cwd(), 'src/schemas/schema.gql'),
       playground: process.env.NODE_ENV === 'development',
       introspection: true,
       context: ({ req }) => ({ req }),
@@ -30,6 +31,6 @@ import { HealthController } from './health.controller';
     AuthModule,
     UsersModule,
   ],
-  controllers: [HealthController],
+  controllers: [HealthController, SchemasController],
 })
 export class AppModule {}
