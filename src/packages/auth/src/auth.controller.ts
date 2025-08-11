@@ -1,11 +1,15 @@
-import { Controller, Post, Body, UseGuards, Get, Request, ValidationPipe, UsePipes } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get, Request, UsePipes } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CheckPolicies, PoliciesGuard } from './policies.guard';
 import { AppAbility } from './abilities/user.ability';
 import { RegisterInput, LoginInput, RefreshTokenInput, User } from './dto/auth.dto';
 import { ZodValidationPipe } from '../../../common/zod-validation.pipe';
-import { UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema } from '../../../common/validation.schemas';
+import {
+  UserRegistrationSchema,
+  UserLoginSchema,
+  RefreshTokenSchema,
+} from '../../../common/validation.schemas';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -41,7 +45,10 @@ export class AuthController {
         error: {
           code: 'VALIDATION_ERROR',
           message: 'Input validation failed',
-          details: ['email: Invalid email format', 'password: Password must be at least 6 characters'],
+          details: [
+            'email: Invalid email format',
+            'password: Password must be at least 6 characters',
+          ],
           statusCode: 400,
           timestamp: '2023-01-01T00:00:00.000Z',
           path: '/auth/register',

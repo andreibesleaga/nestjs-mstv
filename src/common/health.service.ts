@@ -35,23 +35,31 @@ export class HealthService {
   }
 
   async getDetailedHealth() {
-    const [database, redis] = await Promise.all([
-      this.checkDatabase(),
-      this.checkRedis(),
-    ]);
+    try {
+      const [database, redis] = await Promise.all([this.checkDatabase(), this.checkRedis()]);
 
-    const overall = database.status === 'healthy' && redis.status === 'healthy' 
-      ? 'healthy' : 'unhealthy';
+      const overall =
+        database.status === 'healthy' && redis.status === 'healthy' ? 'healthy' : 'unhealthy';
 
-    return {
-      status: overall,
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      version: process.env.npm_package_version || '1.0.0',
-      checks: {
-        database,
-        redis,
-      },
-    };
+      return {
+        status: overall,
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        version: process.env.npm_package_version || '1.0.0',
+        checks: {
+          database,
+          redis,
+        },
+      };
+    } catch (error) {
+      this.logger.error('Health check failed:', error);
+      return {
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        version: process.env.npm_package_version || '1.0.0',
+        error: 'Health check failed',
+      };
+    }
   }
 }

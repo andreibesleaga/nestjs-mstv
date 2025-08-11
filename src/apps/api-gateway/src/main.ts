@@ -18,7 +18,7 @@ import {
 async function bootstrap() {
   const httpsService = new HttpsService();
   const httpsOptions = httpsService.getHttpsOptions();
-  
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({
@@ -140,19 +140,18 @@ async function bootstrap() {
   process.on('SIGTERM', async () => {
     console.log('SIGTERM received, shutting down gracefully');
     await app.close();
-    process.exit(0);
   });
 
   process.on('SIGINT', async () => {
     console.log('SIGINT received, shutting down gracefully');
     await app.close();
-    process.exit(0);
   });
 
-  const baseUrl = process.env.NODE_ENV === 'production' 
-    ? process.env.API_BASE_URL || `https://api.yourdomain.com`
-    : `http://${host}:${port}`;
-    
+  const baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? process.env.API_BASE_URL || `https://api.yourdomain.com`
+      : `http://${host}:${port}`;
+
   console.log(`🚀 API Gateway (Fastify) running on ${host}:${port}`);
   console.log(`📖 REST API Documentation: ${baseUrl}/api`);
   console.log(`🚀 GraphQL Playground: ${baseUrl}/graphql`);

@@ -3,17 +3,21 @@ import { UseGuards, UsePipes } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { CheckPolicies, PoliciesGuard } from '../policies.guard';
 import { AppAbility } from '../abilities/user.ability';
-import { 
-  User, 
-  AuthPayload, 
-  RefreshPayload, 
+import {
+  User,
+  AuthPayload,
+  RefreshPayload,
   LogoutPayload,
-  RegisterInput, 
-  LoginInput, 
-  RefreshTokenInput 
+  RegisterInput,
+  LoginInput,
+  RefreshTokenInput,
 } from '../dto/auth.dto';
 import { ZodValidationPipe } from '../../../../common/zod-validation.pipe';
-import { UserRegistrationSchema, UserLoginSchema, RefreshTokenSchema } from '../../../../common/validation.schemas';
+import {
+  UserRegistrationSchema,
+  UserLoginSchema,
+  RefreshTokenSchema,
+} from '../../../../common/validation.schemas';
 
 @Resolver()
 export class AuthResolver {
@@ -98,13 +102,13 @@ export class AuthResolver {
   @CheckPolicies((ability: AppAbility) => ability.can('read', 'all'))
   async getUser(@Args('id') id: string): Promise<User | null> {
     const users = await this.authService.getAllUsers();
-    return users.find(user => user.id === id) || null;
+    return users.find((user) => user.id === id) || null;
   }
 
   @Mutation(() => Boolean)
   @UseGuards(PoliciesGuard)
   @CheckPolicies((ability: AppAbility) => ability.can('delete', 'all'))
-  async deleteUser(@Args('id') id: string): Promise<boolean> {
+  async deleteUser(@Args('id') _id: string): Promise<boolean> {
     // Implementation would go here
     return true;
   }

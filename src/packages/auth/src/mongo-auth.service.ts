@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Collection } from 'mongodb';
 import { MongoDbService } from '../../../common/mongodb.service';
-import * as bcrypt from 'bcrypt';
 
 interface RefreshTokenDocument {
   _id?: string;
@@ -19,10 +18,16 @@ export class MongoAuthService {
   private refreshTokens: Collection<RefreshTokenDocument>;
 
   constructor(private readonly mongoService: MongoDbService) {
-    this.refreshTokens = this.mongoService.getDb().collection<RefreshTokenDocument>('refresh_tokens');
+    this.refreshTokens = this.mongoService
+      .getDb()
+      .collection<RefreshTokenDocument>('refresh_tokens');
   }
 
-  async createRefreshToken(userId: string, token: string, expiresAt: Date): Promise<RefreshTokenDocument> {
+  async createRefreshToken(
+    userId: string,
+    token: string,
+    expiresAt: Date
+  ): Promise<RefreshTokenDocument> {
     const refreshToken: RefreshTokenDocument = {
       _id: new Date().getTime().toString(),
       token,
@@ -44,20 +49,20 @@ export class MongoAuthService {
   async revokeRefreshToken(token: string): Promise<void> {
     await this.refreshTokens.updateOne(
       { token },
-      { 
-        $set: { 
-          revoked: true, 
-          updatedAt: new Date() 
-        } 
+      {
+        $set: {
+          revoked: true,
+          updatedAt: new Date(),
+        },
       }
     );
   }
 
   async cleanupExpiredTokens(): Promise<void> {
     const result = await this.refreshTokens.deleteMany({
-      expiresAt: { $lt: new Date() }
+      expiresAt: { $lt: new Date() },
     });
-    
+
     if (result.deletedCount > 0) {
       this.logger.log(`Cleaned up ${result.deletedCount} expired refresh tokens`);
     }

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
+import { GrpcMethod } from '@nestjs/microservices';
 import { AuthService } from '../../packages/auth/src/auth.service';
 
 interface GetUserRequest {
@@ -36,7 +36,7 @@ export class GrpcUserService {
   @GrpcMethod('UserService', 'GetUser')
   async getUser(data: GetUserRequest): Promise<UserResponse> {
     this.logger.log(`gRPC GetUser: ${data.id}`);
-    
+
     // Mock response - integrate with actual user service
     return {
       id: data.id,
@@ -50,7 +50,7 @@ export class GrpcUserService {
   @GrpcMethod('UserService', 'CreateUser')
   async createUser(data: CreateUserRequest): Promise<UserResponse> {
     this.logger.log(`gRPC CreateUser: ${data.email}`);
-    
+
     try {
       const user = await this.authService.register(data.email, data.password, data.name);
       return {
@@ -69,11 +69,11 @@ export class GrpcUserService {
   @GrpcMethod('UserService', 'ListUsers')
   async listUsers(data: ListUsersRequest) {
     this.logger.log(`gRPC ListUsers: page=${data.page}, limit=${data.limit}`);
-    
+
     try {
       const users = await this.authService.getAllUsers();
       return {
-        users: users.map(user => ({
+        users: users.map((user) => ({
           id: user.id,
           email: user.email,
           name: user.name || '',

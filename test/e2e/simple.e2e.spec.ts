@@ -80,8 +80,8 @@ describe('Simple E2E Tests', () => {
       return request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: 'test@example.com',
-          password: 'password123',
+          email: process.env.TEST_EMAIL || 'test@example.com',
+          password: process.env.TEST_PASSWORD || 'password123',
           name: 'Test User',
         })
         .expect((res) => {
@@ -93,8 +93,8 @@ describe('Simple E2E Tests', () => {
       return request(app.getHttpServer())
         .post('/auth/login')
         .send({
-          email: 'test@example.com',
-          password: 'password123',
+          email: process.env.TEST_EMAIL || 'test@example.com',
+          password: process.env.TEST_PASSWORD || 'password123',
         })
         .expect((res) => {
           expect([200, 201, 401, 500].includes(res.status)).toBe(true);

@@ -25,7 +25,7 @@ export class AuthService {
 
   private jwtSecret(): string {
     const secret = process.env.JWT_SECRET;
-    if (!secret || secret === 'changeme') {
+    if (!secret || this.isDefaultSecret(secret)) {
       if (process.env.NODE_ENV === 'production') {
         throw new Error('JWT_SECRET must be set in production environment');
       }
@@ -33,6 +33,13 @@ export class AuthService {
       return 'changeme';
     }
     return secret;
+  }
+
+  private isDefaultSecret(secret: string): boolean {
+    const defaultSecret = Buffer.from('changeme');
+    const providedSecret = Buffer.from(secret);
+    if (defaultSecret.length !== providedSecret.length) return false;
+    return require('crypto').timingSafeEqual(defaultSecret, providedSecret);
   }
   private accessExp(): string {
     return process.env.ACCESS_TOKEN_EXP || '15m';
@@ -120,14 +127,14 @@ export class AuthService {
       }
 
       this.logger.log(`User validated successfully: ${user.id}`);
-      
+
       // Publish login event
       try {
         await this.kafkaService?.publishUserLoggedIn(user.id);
       } catch (error) {
         this.logger.warn('Failed to publish login event:', error);
       }
-      
+
       return user;
     } catch (error) {
       if (error instanceof InvalidCredentialsError) {
@@ -155,16 +162,16 @@ export class AuthService {
       const refreshToken = await this.prisma.refreshToken.create({
         data: { userId, token: tempToken, expiresAt: exp },
       });
-      
+
       const token = sign({ tokenId: refreshToken.id }, this.jwtSecret());
-      
+
       // Publish token refresh event
       try {
         await this.kafkaService?.publishTokenRefreshed(userId, refreshToken.id);
       } catch (error) {
         this.logger.warn('Failed to publish token refresh event:', error);
       }
-      
+
       return token;
     } catch (error) {
       this.logger.error('Failed to create refresh token:', error);
@@ -176,7 +183,7 @@ export class AuthService {
     try {
       await this.redis.set(`revoked_${token}`, 'true');
       this.logger.log(`Refresh token revoked: ${token.substring(0, 10)}...`);
-      
+
       // Publish logout event if userId provided
       if (userId) {
         try {

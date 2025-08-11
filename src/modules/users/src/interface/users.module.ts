@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '../../../../common/cqrs/cqrs.module';
 import { UsersController } from './users.controller';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from '../application/users.service';
@@ -7,19 +8,26 @@ import { MongoUserRepo } from '../infrastructure/mongo-user.repo';
 import { PrismaService } from '../../../../common/prisma.service';
 import { MongoDbService } from '../../../../common/mongodb.service';
 import { DatabaseConfig } from '../../../../common/database.config';
+import { CreateUserHandler } from '../cqrs/handlers/create-user.handler';
+import { GetUserHandler } from '../cqrs/handlers/get-user.handler';
+import { GetAllUsersHandler } from '../cqrs/handlers/get-all-users.handler';
 
 @Module({
+  imports: [CqrsModule],
   controllers: [UsersController],
   providers: [
     PrismaService,
     MongoDbService,
     UsersService,
     UsersResolver,
+    CreateUserHandler,
+    GetUserHandler,
+    GetAllUsersHandler,
     {
       provide: 'IUserRepository',
       useFactory: (prismaService: PrismaService, mongoService: MongoDbService) => {
-        return DatabaseConfig.isMongoDb() 
-          ? new MongoUserRepo(mongoService) 
+        return DatabaseConfig.isMongoDb()
+          ? new MongoUserRepo(mongoService)
           : new PrismaUserRepo(prismaService);
       },
       inject: [PrismaService, MongoDbService],
