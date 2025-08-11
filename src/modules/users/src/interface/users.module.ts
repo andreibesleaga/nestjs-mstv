@@ -9,6 +9,8 @@ import { PrismaService } from '../../../../common/prisma.service';
 import { MongoDbService } from '../../../../common/mongodb.service';
 import { DatabaseConfig } from '../../../../common/database.config';
 import { CreateUserHandler } from '../cqrs/handlers/create-user.handler';
+import { UpdateUserHandler } from '../cqrs/handlers/update-user.handler';
+import { DeleteUserHandler } from '../cqrs/handlers/delete-user.handler';
 import { GetUserHandler } from '../cqrs/handlers/get-user.handler';
 import { GetAllUsersHandler } from '../cqrs/handlers/get-all-users.handler';
 
@@ -21,6 +23,8 @@ import { GetAllUsersHandler } from '../cqrs/handlers/get-all-users.handler';
     UsersService,
     UsersResolver,
     CreateUserHandler,
+    UpdateUserHandler,
+    DeleteUserHandler,
     GetUserHandler,
     GetAllUsersHandler,
     {

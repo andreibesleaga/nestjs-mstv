@@ -1,11 +1,8 @@
 
 FROM node:20-alpine
 
-# Install build dependencies for native modules and OpenSSL compatibility
-RUN apk add --no-cache python3 make g++ openssl1.1-compat
-
-# Set OpenSSL environment variable for Prisma
-ENV OPENSSL_ROOT_DIR=/usr
+# Install build dependencies for native modules and OpenSSL
+RUN apk add --no-cache python3 make g++ openssl openssl-dev
 
 # Install pnpm
 RUN npm install -g pnpm

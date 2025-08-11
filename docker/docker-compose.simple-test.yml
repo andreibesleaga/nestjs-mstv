@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  app-test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      NODE_ENV: test
+      JWT_SECRET: test-secret
+      DATABASE_URL: postgresql://mock:mock@localhost:5432/mock
+      REDIS_URL: redis://localhost:6379
+    command: pnpm test:e2e
+    ports:
+      - '3001:3000'
