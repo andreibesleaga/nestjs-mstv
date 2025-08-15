@@ -2,13 +2,28 @@ import { HttpsService } from '../src/protocols/https.service';
 import { MqttService } from '../src/protocols/mqtt.service';
 import { AppWebSocketGateway } from '../src/protocols/websocket.gateway';
 import { GrpcUserService } from '../src/protocols/grpc/grpc.service';
+import { FeatureFlagsService } from '../src/common/feature-flags.service';
+
+// Mock FeatureFlagsService
+const mockFeatureFlagsService = {
+  isWebSocketEnabled: true,
+  isMqttEnabled: true,
+  isHttpsEnabled: true,
+  isGrpcEnabled: true,
+  isJaegerTracingEnabled: true,
+  isRedisCacheEnabled: true,
+  isConsulDiscoveryEnabled: true,
+  isCircuitBreakerEnabled: true,
+  isPerformanceMonitoringEnabled: true,
+  isEmailServiceEnabled: true,
+} as FeatureFlagsService;
 
 describe('Protocol Services', () => {
   describe('HttpsService', () => {
     let service: HttpsService;
 
     beforeEach(() => {
-      service = new HttpsService();
+      service = new HttpsService(mockFeatureFlagsService);
     });
 
     it('should be defined', () => {
@@ -18,7 +33,7 @@ describe('Protocol Services', () => {
     it('should return null when SSL not configured', () => {
       delete process.env.SSL_CERT_PATH;
       delete process.env.SSL_KEY_PATH;
-      
+
       const options = service.getHttpsOptions();
       expect(options).toBeNull();
     });
@@ -28,7 +43,9 @@ describe('Protocol Services', () => {
     let service: MqttService;
 
     beforeEach(() => {
-      service = new MqttService();
+      service = new MqttService(mockFeatureFlagsService);
+      // Mock the isEnabled property since it's set in the constructor
+      (service as any).isEnabled = true;
     });
 
     it('should be defined', () => {
@@ -37,9 +54,9 @@ describe('Protocol Services', () => {
 
     it('should publish user event', () => {
       const publishSpy = jest.spyOn(service, 'publish').mockImplementation();
-      
+
       service.publishUserEvent('user123', 'login', { ip: '127.0.0.1' });
-      
+
       expect(publishSpy).toHaveBeenCalledWith('users/user123/login', {
         userId: 'user123',
         event: 'login',
@@ -50,9 +67,9 @@ describe('Protocol Services', () => {
 
     it('should publish system alert', () => {
       const publishSpy = jest.spyOn(service, 'publish').mockImplementation();
-      
+
       service.publishSystemAlert('error', 'Database connection failed');
-      
+
       expect(publishSpy).toHaveBeenCalledWith('system/alerts/error', {
         level: 'error',
         message: 'Database connection failed',
@@ -65,7 +82,7 @@ describe('Protocol Services', () => {
     let gateway: AppWebSocketGateway;
 
     beforeEach(() => {
-      gateway = new AppWebSocketGateway();
+      gateway = new AppWebSocketGateway(mockFeatureFlagsService);
     });
 
     it('should be defined', () => {
@@ -75,7 +92,7 @@ describe('Protocol Services', () => {
     it('should handle message', () => {
       const mockClient = { id: 'client123' } as any;
       const result = gateway.handleMessage({ text: 'hello' }, mockClient);
-      
+
       expect(result).toEqual({
         event: 'response',
         data: 'Echo: {"text":"hello"}',
@@ -92,7 +109,7 @@ describe('Protocol Services', () => {
         register: jest.fn(),
         getAllUsers: jest.fn(),
       };
-      service = new GrpcUserService(mockAuthService);
+      service = new GrpcUserService(mockAuthService, mockFeatureFlagsService);
     });
 
     it('should be defined', () => {
@@ -101,7 +118,7 @@ describe('Protocol Services', () => {
 
     it('should get user', async () => {
       const result = await service.getUser({ id: 'user123' });
-      
+
       expect(result).toEqual({
         id: 'user123',
         email: 'user@example.com',
@@ -119,15 +136,15 @@ describe('Protocol Services', () => {
         role: 'user',
         createdAt: new Date(),
       };
-      
+
       mockAuthService.register.mockResolvedValue(mockUser);
-      
+
       const result = await service.createUser({
         email: 'test@example.com',
         name: 'Test User',
         password: 'password123',
       });
-      
+
       expect(result.email).toBe('test@example.com');
       expect(mockAuthService.register).toHaveBeenCalledWith(
         'test@example.com',

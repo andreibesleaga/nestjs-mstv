@@ -1,14 +1,16 @@
 import { EmailingService } from '../src/common/emailing.service';
 import { BullMQService } from '../src/common/messaging/bullmq.service';
+import { FeatureFlagsService } from '../src/common/feature-flags.service';
 
 describe('EmailingService', () => {
   let emailingService: EmailingService;
   let mockBullMQService: Partial<BullMQService>;
+  let mockFeatureFlagsService: FeatureFlagsService;
 
   beforeEach(() => {
     mockBullMQService = {
+      addJob: jest.fn().mockResolvedValue({ id: 'job-123' }),
       createQueue: jest.fn(),
-      addJob: jest.fn().mockResolvedValue({ id: 'test-job-id' }),
       getQueueStats: jest.fn().mockResolvedValue({
         waiting: 0,
         active: 0,
@@ -17,7 +19,17 @@ describe('EmailingService', () => {
       }),
     };
 
-    emailingService = new EmailingService(mockBullMQService as BullMQService);
+    mockFeatureFlagsService = {
+      isEmailServiceEnabled: true,
+    } as FeatureFlagsService;
+
+    emailingService = new EmailingService(
+      mockBullMQService as BullMQService,
+      mockFeatureFlagsService
+    );
+
+    // Mock the isEnabled property since it's set in the constructor
+    (emailingService as any).isEnabled = true;
   });
 
   describe('queueEmail', () => {
@@ -31,7 +43,7 @@ describe('EmailingService', () => {
       const result = await emailingService.queueEmail(emailData);
 
       expect(mockBullMQService.addJob).toHaveBeenCalledWith('email', 'send-email', emailData, {});
-      expect(result).toEqual({ id: 'test-job-id' });
+      expect(result).toEqual({ id: 'job-123' });
     });
 
     it('should queue an email job with delay', async () => {

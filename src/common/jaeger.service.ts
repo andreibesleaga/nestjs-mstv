@@ -1,14 +1,26 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { MicroserviceConfig } from './microservice.config';
+import { FeatureFlagsService } from './feature-flags.service';
 
 @Injectable()
 export class JaegerService implements OnModuleInit {
   private readonly logger = new Logger(JaegerService.name);
   private tracer: any;
+  private isEnabled = false;
 
-  constructor(private readonly config: MicroserviceConfig) {}
+  constructor(
+    private readonly config: MicroserviceConfig,
+    private readonly featureFlags: FeatureFlagsService
+  ) {}
 
   async onModuleInit() {
+    this.isEnabled = this.featureFlags.isJaegerTracingEnabled;
+
+    if (!this.isEnabled) {
+      this.logger.log('Jaeger tracing is disabled by feature flag');
+      return;
+    }
+
     if (!process.env.JAEGER_ENDPOINT) {
       this.logger.warn('Jaeger not configured - skipping tracing setup');
       return;
@@ -40,7 +52,7 @@ export class JaegerService implements OnModuleInit {
   }
 
   startSpan(operationName: string, parentSpan?: any): any {
-    if (!this.tracer) return null;
+    if (!this.isEnabled || !this.tracer) return null;
 
     try {
       return this.tracer.startSpan(operationName, { childOf: parentSpan });
@@ -51,7 +63,7 @@ export class JaegerService implements OnModuleInit {
   }
 
   finishSpan(span: any, tags?: Record<string, any>): void {
-    if (!span) return;
+    if (!this.isEnabled || !span) return;
 
     try {
       if (tags) {
@@ -66,6 +78,6 @@ export class JaegerService implements OnModuleInit {
   }
 
   getTracer(): any {
-    return this.tracer;
+    return this.isEnabled ? this.tracer : null;
   }
 }

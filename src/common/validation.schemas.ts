@@ -25,6 +25,50 @@ export const EnvironmentSchema = z.object({
   MONGODB_URL: z.string().optional(),
   JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
   REDIS_URL: z.string().default('redis://localhost:6379'),
+
+  // Feature Flags - Protocols
+  ENABLE_WEBSOCKET: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
+  ENABLE_MQTT: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  ENABLE_HTTPS: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
+  ENABLE_GRPC: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+
+  // Feature Flags - Services
+  ENABLE_JAEGER_TRACING: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  ENABLE_REDIS_CACHE: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
+  ENABLE_CONSUL_DISCOVERY: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  ENABLE_CIRCUIT_BREAKER: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  ENABLE_PERFORMANCE_MONITORING: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  ENABLE_EMAIL_SERVICE: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
 });
 
 // Kafka event schemas

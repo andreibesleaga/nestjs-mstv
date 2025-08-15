@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { BullMQService, JobData } from './messaging/bullmq.service';
 import * as nodemailer from 'nodemailer';
 import { Job } from 'bullmq';
+import { FeatureFlagsService } from './feature-flags.service';
 
 export interface EmailJobData extends JobData {
   to: string;
@@ -14,10 +15,21 @@ export interface EmailJobData extends JobData {
 export class EmailingService implements OnModuleInit {
   private readonly logger = new Logger(EmailingService.name);
   private transporter: nodemailer.Transporter;
+  private isEnabled = false;
 
-  constructor(private readonly bullMQService: BullMQService) {}
+  constructor(
+    private readonly bullMQService: BullMQService,
+    private readonly featureFlags: FeatureFlagsService
+  ) {}
 
   async onModuleInit() {
+    this.isEnabled = this.featureFlags.isEmailServiceEnabled;
+
+    if (!this.isEnabled) {
+      this.logger.log('Email service is disabled by feature flag');
+      return;
+    }
+
     if (process.env.NODE_ENV === 'test') {
       this.logger.warn('Email service disabled in test environment');
       return;
@@ -50,11 +62,10 @@ export class EmailingService implements OnModuleInit {
   }
 
   private async processEmailJob(job: Job<EmailJobData>): Promise<void> {
-    const { to, subject, body, html } = job.data;
+    if (!this.isEnabled) return;
 
-    this.logger.log(
-      `Processing email job ${job.id} for recipient: ${to.replace(/(.{3}).*@/, '$1***@')}`
-    );
+    const { to, subject, body, html } = job.data;
+    this.logger.log(`Processing email job ${job.id} for ${to}`);
 
     try {
       await this.sendEmail({ to, subject, body, html });
@@ -66,6 +77,11 @@ export class EmailingService implements OnModuleInit {
   }
 
   async sendEmail(emailData: EmailJobData): Promise<void> {
+    if (!this.isEnabled) {
+      this.logger.log('Email service is disabled - email not sent');
+      return;
+    }
+
     if (process.env.NODE_ENV === 'test') {
       this.logger.log(`[TEST] Email would be sent to: ${emailData.to} - ${emailData.subject}`);
       return;
@@ -88,14 +104,57 @@ export class EmailingService implements OnModuleInit {
   }
 
   async queueEmail(emailData: EmailJobData, delay?: number): Promise<any> {
-    return this.bullMQService.addJob('email', 'send-email', emailData, { delay });
+    if (!this.isEnabled) {
+      this.logger.log('Email service is disabled - email not queued');
+      return null;
+    }
+
+    const options = delay ? { delay } : {};
+    return this.bullMQService.addJob('email', 'send-email', emailData, options);
+  }
+
+  async sendWelcomeEmail(userEmail: string, userName?: string): Promise<void> {
+    if (!this.isEnabled) return;
+
+    await this.queueEmail({
+      to: userEmail,
+      subject: 'Welcome!',
+      body: `Hello ${userName || 'there'}! Welcome to our application.`,
+      html: `<h1>Welcome ${userName || 'there'}!</h1><p>Thank you for joining our application.</p>`,
+    });
+  }
+
+  async sendPasswordResetEmail(userEmail: string, resetToken: string): Promise<void> {
+    if (!this.isEnabled) return;
+
+    await this.queueEmail({
+      to: userEmail,
+      subject: 'Password Reset Request',
+      body: `Password reset token: ${resetToken}`,
+      html: `<p>Your password reset token is: <strong>${resetToken}</strong></p>`,
+    });
   }
 
   async sendImmediateEmail(emailData: EmailJobData): Promise<void> {
-    return this.sendEmail(emailData);
+    if (!this.isEnabled) {
+      this.logger.log('Email service is disabled - immediate email not sent');
+      return;
+    }
+
+    // Send email immediately without queueing
+    await this.sendEmail(emailData);
   }
 
-  async getEmailQueueStats() {
-    return this.bullMQService.getQueueStats('email');
+  async getEmailQueueStats(): Promise<any> {
+    if (!this.isEnabled) {
+      return { waiting: 0, active: 0, completed: 0, failed: 0 };
+    }
+
+    try {
+      return await this.bullMQService.getQueueStats('email');
+    } catch (error) {
+      this.logger.error('Failed to get email queue stats:', error.message);
+      return { waiting: 0, active: 0, completed: 0, failed: 0 };
+    }
   }
 }

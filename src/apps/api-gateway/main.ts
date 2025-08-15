@@ -6,6 +6,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from '../../modules/auth/filters/global-exception.filter';
 import { HttpsService } from '../../protocols/https.service';
+import { FeatureFlagsService } from '../../common/feature-flags.service';
+
 import {
   UserSchema,
   LoginResponseSchema,
@@ -16,7 +18,7 @@ import {
 } from '../../schemas/openapi.schemas';
 
 async function bootstrap() {
-  const httpsService = new HttpsService();
+  const httpsService = new HttpsService(new FeatureFlagsService());
   const httpsOptions = httpsService.getHttpsOptions();
 
   const app = await NestFactory.create<NestFastifyApplication>(

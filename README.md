@@ -2,6 +2,13 @@
 
 A NestJS microservice template variant implementing basic DDD, clean architecture principles with comprehensive features and microservices common design patterns for versatility and performance.
 
+## ⚡ **Feature Flags & Performance**
+
+- **🎯 Feature Flags System** - Enable/disable protocols and services for optimal performance
+- **🚀 Fast Startup** - Minimal resource usage with selective service loading
+- **📊 Performance Monitoring** - Optional performance interceptors and metrics
+- **🔧 Environment-Specific Configs** - Different feature sets for dev/test/prod
+
 ## 🏗️ **Architecture & Design**
 
 - **DDD/Clean Architecture** - Domain entities, value objects, repositories
@@ -119,6 +126,20 @@ SMTP_SECURE=false
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
 SMTP_FROM=your-email@gmail.com
+
+# Feature Flags - Protocols
+ENABLE_WEBSOCKET=true
+ENABLE_MQTT=false
+ENABLE_HTTPS=true
+ENABLE_GRPC=false
+
+# Feature Flags - Services
+ENABLE_JAEGER_TRACING=false
+ENABLE_REDIS_CACHE=true
+ENABLE_CONSUL_DISCOVERY=false
+ENABLE_CIRCUIT_BREAKER=false
+ENABLE_PERFORMANCE_MONITORING=false
+ENABLE_EMAIL_SERVICE=true
 
 ```
 
@@ -767,7 +788,7 @@ SSL_CERT_PATH = /path/ot / cert.pem;
 SSL_KEY_PATH = /path/ot / key.pem;
 
 // Make secure API calls
-const httpsService = new HttpsService();
+const httpsService = new HttpsService(new FeatureFlagsService());
 const response = await httpsService.makeSecureRequest('https://api.example.com/data');
 ```
 

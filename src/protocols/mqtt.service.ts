@@ -1,12 +1,23 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import * as mqtt from 'mqtt';
+import { FeatureFlagsService } from '../common/feature-flags.service';
 
 @Injectable()
 export class MqttService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(MqttService.name);
   private client: mqtt.MqttClient;
+  private isEnabled = false;
+
+  constructor(private readonly featureFlags: FeatureFlagsService) {}
 
   async onModuleInit() {
+    this.isEnabled = this.featureFlags.isMqttEnabled;
+
+    if (!this.isEnabled) {
+      this.logger.log('MQTT is disabled by feature flag');
+      return;
+    }
+
     if (!process.env.MQTT_BROKER_URL) {
       this.logger.warn('MQTT broker not configured - skipping MQTT setup');
       return;
@@ -43,7 +54,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   }
 
   publish(topic: string, message: string | object): void {
-    if (!this.client) return;
+    if (!this.isEnabled || !this.client) return;
 
     const payload = typeof message === 'string' ? message : JSON.stringify(message);
     this.client.publish(topic, payload, (error) => {
@@ -56,7 +67,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   }
 
   subscribe(topic: string): void {
-    if (!this.client) return;
+    if (!this.isEnabled || !this.client) return;
 
     this.client.subscribe(topic, (error) => {
       if (error) {
@@ -68,10 +79,17 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
   }
 
   publishUserEvent(userId: string, event: string, data: any): void {
-    this.publish(`users/${userId}/${event}`, { userId, event, data, timestamp: new Date().toISOString() });
+    if (!this.isEnabled) return;
+    this.publish(`users/${userId}/${event}`, {
+      userId,
+      event,
+      data,
+      timestamp: new Date().toISOString(),
+    });
   }
 
   publishSystemAlert(level: string, message: string): void {
+    if (!this.isEnabled) return;
     this.publish(`system/alerts/${level}`, { level, message, timestamp: new Date().toISOString() });
   }
 }

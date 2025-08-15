@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { FeatureFlagsService } from './feature-flags.service';
 
 interface CircuitBreakerOptions {
   failureThreshold: number;
@@ -15,12 +16,16 @@ enum CircuitState {
 @Injectable()
 export class CircuitBreakerService {
   private readonly logger = new Logger(CircuitBreakerService.name);
-  private circuits = new Map<string, {
-    state: CircuitState;
-    failures: number;
-    lastFailureTime: number;
-    options: CircuitBreakerOptions;
-  }>();
+  private isEnabled = false;
+  private circuits = new Map<
+    string,
+    {
+      state: CircuitState;
+      failures: number;
+      lastFailureTime: number;
+      options: CircuitBreakerOptions;
+    }
+  >();
 
   private defaultOptions: CircuitBreakerOptions = {
     failureThreshold: 5,
@@ -28,11 +33,23 @@ export class CircuitBreakerService {
     monitoringPeriod: 10000, // 10 seconds
   };
 
+  constructor(private readonly featureFlags: FeatureFlagsService) {
+    this.isEnabled = this.featureFlags.isCircuitBreakerEnabled;
+    if (!this.isEnabled) {
+      this.logger.log('Circuit breaker is disabled by feature flag');
+    }
+  }
+
   async execute<T>(
     circuitName: string,
     operation: () => Promise<T>,
     options?: Partial<CircuitBreakerOptions>
   ): Promise<T> {
+    // If circuit breaker is disabled, execute operation directly
+    if (!this.isEnabled) {
+      return await operation();
+    }
+
     const circuit = this.getOrCreateCircuit(circuitName, options);
 
     if (circuit.state === CircuitState.OPEN) {
@@ -88,10 +105,12 @@ export class CircuitBreakerService {
 
   getCircuitStatus(circuitName: string) {
     const circuit = this.circuits.get(circuitName);
-    return circuit ? {
-      state: circuit.state,
-      failures: circuit.failures,
-      lastFailureTime: circuit.lastFailureTime,
-    } : null;
+    return circuit
+      ? {
+          state: circuit.state,
+          failures: circuit.failures,
+          lastFailureTime: circuit.lastFailureTime,
+        }
+      : null;
   }
 }

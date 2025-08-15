@@ -1,15 +1,27 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { MicroserviceConfig } from './microservice.config';
+import { FeatureFlagsService } from './feature-flags.service';
 
 @Injectable()
 export class ConsulService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ConsulService.name);
   private consul: any;
   private serviceId: string;
+  private isEnabled = false;
 
-  constructor(private readonly config: MicroserviceConfig) {}
+  constructor(
+    private readonly config: MicroserviceConfig,
+    private readonly featureFlags: FeatureFlagsService
+  ) {}
 
   async onModuleInit() {
+    this.isEnabled = this.featureFlags.isConsulDiscoveryEnabled;
+
+    if (!this.isEnabled) {
+      this.logger.log('Consul service discovery is disabled by feature flag');
+      return;
+    }
+
     if (!process.env.CONSUL_HOST) {
       this.logger.warn('Consul not configured - skipping service registration');
       return;
@@ -40,17 +52,21 @@ export class ConsulService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    if (this.consul && this.serviceId) {
-      try {
-        await this.consul.agent.service.deregister(this.serviceId);
-        this.logger.log(`Service deregistered from Consul: ${this.serviceId}`);
-      } catch (error) {
-        this.logger.error('Failed to deregister from Consul:', error.message);
-      }
+    if (!this.isEnabled || !this.consul || !this.serviceId) return;
+
+    try {
+      await this.consul.agent.service.deregister(this.serviceId);
+      this.logger.log(`Service deregistered from Consul: ${this.serviceId}`);
+    } catch (error) {
+      this.logger.error('Failed to deregister from Consul:', error.message);
     }
   }
 
   async getHealthyServices(serviceName: string): Promise<any[]> {
+    if (!this.isEnabled || !this.consul) {
+      this.logger.warn('Consul service discovery is disabled');
+      return [];
+    }
     if (!this.consul) return [];
 
     try {

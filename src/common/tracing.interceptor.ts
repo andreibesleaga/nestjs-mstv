@@ -8,9 +8,9 @@ export class TracingInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): any {
     const request = context.switchToHttp().getRequest();
     const operationName = `${request.method} ${request.url}`;
-    
+
     const span = this.jaegerService.startSpan(operationName);
-    
+
     if (span) {
       span.setTag('http.method', request.method);
       span.setTag('http.url', request.url);
@@ -18,7 +18,7 @@ export class TracingInterceptor implements NestInterceptor {
     }
 
     const result = next.handle();
-    
+
     // Finish span after request completes
     setTimeout(() => {
       if (span) {

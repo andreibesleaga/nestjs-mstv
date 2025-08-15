@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { AuthService } from '../../modules/auth/auth.service';
+import { FeatureFlagsService } from '../../common/feature-flags.service';
 
 interface GetUserRequest {
   id: string;
@@ -30,11 +31,24 @@ interface UserResponse {
 @Injectable()
 export class GrpcUserService {
   private readonly logger = new Logger(GrpcUserService.name);
+  private isEnabled = false;
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly featureFlags: FeatureFlagsService
+  ) {
+    this.isEnabled = this.featureFlags.isGrpcEnabled;
+    if (!this.isEnabled) {
+      this.logger.log('gRPC service is disabled by feature flag');
+    }
+  }
 
   @GrpcMethod('UserService', 'GetUser')
   async getUser(data: GetUserRequest): Promise<UserResponse> {
+    if (!this.isEnabled) {
+      throw new Error('gRPC service is disabled');
+    }
+
     this.logger.log(`gRPC GetUser: ${data.id}`);
 
     // Mock response - integrate with actual user service
@@ -68,6 +82,10 @@ export class GrpcUserService {
 
   @GrpcMethod('UserService', 'ListUsers')
   async listUsers(data: ListUsersRequest) {
+    if (!this.isEnabled) {
+      throw new Error('gRPC service is disabled');
+    }
+
     this.logger.log(`gRPC ListUsers: page=${data.page}, limit=${data.limit}`);
 
     try {
