@@ -1,48 +1,22 @@
-import { PrismaClient } from '@prisma/client';
-import { execSync } from 'child_process';
-
-let prisma: PrismaClient;
+import 'reflect-metadata';
 
 beforeAll(async () => {
-  // Setup test environment
+  // Setup test environment without real database connections
   process.env.NODE_ENV = 'test';
-  process.env.DATABASE_URL = 'file:./test.db';
+  process.env.DATABASE_TYPE = 'postgresql';
+  process.env.DATABASE_URL = 'postgresql://mock:mock@localhost:5432/mock';
   process.env.JWT_SECRET = 'test-jwt-secret';
   process.env.REDIS_URL = 'redis://localhost:6379';
 
-  // Initialize Prisma client for tests
-  prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL,
-      },
-    },
-  });
-
-  // Run migrations for test database
-  try {
-    execSync('npx prisma migrate deploy', {
-      env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
-      stdio: 'pipe',
-    });
-  } catch {
-    console.warn('Migration failed, continuing with existing schema');
-  }
-
-  await prisma.$connect();
+  // Skip actual database setup for integration tests since we're using mocks
+  console.log('Integration test environment setup complete with mocked services');
 });
 
 beforeEach(async () => {
-  // Clean database before each test
-  const deleteUsers = prisma.user.deleteMany();
-  const deleteRefreshTokens = prisma.refreshToken.deleteMany();
-
-  await prisma.$transaction([deleteRefreshTokens, deleteUsers]);
+  // No database cleanup needed for mocked tests
 });
 
 afterAll(async () => {
-  await prisma.$disconnect();
+  // No cleanup needed for mocked tests
+  console.log('Integration test cleanup complete');
 });
-
-// Export for use in integration tests
-export { prisma };

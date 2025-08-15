@@ -1,7 +1,10 @@
 {
-  "name": "nestjs-template-variant",
+  "name": "nestjs-mstv",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Andrei Besleaga"
+  },
   "scripts": {
     "start:dev": "ts-node -r tsconfig-paths/register src/apps/api-gateway/src/main.ts",
     "build": "tsc -p tsconfig.json",

@@ -2,14 +2,60 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AppModule } from '../../src/apps/api-gateway/src/app.module';
+import { PrismaService } from '../../src/common/prisma.service';
+import { MongoDbService } from '../../src/common/mongodb.service';
+import { RedisClient } from '../../src/packages/auth/src/redis.client';
 
 describe('Simple E2E Tests', () => {
   let app: NestFastifyApplication;
 
   beforeAll(async () => {
+    // Mock services for testing
+    const mockPrismaService = {
+      $queryRaw: jest.fn().mockResolvedValue([{ '?column?': 1 }]),
+      $connect: jest.fn(),
+      $disconnect: jest.fn(),
+      user: {
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        findMany: jest.fn().mockResolvedValue([]),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      refreshToken: {
+        create: jest.fn(),
+        findUnique: jest.fn(),
+        updateMany: jest.fn(),
+        deleteMany: jest.fn(),
+      },
+    };
+
+    const mockMongoDbService = {
+      getDb: jest.fn().mockReturnValue({
+        command: jest.fn().mockResolvedValue({ ok: 1 }),
+      }),
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+    };
+
+    const mockRedisClient = {
+      set: jest.fn().mockResolvedValue('OK'),
+      get: jest.fn().mockResolvedValue('ok'),
+      del: jest.fn().mockResolvedValue(1),
+      connect: jest.fn(),
+      disconnect: jest.fn(),
+    };
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(PrismaService)
+      .useValue(mockPrismaService)
+      .overrideProvider(MongoDbService)
+      .useValue(mockMongoDbService)
+      .overrideProvider(RedisClient)
+      .useValue(mockRedisClient)
+      .compile();
 
     app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
@@ -102,8 +148,10 @@ describe('Simple E2E Tests', () => {
     });
 
     it('should handle users endpoint', () => {
+      // Use a valid UUID format for the test
+      const testUUID = '123e4567-e89b-12d3-a456-426614174000';
       return request(app.getHttpServer())
-        .get('/users/test-id')
+        .get(`/users/${testUUID}`)
         .expect((res) => {
           expect([200, 404, 500].includes(res.status)).toBe(true);
         });

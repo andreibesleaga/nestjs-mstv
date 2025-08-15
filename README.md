@@ -1,6 +1,6 @@
-# NestJS Microservice Clean Architecture Template
+# NestJS Microservice Template Variant
 
-A production-ready NestJS microservice template implementing Clean Architecture/DDD principles with comprehensive features:
+A NestJS microservice template variant implementing basic DDD, clean architecture principles with comprehensive features and microservices common design patterns for versatility and performance.
 
 ## 🏗️ **Architecture & Design**
 
@@ -11,8 +11,8 @@ A production-ready NestJS microservice template implementing Clean Architecture/
 
 ## 🗄️ **Database & Persistence**
 
-- **Flexible Database Support** - PostgreSQL (Prisma) or MongoDB with runtime selection
-- **Database Migrations** - Prisma migrations and seed scripts
+- **Flexible Database Support** - SQL/NoSQL/PostgreSQL (via Prisma) or direct MongoDB with runtime selection
+- **Database Migrations** - Prisma/MongoDB migrations and seed scripts
 - **Repository Pattern** - Clean abstraction over data access
 - **Connection Management** - Proper connection pooling and health checks
 
@@ -26,11 +26,11 @@ A production-ready NestJS microservice template implementing Clean Architecture/
 
 ## 🚀 **APIs & Communication**
 
-- **REST API** - Complete Fastify-based REST endpoints
-- **GraphQL API** - Full GraphQL schema with resolvers and playground
+- **REST API** - Fastify-based REST endpoints
+- **GraphQL API** - Full GraphQL schema with resolvers
 - **OpenAPI/Swagger** - Interactive API documentation
 - **Event Streaming** - Kafka producer/consumer for user lifecycle events
-- **Background Jobs** - BullMQ for email processing and async tasks
+- **Background Jobs** - BullMQ for async tasks (TODO: desired email provider implementation)
 
 ## 🔧 **Microservice Features**
 
@@ -73,7 +73,7 @@ src/
 └── schemas/                # API and event schemas
 ```
 
-### 1. Environment Setup
+### 1. Required Environment Setup
 
 ```bash
 # Copy environment template
@@ -84,13 +84,36 @@ DATABASE_TYPE=postgresql  # or mongodb
 DATABASE_URL=postgresql://dev:dev@localhost:5432/dev
 # MONGODB_URL=mongodb://dev:dev@localhost:27017/nestjs-app
 
-# Configure JWT secret (REQUIRED)
-JWT_SECRET=your-strong-secret-key
+# Security (REQUIRED)
+JWT_SECRET=your-strong-secret-key-change-in-production
+ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com
 
-# Configure other services
+# Services
 REDIS_URL=redis://localhost:6379
 KAFKA_BROKERS=localhost:9092
+
+# Microservices (Optional)
+CONSUL_HOST=localhost
+CONSUL_PORT=8500
+JAEGER_ENDPOINT=http://localhost:14268/api/traces
+
+# Protocols (Optional)
+SSL_CERT_PATH=/path/to/cert.pem
+SSL_KEY_PATH=/path/to/key.pem
+MQTT_BROKER_URL=mqtt://localhost:1883
+GRPC_PORT=5000
+
+# Security Settings
+RATE_LIMIT_MAX=100
+RATE_LIMIT_WINDOW=60000
+BODY_LIMIT=1048576
 ```
+
+## **Environment Files**
+
+- **`.env.example`** - Template with all available variables
+- **`.env`** - Your local configuration (not in git)
+- **Production** - Use environment-specific values
 
 ### 2. Install Dependencies
 
@@ -203,7 +226,7 @@ REDIS_URL=redis://localhost:6379
 
 - **Unit tests**: `pnpm test:unit` - 17 tests with full mocking
 - **E2E tests**: `pnpm test:e2e` - Application startup and endpoint tests
-- **All tests**: `pnpm test:all` - Complete test suite for CI/CD
+- **All tests**: `pnpm test:all` - Test suite for CI/CD
 - **Coverage**: `pnpm test:unit --coverage` - Code coverage reports
 
 All tests use comprehensive mocking (Prisma, Redis, bcrypt) and run without external dependencies.
@@ -345,7 +368,7 @@ query {
 
 ### Background Jobs (BullMQ)
 
-- **Email Processing**: Welcome emails, password resets, verification
+- **Email Processing**: Welcome emails, password resets, verification (provider not implemented)
 - **Queue Management**: Job retry logic and dead letter queues
 - **Monitoring**: Queue statistics and job status tracking
 
@@ -421,7 +444,7 @@ Comprehensive testing strategy with multiple test types and environments.
 ### E2E Tests (Full)
 
 - **Command**: `pnpm test:e2e:full`
-- **Purpose**: Complete application flows with real services
+- **Purpose**: Application flows with real services
 - **Environment**: Full Docker stack required
 - **Scope**: End-to-end user journeys
 
@@ -556,7 +579,7 @@ docker-compose -f docker/docker-compose.test.yml config
 
 # 🏢 **CQRS Architecture**
 
-## 📝 **Complete CQRS Implementation**
+## 📝 **CQRS Implementation**
 
 ### **Command Query Responsibility Segregation**
 
@@ -855,7 +878,7 @@ pnpm test:unit
 - **Rate limiting**: Accurate IP-based limiting
 - **Security headers**: Proper forwarded headers handling
 
-## Environment Variables
+## Security Environment Variables
 
 ### Required Security Variables
 
@@ -904,7 +927,7 @@ Regular updates of dependencies and security patches:
 
 ---
 
-# 🎆 **Production Readiness**
+# 🎆 **Production Development Readiness**
 
 ## ✅ **Completed Features**
 
@@ -917,7 +940,7 @@ Regular updates of dependencies and security patches:
 
 ### Database & Persistence
 
-- ✅ Flexible database support (PostgreSQL/MongoDB)
+- ✅ Flexible database support (Prisma/PostgreSQL/MongoDB)
 - ✅ Repository pattern with clean abstractions
 - ✅ Database migrations and seeding
 - ✅ Connection pooling and health monitoring
@@ -970,9 +993,9 @@ Regular updates of dependencies and security patches:
 - ✅ Multi-environment configuration
 - ✅ Production monitoring and observability
 
-## 🚀 **Ready for Production**
+## 🚀 **Ready for Development**
 
-This template provides a complete, production-ready foundation for building scalable NestJS microservices with:
+This template provides a complete production-ready foundation for building scalable NestJS microservices with:
 
 - **Enterprise-grade architecture** following industry best practices
 - **Complete CQRS implementation** with command/query separation
@@ -985,69 +1008,21 @@ This template provides a complete, production-ready foundation for building scal
 - **Quality assurance** with 42 comprehensive tests and code quality tools
 - **Docker-ready deployment** with optimized containers and orchestration
 
-## **Complete Feature Matrix**
+## **Feature Matrix**
 
-| Feature Category   | Implementation                                             | Status      |
-| ------------------ | ---------------------------------------------------------- | ----------- |
-| **Architecture**   | Clean Architecture, DDD, Hexagonal                         | ✅ Complete |
-| **CQRS**           | Command/Query/Event Buses with Auto-discovery              | ✅ Complete |
-| **Database**       | PostgreSQL (Prisma) + MongoDB with Repository Pattern      | ✅ Complete |
-| **Authentication** | JWT + Refresh Tokens + Redis Revocation                    | ✅ Complete |
-| **Authorization**  | CASL-based Fine-grained Permissions                        | ✅ Complete |
-| **Security**       | Multi-layer (Helmet, CORS, Rate Limiting, Validation)      | ✅ Complete |
-| **Protocols**      | HTTPS, WebSocket, MQTT, gRPC                               | ✅ Complete |
-| **APIs**           | REST (OpenAPI) + GraphQL with Playground                   | ✅ Complete |
-| **Messaging**      | Kafka Event Streaming + BullMQ Background Jobs             | ✅ Complete |
-| **Microservices**  | Service Discovery (Consul) + Tracing (Jaeger)              | ✅ Complete |
-| **Monitoring**     | Health Checks + Performance Monitoring + Circuit Breaker   | ✅ Complete |
-| **Testing**        | 42 Tests (Unit + E2E + Integration + Performance + Docker) | ✅ Complete |
-| **DevOps**         | Docker + Kubernetes + Helm + CI/CD                         | ✅ Complete |
-| **Code Quality**   | ESLint + Prettier + Pre-commit Hooks + Zero Lint Issues    | ✅ Complete |
-
-**🎆 100% Production Ready - Deploy with Confidence!**
-
-# 🔧 **Environment Configuration**
-
-## **Required Environment Variables**
-
-```env
-# Database (Choose one)
-DATABASE_TYPE=postgresql  # or mongodb
-DATABASE_URL=postgresql://user:pass@localhost:5432/db
-# MONGODB_URL=mongodb://user:pass@localhost:27017/db
-
-# Security (REQUIRED)
-JWT_SECRET=your-strong-secret-key-change-in-production
-ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com
-
-# Services
-REDIS_URL=redis://localhost:6379
-KAFKA_BROKERS=localhost:9092
-
-# Microservices (Optional)
-CONSUL_HOST=localhost
-CONSUL_PORT=8500
-JAEGER_ENDPOINT=http://localhost:14268/api/traces
-
-# Protocols (Optional)
-SSL_CERT_PATH=/path/to/cert.pem
-SSL_KEY_PATH=/path/to/key.pem
-MQTT_BROKER_URL=mqtt://localhost:1883
-GRPC_PORT=5000
-
-# Security Settings
-RATE_LIMIT_MAX=100
-RATE_LIMIT_WINDOW=60000
-BODY_LIMIT=1048576
-```
-
-## **Environment Files**
-
-- **`.env.example`** - Template with all available variables
-- **`.env`** - Your local configuration (not in git)
-- **Production** - Use environment-specific values
-
-```bash
-# Copy and customize
-cp .env.example .env
-```
+| Feature Category   | Implementation                                             | Status   |
+| ------------------ | ---------------------------------------------------------- | -------- |
+| **Architecture**   | Clean Architecture, DDD, Hexagonal                         | Complete |
+| **CQRS**           | Command/Query/Event Buses with Auto-discovery              | Complete |
+| **Database**       | PostgreSQL (Prisma) + MongoDB with Repository Pattern      | Complete |
+| **Authentication** | JWT + Refresh Tokens + Redis Revocation                    | Complete |
+| **Authorization**  | CASL-based Fine-grained Permissions                        | Complete |
+| **Security**       | Multi-layer (Helmet, CORS, Rate Limiting, Validation)      | Complete |
+| **Protocols**      | HTTPS, WebSocket, MQTT, gRPC                               | Complete |
+| **APIs**           | REST (OpenAPI) + GraphQL with Playground                   | Complete |
+| **Messaging**      | Kafka Event Streaming + BullMQ Background Jobs             | Complete |
+| **Microservices**  | Service Discovery (Consul) + Tracing (Jaeger)              | Complete |
+| **Monitoring**     | Health Checks + Performance Monitoring + Circuit Breaker   | Complete |
+| **Testing**        | 42 Tests (Unit + E2E + Integration + Performance + Docker) | Complete |
+| **DevOps**         | Docker + Kubernetes + Helm + CI/CD                         | Complete |
+| **Code Quality**   | ESLint + Prettier + Pre-commit Hooks + Zero Lint Issues    | Complete |

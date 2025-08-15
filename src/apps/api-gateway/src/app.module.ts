@@ -21,9 +21,12 @@ import { CircuitBreakerService } from '../../../common/circuit-breaker.service';
 import { CacheService } from '../../../common/cache.service';
 import { ProtocolsModule } from '../../../protocols/protocols.module';
 
-const databaseProviders = DatabaseConfig.isMongoDb() 
-  ? [MongoDbService] 
-  : [PrismaService];
+const databaseProviders =
+  process.env.NODE_ENV === 'test'
+    ? [PrismaService, MongoDbService] // Provide both for tests
+    : DatabaseConfig.isMongoDb()
+      ? [MongoDbService]
+      : [PrismaService];
 
 @Module({
   imports: [
@@ -51,8 +54,8 @@ const databaseProviders = DatabaseConfig.isMongoDb()
   ],
   controllers: [HealthController, SchemasController],
   providers: [
-    HealthService, 
-    RedisClient, 
+    HealthService,
+    RedisClient,
     MicroserviceConfig,
     ConsulService,
     JaegerService,
@@ -60,7 +63,7 @@ const databaseProviders = DatabaseConfig.isMongoDb()
     PerformanceInterceptor,
     CircuitBreakerService,
     CacheService,
-    ...databaseProviders
+    ...databaseProviders,
   ],
 })
 export class AppModule {}

@@ -1,8 +1,8 @@
 
 FROM node:20-alpine
 
-# Install build dependencies for native modules and OpenSSL
-RUN apk add --no-cache python3 make g++ openssl openssl-dev
+# Install build dependencies for native modules and OpenSSL compatibility
+RUN apk add --no-cache python3 make g++ openssl openssl-dev libc6-compat libgcc
 
 # Install pnpm
 RUN npm install -g pnpm

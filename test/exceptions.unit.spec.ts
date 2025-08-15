@@ -1,4 +1,4 @@
-import { ValidationError } from '../src/exceptions/auth.exceptions';
+import { ValidationError } from '../src/packages/auth/src/exceptions/auth.exceptions';
 
 describe('AuthExceptions', () => {
   describe('ValidationError', () => {

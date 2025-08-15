@@ -108,10 +108,8 @@ export class BullMQService implements OnModuleInit {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Email service integration point - configure with SendGrid, Mailgun, SES, etc.
-    this.logger.log(
-      `📧 Email processed: ${data.to.replace(/(.{3}).*@/, '$1***@')} - ${data.subject}`
-    );
-    
+    this.logger.log(`Email processed: ${data.to.replace(/(.{3}).*@/, '$1***@')} - ${data.subject}`);
+
     // TODO: Replace with actual email service implementation
     // Example: await this.emailProvider.send(data);
   }

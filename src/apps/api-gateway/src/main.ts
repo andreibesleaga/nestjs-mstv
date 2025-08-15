@@ -152,11 +152,11 @@ async function bootstrap() {
       ? process.env.API_BASE_URL || `https://api.yourdomain.com`
       : `http://${host}:${port}`;
 
-  console.log(`🚀 API Gateway (Fastify) running on ${host}:${port}`);
-  console.log(`📖 REST API Documentation: ${baseUrl}/api`);
-  console.log(`🚀 GraphQL Playground: ${baseUrl}/graphql`);
-  console.log(`📋 OpenAPI JSON: ${baseUrl}/api-json`);
-  console.log(`📊 GraphQL Schema: Auto-generated from resolvers`);
-  console.log(`📨 Kafka Schemas: Available in /src/schemas/kafka.schemas.ts`);
+  console.log(`API Gateway (Fastify) running on ${host}:${port}`);
+  console.log(`REST API Documentation: ${baseUrl}/api`);
+  console.log(`GraphQL Playground: ${baseUrl}/graphql`);
+  console.log(`OpenAPI JSON: ${baseUrl}/api-json`);
+  console.log(`GraphQL Schema: Auto-generated from resolvers`);
+  console.log(`Kafka Schemas: Available in /src/schemas/kafka.schemas.ts`);
 }
 bootstrap();

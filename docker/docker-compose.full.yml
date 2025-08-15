@@ -55,7 +55,7 @@ services:
       - '16686:16686'
       - '14268:14268'
     environment:
-      COLLECTOR_OTLP_ENABLED: true
+      COLLECTOR_OTLP_ENABLED: "true"
 
   api:
     build:
