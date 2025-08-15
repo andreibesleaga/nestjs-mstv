@@ -1,5 +1,5 @@
-import { defineAbilityFor } from '../src/packages/auth/src/abilities/user.ability';
-import { PoliciesGuard } from '../src/packages/auth/src/policies.guard';
+import { defineAbilityFor } from '../src/modules/auth/abilities/user.ability';
+import { PoliciesGuard } from '../src/modules/auth/policies.guard';
 import { Reflector } from '@nestjs/core';
 
 describe('CASL Authorization', () => {

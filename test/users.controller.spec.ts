@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersController } from '../src/modules/users/src/interface/users.controller';
-import { UsersService } from '../src/modules/users/src/application/users.service';
-import { CreateUserDto, UpdateUserDto } from '../src/modules/users/src/interface/dto';
-import { User } from '../src/modules/users/src/domain/user.entity';
+import { UsersController } from '../src/modules/users/interface/users.controller';
+import { UsersService } from '../src/modules/users/application/users.service';
+import { CreateUserDto, UpdateUserDto } from '../src/modules/users/interface/dto';
+import { User } from '../src/modules/users/domain/user.entity';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 
 describe('UsersController', () => {

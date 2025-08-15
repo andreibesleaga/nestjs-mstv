@@ -1,7 +1,7 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { MongoDbService } from './mongodb.service';
-import { RedisClient } from '../packages/auth/src/redis.client';
+import { RedisClient } from '../modules/auth/redis.client';
 import { DatabaseConfig } from './database.config';
 
 @Injectable()

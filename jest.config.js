@@ -9,8 +9,8 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.ts', '!**/*.d.ts', '!**/node_modules/**', '!**/dist/**'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@auth/(.*)$': '<rootDir>/src/packages/auth/src/$1',
-    '^@users/(.*)$': '<rootDir>/src/modules/users/src/$1',
+    '^@auth/(.*)$': '<rootDir>/src/modules/auth/$1',
+    '^@users/(.*)$': '<rootDir>/src/modules/users/$1',
     '^@messaging/(.*)$': '<rootDir>/src/packages/messaging/src/$1',
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],

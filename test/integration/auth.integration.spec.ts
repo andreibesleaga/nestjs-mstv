@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from '../../src/packages/auth/src/auth.service';
+import { AuthService } from '../../src/modules/auth/auth.service';
 import { PrismaService } from '../../src/common/prisma.service';
-import { RedisClient } from '../../src/packages/auth/src/redis.client';
+import { RedisClient } from '../../src/modules/auth/redis.client';
 import * as bcrypt from 'bcrypt';
 
 // Mock bcrypt

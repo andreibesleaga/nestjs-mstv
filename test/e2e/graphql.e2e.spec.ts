@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
-import { AppModule } from '../../src/apps/api-gateway/src/app.module';
+import { AppModule } from '../../src/apps/api-gateway/app.module';
 
 describe('GraphQL E2E', () => {
   let app: NestFastifyApplication;

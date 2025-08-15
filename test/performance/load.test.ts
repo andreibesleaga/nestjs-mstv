@@ -1,10 +1,10 @@
 import request from 'supertest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { AppModule } from '../../src/apps/api-gateway/src/app.module';
+import { AppModule } from '../../src/apps/api-gateway/app.module';
 import { PrismaService } from '../../src/common/prisma.service';
 import { MongoDbService } from '../../src/common/mongodb.service';
-import { RedisClient } from '../../src/packages/auth/src/redis.client';
+import { RedisClient } from '../../src/modules/auth/redis.client';
 
 describe('Performance Tests', () => {
   let app: NestFastifyApplication;

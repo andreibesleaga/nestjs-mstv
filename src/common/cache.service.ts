@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RedisClient } from '../packages/auth/src/redis.client';
+import { RedisClient } from '../modules/auth/redis.client';
 
 @Injectable()
 export class CacheService {
@@ -33,11 +33,7 @@ export class CacheService {
     }
   }
 
-  async getOrSet<T>(
-    key: string,
-    factory: () => Promise<T>,
-    ttlSeconds = 300
-  ): Promise<T> {
+  async getOrSet<T>(key: string, factory: () => Promise<T>, ttlSeconds = 300): Promise<T> {
     const cached = await this.get<T>(key);
     if (cached !== null) {
       return cached;

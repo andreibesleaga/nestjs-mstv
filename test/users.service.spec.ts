@@ -1,4 +1,4 @@
-import { UsersService } from '../src/modules/users/src/application/users.service';
+import { UsersService } from '../src/modules/users/application/users.service';
 
 const mockCommandBus = {
   execute: jest.fn(),

@@ -2,11 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CommandBus } from '../src/common/cqrs/command-bus';
 import { QueryBus } from '../src/common/cqrs/query-bus';
 import { EventBus } from '../src/common/cqrs/event-bus';
-import { CreateUserCommand } from '../src/modules/users/src/cqrs/commands/create-user.command';
-import { GetUserQuery } from '../src/modules/users/src/cqrs/queries/get-user.query';
-import { UserCreatedEvent } from '../src/modules/users/src/cqrs/events/user-created.event';
-import { CreateUserHandler } from '../src/modules/users/src/cqrs/handlers/create-user.handler';
-import { GetUserHandler } from '../src/modules/users/src/cqrs/handlers/get-user.handler';
+import { CreateUserCommand } from '../src/modules/users/cqrs/commands/create-user.command';
+import { GetUserQuery } from '../src/modules/users/cqrs/queries/get-user.query';
+import { UserCreatedEvent } from '../src/modules/users/cqrs/events/user-created.event';
+import { CreateUserHandler } from '../src/modules/users/cqrs/handlers/create-user.handler';
+import { GetUserHandler } from '../src/modules/users/cqrs/handlers/get-user.handler';
 
 describe('CQRS Implementation', () => {
   let commandBus: CommandBus;

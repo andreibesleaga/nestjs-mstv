@@ -24,4 +24,4 @@ RUN pnpm prisma:generate
 # Build the application
 RUN pnpm build
 
-CMD [ "node", "dist/src/apps/api-gateway/src/main.js" ]
+CMD [ "node", "dist/src/apps/api-gateway/main.js" ]

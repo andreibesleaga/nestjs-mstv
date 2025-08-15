@@ -62,15 +62,19 @@ A NestJS microservice template variant implementing basic DDD, clean architectur
 
 ```
 src/
-├── apps/api-gateway/          # Application entry point
-├── packages/                  # Shared packages
+├── apps/
+│   └── api-gateway/          # Application entry point (flattened)
+├── modules/                  # Domain modules (flattened)
 │   ├── auth/                 # Authentication domain
-│   ├── messaging/            # Event/messaging infrastructure
-│   └── packs/               # Shared repositories
-├── modules/users/            # User domain module
-├── protocols/               # Network protocol implementations
-├── common/                  # Shared utilities and services
-└── schemas/                # API and event schemas
+│   └── users/                # User domain
+│       ├── application/
+│       ├── domain/
+│       ├── infrastructure/
+│       ├── interface/
+│       └── messaging/
+├── common/                   # Shared utilities
+├── protocols/                # Communication protocols
+└── schemas/                  # Data schemas
 ```
 
 ### 1. Required Environment Setup
@@ -107,6 +111,15 @@ GRPC_PORT=5000
 RATE_LIMIT_MAX=100
 RATE_LIMIT_WINDOW=60000
 BODY_LIMIT=1048576
+
+# Email/SMTP Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+SMTP_FROM=your-email@gmail.com
+
 ```
 
 ## **Environment Files**

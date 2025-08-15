@@ -1,5 +1,5 @@
-import { AuthService } from '../src/packages/auth/src/auth.service';
-import { RedisClient } from '../src/packages/auth/src/redis.client';
+import { AuthService } from '../src/modules/auth/auth.service';
+import { RedisClient } from '../src/modules/auth/redis.client';
 
 // Mock bcrypt
 jest.mock('bcrypt', () => ({
