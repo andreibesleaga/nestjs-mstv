@@ -419,18 +419,7 @@ SERVICE_NAME=api-gateway npm run start:prod
 
 ### 3. Protocol-Specific Services
 
-Deploy services optimized for specific protocols:
-
-```bash
-# GraphQL-only service
-ENABLE_GRAPHQL=true ENABLE_REST=false npm run start:prod
-
-# gRPC service
-ENABLE_GRPC=true ENABLE_HTTP=false npm run start:prod
-
-# WebSocket service
-ENABLE_WEBSOCKET=true npm run start:prod
-```
+Deploy services optimized for specific protocols
 
 ## Configuration & Environment
 
@@ -457,20 +446,6 @@ KAFKA_BROKERS=localhost:9092
 # Security
 JWT_SECRET=your-secret-key
 ENCRYPTION_KEY=your-encryption-key
-```
-
-### Feature Flags
-
-```typescript
-// Dynamic feature enabling
-export const FeatureFlags = {
-  enableGraphQL: process.env.ENABLE_GRAPHQL === 'true',
-  enablegRPC: process.env.ENABLE_GRPC === 'true',
-  enableWebSocket: process.env.ENABLE_WEBSOCKET === 'true',
-  enableMQTT: process.env.ENABLE_MQTT === 'true',
-  enableTracing: process.env.ENABLE_TRACING !== 'false',
-  enableMetrics: process.env.ENABLE_METRICS !== 'false',
-};
 ```
 
 ## Testing Strategy

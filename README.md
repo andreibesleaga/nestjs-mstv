@@ -107,14 +107,6 @@ SSL_KEY_PATH=/path/to/key.pem
 MQTT_BROKER_URL=mqtt://localhost:1883
 GRPC_PORT=5000
 
-# Protocol Feature Flags (Optional)
-ENABLE_GRAPHQL=true
-ENABLE_GRPC=true
-ENABLE_WEBSOCKET=true
-ENABLE_MQTT=true
-ENABLE_TRACING=true
-ENABLE_METRICS=true
-
 # Security Settings
 RATE_LIMIT_MAX=100
 RATE_LIMIT_WINDOW=60000
@@ -172,15 +164,6 @@ SMTP_FROM=your-email@gmail.com
 - `MQTT_PASSWORD`: MQTT authentication password
 - `WS_PORT`: WebSocket server port (default: 3001)
 - `GRPC_PORT`: gRPC server port (default: 5000)
-
-### Protocol Feature Flags
-
-- `ENABLE_GRAPHQL`: Enable GraphQL API (default: true)
-- `ENABLE_GRPC`: Enable gRPC services (default: true)
-- `ENABLE_WEBSOCKET`: Enable WebSocket gateway (default: true)
-- `ENABLE_MQTT`: Enable MQTT messaging (default: true)
-- `ENABLE_TRACING`: Enable distributed tracing (default: true)
-- `ENABLE_METRICS`: Enable performance metrics (default: true)
 
 ### Email Configuration
 
