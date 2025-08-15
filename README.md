@@ -107,6 +107,14 @@ SSL_KEY_PATH=/path/to/key.pem
 MQTT_BROKER_URL=mqtt://localhost:1883
 GRPC_PORT=5000
 
+# Protocol Feature Flags (Optional)
+ENABLE_GRAPHQL=true
+ENABLE_GRPC=true
+ENABLE_WEBSOCKET=true
+ENABLE_MQTT=true
+ENABLE_TRACING=true
+ENABLE_METRICS=true
+
 # Security Settings
 RATE_LIMIT_MAX=100
 RATE_LIMIT_WINDOW=60000
@@ -122,11 +130,73 @@ SMTP_FROM=your-email@gmail.com
 
 ```
 
-## **Environment Files**
+## Environment Variables Reference
 
-- **`.env.example`** - Template with all available variables
-- **`.env`** - Your local configuration (not in git)
-- **Production** - Use environment-specific values
+### Database Configuration
+
+- `DATABASE_TYPE`: Database type selection (`postgresql` or `mongodb`)
+- `DATABASE_URL`: PostgreSQL connection string
+- `MONGODB_URL`: MongoDB connection string
+
+### Authentication & Security
+
+- `JWT_SECRET`: Secret key for JWT token signing (required in production)
+- `ACCESS_TOKEN_EXP`: Access token expiration time (default: 15m)
+- `REFRESH_TOKEN_EXP`: Refresh token expiration time (default: 7d)
+- `ALLOWED_ORIGINS`: CORS allowed origins (comma-separated)
+- `RATE_LIMIT_MAX`: Maximum requests per window (default: 100)
+- `RATE_LIMIT_WINDOW`: Rate limit window in ms (default: 60000)
+- `BODY_LIMIT`: Request body size limit in bytes (default: 1048576)
+
+### Service Configuration
+
+- `SERVICE_NAME`: Microservice identifier
+- `SERVICE_VERSION`: Service version for discovery
+- `SERVICE_HOST`: Service host binding
+- `PORT`: HTTP server port (default: 3000)
+
+### External Services
+
+- `REDIS_URL`: Redis connection string for caching and sessions
+- `KAFKA_BROKERS`: Kafka broker addresses (comma-separated)
+- `CONSUL_HOST`: Consul server host for service discovery
+- `CONSUL_PORT`: Consul server port (default: 8500)
+- `JAEGER_ENDPOINT`: Jaeger tracing endpoint URL
+
+### Protocol Configuration
+
+- `SSL_CERT_PATH`: SSL certificate file path for HTTPS
+- `SSL_KEY_PATH`: SSL private key file path for HTTPS
+- `MQTT_BROKER_URL`: MQTT broker connection URL
+- `MQTT_USERNAME`: MQTT authentication username
+- `MQTT_PASSWORD`: MQTT authentication password
+- `WS_PORT`: WebSocket server port (default: 3001)
+- `GRPC_PORT`: gRPC server port (default: 5000)
+
+### Protocol Feature Flags
+
+- `ENABLE_GRAPHQL`: Enable GraphQL API (default: true)
+- `ENABLE_GRPC`: Enable gRPC services (default: true)
+- `ENABLE_WEBSOCKET`: Enable WebSocket gateway (default: true)
+- `ENABLE_MQTT`: Enable MQTT messaging (default: true)
+- `ENABLE_TRACING`: Enable distributed tracing (default: true)
+- `ENABLE_METRICS`: Enable performance metrics (default: true)
+
+### Email Configuration
+
+- `SMTP_HOST`: SMTP server hostname
+- `SMTP_PORT`: SMTP server port (default: 587)
+- `SMTP_SECURE`: Use secure connection (default: false)
+- `SMTP_USER`: SMTP authentication username
+- `SMTP_PASS`: SMTP authentication password
+- `SMTP_FROM`: Default sender email address
+
+### Application Settings
+
+- `NODE_ENV`: Environment mode (`development`, `production`, `test`)
+- `LOG_LEVEL`: Logging level (`info`, `debug`, `warn`, `error`)
+- `APP_URL`: Application base URL for links
+- `API_BASE_URL`: API base URL for external references
 
 ### 2. Install Dependencies
 
@@ -150,7 +220,7 @@ pnpm docker:full
 
 ```bash
 pnpm prisma:generate
-pnpm prisma:migrate:dev --name init
+pnpm prisma:migrate:dev
 pnpm prisma:seed
 ```
 
@@ -237,10 +307,10 @@ REDIS_URL=redis://localhost:6379
 
 ### Testing
 
-- **Unit tests**: `pnpm test:unit` - 17 tests with full mocking
+- **Unit tests**: `pnpm test:unit` - 52 tests with full mocking
 - **E2E tests**: `pnpm test:e2e` - Application startup and endpoint tests
 - **All tests**: `pnpm test:all` - Test suite for CI/CD
-- **Coverage**: `pnpm test:unit --coverage` - Code coverage reports
+- **Coverage**: Add `--coverage` flag to any test command for coverage reports
 
 All tests use comprehensive mocking (Prisma, Redis, bcrypt) and run without external dependencies.
 
