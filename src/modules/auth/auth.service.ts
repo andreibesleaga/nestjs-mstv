@@ -77,18 +77,62 @@ export class AuthService {
       }
 
       const hashed = await bcrypt.hash(password, 10);
-      const user = await this.prisma.user.create({
-        data: {
-          email,
-          password: hashed,
-          name,
-          role: 'user',
-        },
-      });
+
+      // Add retry logic for database operations
+      let retries = 3;
+      let user = null;
+
+      while (retries > 0 && !user) {
+        try {
+          user = await this.prisma.user.create({
+            data: {
+              email,
+              password: hashed,
+              name,
+              role: 'user',
+            },
+          });
+
+          if (user && user.id) {
+            break; // Success!
+          }
+
+          this.logger.warn(
+            `User creation returned null/invalid user, retrying... (${retries} attempts left)`
+          );
+          retries--;
+          if (retries > 0) {
+            await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay
+          }
+        } catch (dbError) {
+          if (dbError.code === 'P2002') {
+            // Unique constraint violation - don't retry
+            throw new UserAlreadyExistsError(email);
+          }
+
+          this.logger.warn(
+            `Database error during user creation, retrying... (${retries} attempts left):`,
+            dbError.message
+          );
+          retries--;
+          if (retries === 0) {
+            throw dbError;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100)); // Small delay before retry
+        }
+      }
+
+      if (!user) {
+        throw new Error('User creation failed after retries - prisma returned null');
+      }
+
+      if (!user.id) {
+        throw new Error(`User creation failed - no user id. User object: ${JSON.stringify(user)}`);
+      }
 
       this.logger.log(`User registered successfully: ${user.id}`);
 
-      // Publish events
+      // Publish events (with error tolerance)
       try {
         await this.userKafkaService?.publishUserRegistered(
           user.id,
@@ -110,7 +154,7 @@ export class AuthService {
       if (error instanceof ValidationError || error instanceof UserAlreadyExistsError) {
         throw error;
       }
-      this.logger.error(`Registration failed for ${email}:`, error);
+      this.logger.error(`Registration failed for ${email}:`, error.message || error);
       throw error;
     }
   }

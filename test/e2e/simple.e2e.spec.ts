@@ -16,17 +16,39 @@ describe('Simple E2E Tests', () => {
       $connect: jest.fn(),
       $disconnect: jest.fn(),
       user: {
-        findUnique: jest.fn(),
-        create: jest.fn(),
+        findUnique: jest.fn().mockResolvedValue(null),
+        create: jest.fn().mockImplementation(({ data }) => {
+          return Promise.resolve({
+            id: 'test-user-id',
+            email: data.email,
+            name: data.name,
+            password: data.password,
+            role: data.role || 'user',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }),
         findMany: jest.fn().mockResolvedValue([]),
-        update: jest.fn(),
-        delete: jest.fn(),
+        update: jest.fn().mockImplementation(({ data }) => {
+          return Promise.resolve({
+            id: 'test-user-id',
+            ...data,
+            updatedAt: new Date(),
+          });
+        }),
+        delete: jest.fn().mockResolvedValue({
+          id: 'test-user-id',
+        }),
       },
       refreshToken: {
-        create: jest.fn(),
-        findUnique: jest.fn(),
-        updateMany: jest.fn(),
-        deleteMany: jest.fn(),
+        create: jest.fn().mockResolvedValue({
+          id: 'test-token-id',
+          token: 'mock-refresh-token',
+          userId: 'test-user-id',
+        }),
+        findUnique: jest.fn().mockResolvedValue(null),
+        updateMany: jest.fn().mockResolvedValue({ count: 1 }),
+        deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
       },
     };
 
@@ -96,10 +118,11 @@ describe('Simple E2E Tests', () => {
     });
 
     it('should handle GraphQL mutations', () => {
+      const uniqueEmail = `test-simple-${Date.now()}@example.com`;
       const mutation = `
         mutation {
           register(input: {
-            email: "test@example.com"
+            email: "${uniqueEmail}"
             password: "password123"
             name: "Test User"
           }) {
@@ -123,10 +146,11 @@ describe('Simple E2E Tests', () => {
 
   describe('REST Endpoints', () => {
     it('should handle auth register endpoint', () => {
+      const uniqueEmail = `test-auth-${Date.now()}@example.com`;
       return request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: process.env.TEST_EMAIL || 'test@example.com',
+          email: process.env.TEST_EMAIL || uniqueEmail,
           password: process.env.TEST_PASSWORD || 'password123',
           name: 'Test User',
         })
@@ -136,10 +160,11 @@ describe('Simple E2E Tests', () => {
     });
 
     it('should handle auth login endpoint', () => {
+      const uniqueEmail = `test-login-${Date.now()}@example.com`;
       return request(app.getHttpServer())
         .post('/auth/login')
         .send({
-          email: process.env.TEST_EMAIL || 'test@example.com',
+          email: process.env.TEST_EMAIL || uniqueEmail,
           password: process.env.TEST_PASSWORD || 'password123',
         })
         .expect((res) => {

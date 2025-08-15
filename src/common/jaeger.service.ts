@@ -17,22 +17,31 @@ export class JaegerService implements OnModuleInit {
     try {
       const jaeger = require('jaeger-client');
       const jaegerConfig = this.config.getJaegerConfig();
-      
-      this.tracer = jaeger.initTracer(jaegerConfig, {
+
+      // Make jaeger initialization more resilient
+      const config = {
+        serviceName: jaegerConfig.serviceName || 'nestjs-api',
+        sampler: {
+          type: 'const',
+          param: 1,
+        },
         reporter: {
           collectorEndpoint: process.env.JAEGER_ENDPOINT,
+          logSpans: false,
         },
-      });
+      };
 
+      this.tracer = jaeger.initTracer(config);
       this.logger.log('Jaeger tracing initialized');
     } catch (error) {
       this.logger.error('Failed to initialize Jaeger:', error.message);
+      // Don't let Jaeger failures prevent app startup
     }
   }
 
   startSpan(operationName: string, parentSpan?: any): any {
     if (!this.tracer) return null;
-    
+
     try {
       return this.tracer.startSpan(operationName, { childOf: parentSpan });
     } catch (error) {
@@ -43,7 +52,7 @@ export class JaegerService implements OnModuleInit {
 
   finishSpan(span: any, tags?: Record<string, any>): void {
     if (!span) return;
-    
+
     try {
       if (tags) {
         Object.entries(tags).forEach(([key, value]) => {

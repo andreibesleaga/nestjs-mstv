@@ -52,10 +52,11 @@ describe('Auth E2E', () => {
     });
 
     it('should fail with short password', () => {
+      const uniqueEmail = `test-short-${Date.now()}@example.com`;
       return request(app.getHttpServer())
         .post('/auth/register')
         .send({
-          email: 'test@example.com',
+          email: uniqueEmail,
           password: '123',
           name: 'Test User',
         })

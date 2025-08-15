@@ -9,7 +9,11 @@ export class MongoDbService implements OnModuleInit, OnModuleDestroy {
 
   constructor() {
     const url = process.env.MONGODB_URL || 'mongodb://localhost:27017';
-    this.client = new MongoClient(url);
+    // Add auth source for authentication with Docker MongoDB
+    const options = {
+      authSource: 'admin', // Use admin database for authentication
+    };
+    this.client = new MongoClient(url, options);
   }
 
   async onModuleInit() {

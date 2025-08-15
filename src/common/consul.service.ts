@@ -25,10 +25,17 @@ export class ConsulService implements OnModuleInit, OnModuleDestroy {
       const consulConfig = this.config.getConsulConfig();
       this.serviceId = consulConfig.service.id;
 
-      await this.consul.agent.service.register(consulConfig.service);
-      this.logger.log(`Service registered with Consul: ${this.serviceId}`);
+      // Make consul registration non-blocking to prevent app startup failure
+      this.consul.agent.service.register(consulConfig.service, (err: any) => {
+        if (err) {
+          this.logger.error('Failed to register with Consul:', err.message);
+        } else {
+          this.logger.log(`Service registered with Consul: ${this.serviceId}`);
+        }
+      });
     } catch (error) {
-      this.logger.error('Failed to register with Consul:', error.message);
+      this.logger.error('Failed to initialize Consul:', error.message);
+      // Don't let Consul failures prevent app startup
     }
   }
 
@@ -45,7 +52,7 @@ export class ConsulService implements OnModuleInit, OnModuleDestroy {
 
   async getHealthyServices(serviceName: string): Promise<any[]> {
     if (!this.consul) return [];
-    
+
     try {
       const result = await this.consul.health.service({ service: serviceName, passing: true });
       return result;
