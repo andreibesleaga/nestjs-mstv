@@ -2,7 +2,7 @@
 
 ## Overview
 
-The NestJS MSTV (Microservices Template Variant) is a production-ready, enterprise-grade template implementing Clean Architecture principles with comprehensive microservices support. It provides a scalable foundation for building distributed applications with built-in observability, caching, circuit breakers, and multiple protocol support.
+The NestJS MSTV (Microservices Template Variant) is a NestJs/Node.js based template implementing clean Architecture principles with comprehensive microservices support. It provides a scalable foundation for building distributed applications with built-in observability, caching, circuit breakers, and multiple protocol support.
 
 ## Architecture Principles
 
