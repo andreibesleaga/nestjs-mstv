@@ -9,15 +9,16 @@ import { FeatureFlagsService } from '../common/feature-flags.service';
 @Module({
   imports: [AuthModule],
   providers: [
+    // Always provide HttpsService; it internally gates behavior via FeatureFlagsService
     FeatureFlagsService,
-    ...(process.env.ENABLE_HTTPS === 'true' ? [HttpsService] : []),
+    HttpsService,
     ...(process.env.ENABLE_WEBSOCKET === 'true' ? [AppWebSocketGateway] : []),
     ...(process.env.ENABLE_MQTT === 'true' ? [MqttService] : []),
     ...(process.env.ENABLE_GRPC === 'true' ? [GrpcUserService] : []),
   ],
   exports: [
     FeatureFlagsService,
-    ...(process.env.ENABLE_HTTPS === 'true' ? [HttpsService] : []),
+    HttpsService,
     ...(process.env.ENABLE_WEBSOCKET === 'true' ? [AppWebSocketGateway] : []),
     ...(process.env.ENABLE_MQTT === 'true' ? [MqttService] : []),
     ...(process.env.ENABLE_GRPC === 'true' ? [GrpcUserService] : []),

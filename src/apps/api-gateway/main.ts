@@ -6,7 +6,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from '../../modules/auth/filters/global-exception.filter';
 import { HttpsService } from '../../protocols/https.service';
-import { FeatureFlagsService } from '../../common/feature-flags.service';
 
 import {
   UserSchema,
@@ -18,7 +17,10 @@ import {
 } from '../../schemas/openapi.schemas';
 
 async function bootstrap() {
-  const httpsService = new HttpsService(new FeatureFlagsService());
+  const context = await NestFactory.createApplicationContext(AppModule, {
+    logger: false,
+  });
+  const httpsService = context.get(HttpsService);
   const httpsOptions = httpsService.getHttpsOptions();
 
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -160,5 +162,6 @@ async function bootstrap() {
   console.log(`OpenAPI JSON: ${baseUrl}/api-json`);
   console.log(`GraphQL Schema: Auto-generated from resolvers`);
   console.log(`Kafka Schemas: Available in /src/schemas/kafka.schemas.ts`);
+  await context.close();
 }
 bootstrap();
