@@ -1,0 +1,8 @@
+flowchart LR
+  A[Incoming request] --> B[Extract user and roles]
+  B --> C{Has JWT and valid}
+  C -- no --> F[Reject 401]
+  C -- yes --> D[Build abilities with CASL]
+  D --> E{Can perform action on resource}
+  E -- yes --> G[Proceed controller handler]
+  E -- no --> H[Reject 403]

@@ -1,0 +1,48 @@
+flowchart TB
+  src --> apps
+  src --> common
+  src --> modules
+  src --> protocols
+  src --> schemas
+
+  subgraph apps
+    api[api-gateway]
+  end
+
+  subgraph common
+    cache[cache.service]
+    circuit[circuit-breaker.service]
+    consul[consul.service]
+    cqrs[cqrs/]
+    dbconf[database.config]
+    email[emailing.service]
+    env[environment.validation]
+    ff[feature-flags.service]
+    health[health.service]
+    http[http-client.service]
+    jaeger[jaeger.service]
+    logger[logger.config]
+    messaging[messaging/]
+    mongo[mongodb.service]
+    otel[opentelemetry]
+    prisma[prisma.service]
+    storage[storage/]
+  end
+
+  subgraph modules
+    auth[auth/]
+    users[users/]
+  end
+
+  subgraph protocols
+    grpc[grpc/]
+    https[https.service]
+    mqtt[mqtt.service]
+    ws[websocket.gateway]
+  end
+
+  subgraph schemas
+    gql[graphql.schemas]
+    openapi[openapi.schemas]
+    kafka[kafka.schemas]
+  end

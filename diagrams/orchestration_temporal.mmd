@@ -1,0 +1,16 @@
+sequenceDiagram
+  participant Client
+  participant Temporal as Temporal Workflow
+  participant Users
+  participant Orders
+  participant Payments
+
+  Client->>Temporal: start hybrid workflow
+  Temporal->>Users: activity: createUser
+  Users-->>Temporal: ok
+  Temporal->>Orders: activity: createOrder
+  Orders-->>Temporal: ok
+  Temporal->>Payments: activity: capturePayment
+  Payments-->>Temporal: ok
+  Note over Temporal: Wait for external signals if needed
+  Temporal-->>Client: result SUCCESS

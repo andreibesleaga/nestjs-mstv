@@ -1,0 +1,40 @@
+graph TB
+    subgraph "Command Side (Write)"
+        Commands[Commands]
+        CommandHandlers[Command Handlers]
+        WriteDB[(Write Database\nPostgreSQL)]
+        EventStore[(Event Store)]
+    end
+
+    subgraph "Event Processing"
+        EventBus[Event Bus\nKafka]
+        EventHandlers[Event Handlers]
+    end
+
+    subgraph "Query Side (Read)"
+        Queries[Queries]
+        QueryHandlers[Query Handlers]
+        ReadDB[(Read Database\nMongoDB)]
+        Cache[(Cache\nRedis)]
+    end
+
+    subgraph "External Services"
+        EmailService[Email Service]
+        NotificationService[Notification Service]
+        AuditService[Audit Service]
+    end
+
+    Commands --> CommandHandlers
+    CommandHandlers --> WriteDB
+    CommandHandlers --> EventStore
+    EventStore --> EventBus
+
+    EventBus --> EventHandlers
+    EventHandlers --> ReadDB
+    EventHandlers --> EmailService
+    EventHandlers --> NotificationService
+    EventHandlers --> AuditService
+
+    Queries --> QueryHandlers
+    QueryHandlers --> ReadDB
+    QueryHandlers --> Cache

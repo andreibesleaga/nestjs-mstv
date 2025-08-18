@@ -1,0 +1,29 @@
+flowchart LR
+  Clients[Web / Mobile / CLI]
+  LB[Load Balancer]
+  LB --> API[API Gateway]
+  Clients --> LB
+
+  subgraph App[Application]
+    Modules[Domain Modules]
+  Protocols[Protocols HTTP GraphQL WS gRPC MQTT]
+  Coordination[Temporal Coordination optional]
+  end
+
+  API --> Modules
+  Modules --> DB[(Relational/NoSQL DB)]
+  Modules --> Cache[(Redis)]
+  Modules <--> Kafka[(Kafka)]
+  Modules --> Storage[(S3/Azure/GCS)]
+
+  subgraph Infra[Infrastructure]
+    Consul[Consul Discovery]
+    Jaeger[Tracing OTel]
+    Prom[Prometheus]
+    PgB[PgBouncer]
+  end
+
+  API -. register .-> Consul
+  API -. trace .-> Jaeger
+  Modules -. metrics .-> Prom
+  DB -. pool .-> PgB

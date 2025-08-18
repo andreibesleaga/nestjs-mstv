@@ -1,0 +1,9 @@
+flowchart LR
+  SCHED[Temporal Schedule] --> WF[hybridWorkflow]
+  WF --> TQ[Task Queue coordination]
+  WF --> ACT1[action1]
+  WF --> ACT2[action2]
+  WF --> ACT3[action3]
+  EXT1[External service 1] -.-> WF
+  EXT2[External service 2] -.-> WF
+  EXT3[External service 3] -.-> WF

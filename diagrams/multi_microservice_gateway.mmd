@@ -1,0 +1,29 @@
+flowchart LR
+  C[Clients] --> GW[API Gateway]
+  GW --> S1[Users Service]
+  GW --> S2[Orders Service]
+  GW --> S3[Payments Service]
+
+  S1 --- DB1[(DB1)]
+  S2 --- DB2[(DB2)]
+  S3 --- DB3[(DB3)]
+
+  subgraph Shared
+    KAFKA[(Kafka Bus)]
+    REDIS[(Redis Cache)]
+    STORE[(Object Storage)]
+  end
+
+  S1 <--> KAFKA
+  S2 <--> KAFKA
+  S3 <--> KAFKA
+  GW --- REDIS
+  GW --- STORE
+
+  subgraph Optional Coordination
+    TEMPORAL[Temporal Workflows Schedules Signals]
+  end
+
+  TEMPORAL <--> S1
+  TEMPORAL <--> S2
+  TEMPORAL <--> S3

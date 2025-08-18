@@ -1,0 +1,10 @@
+flowchart TB
+  Dev[Local Dev Docker Compose] --> Stack1[Postgres + Redis + Kafka]
+  Stack1 --> App1[App]
+
+  Full[Full Docker Compose] --> Stack2[+ MongoDB + Consul + Jaeger + PgBouncer]
+  Stack2 --> App2[App]
+
+  K8s[Kubernetes] --> Deploy[Deployment + Service + Ingress]
+  Deploy --> Probes[Liveness/Readiness]
+  K8s --> Observ[OTel/Jaeger/Prometheus]

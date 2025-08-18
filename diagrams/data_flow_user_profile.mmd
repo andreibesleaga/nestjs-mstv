@@ -1,0 +1,10 @@
+flowchart LR
+  Client --> API[API Gateway]
+  API --> Ctrl[UsersController]
+  Ctrl --> Svc[UsersService]
+  Svc --> Repo[UsersRepository]
+  Repo --> Prisma[Prisma Client]
+  Prisma --> DB[(Database)]
+  Svc --> Cache[(Redis Cache)]
+  Svc --> Events[(Kafka Events)]
+  Events --> Consumers[Downstream Consumers]

@@ -1211,6 +1211,160 @@ Regular updates of dependencies and security patches:
 
 ---
 
+## 🧭 Coordination with Temporal (Cron + Orchestration + Signals)
+
+This template includes an optional hybrid coordination package using Temporal to support:
+
+- Cron schedules (Temporal Schedules)
+- Orchestration (Saga-style workflows + compensations)
+- Choreography via Signals (external services signaling progress)
+
+Docs: see `coordination/README.md`.
+
+Quick commands:
+
+```bash
+# Start local Temporal and UI
+npm run coordination:temporal:up
+
+# Run the coordination worker
+npm run coordination:worker
+
+# Run the hybrid smoke (starts workflow and signals it)
+npm run coordination:smoke
+
+# One-step orchestrated smoke (brings up Temporal, starts worker, runs smoke)
+npm run coordination:smoke:local
+
+# Tear down local Temporal
+npm run coordination:temporal:down
+```
+
+## 📐 Architecture Diagrams
+
+These diagrams illustrate how this template can be used in different setups. They are examples; tailor to your needs.
+
+### 1) Core architecture (single service)
+
+```mermaid
+flowchart LR
+  C[Clients: Web/Mobile/CLI] --> GW[API Gateway (Fastify)]
+  GW --> M1[Modules: Auth]
+  GW --> M2[Modules: Users]
+  GW --> M3[Modules: Emails]
+
+  subgraph Infra
+    DB[(PostgreSQL/MySQL/MongoDB)]
+    REDIS[(Redis)]
+    KAFKA[(Kafka)]
+    STORE[(S3/Azure/GCS/Memory)]
+  end
+
+  M1 --- DB
+  M2 --- DB
+  M3 --- DB
+  GW --- REDIS
+  GW --- STORE
+  GW <--> KAFKA
+
+  subgraph Observability
+    JAEGER[Jaeger]
+    CONSUL[Consul]
+  end
+
+  GW -. tracing .-> JAEGER
+  GW -. discovery .-> CONSUL
+```
+
+Rendered diagram:
+
+![Core architecture](diagrams/svg/core_architecture.svg)
+
+### 2) Multi-microservice with API Gateway
+
+```mermaid
+flowchart LR
+  C[Clients] --> GW[API Gateway]
+  GW --> S1[Users Service]
+  GW --> S2[Orders Service]
+  GW --> S3[Payments Service]
+
+  S1 --- DB1[(DB1)]
+  S2 --- DB2[(DB2)]
+  S3 --- DB3[(DB3)]
+
+  subgraph Shared
+    KAFKA[(Kafka Bus)]
+    REDIS[(Redis Cache)]
+    STORE[(Object Storage)]
+  end
+
+  S1 <--> KAFKA
+  S2 <--> KAFKA
+  S3 <--> KAFKA
+  GW --- REDIS
+  GW --- STORE
+
+  subgraph Optional Coordination
+    TEMPORAL[Temporal (Workflows + Schedules + Signals)]
+  end
+
+  TEMPORAL <--> S1
+  TEMPORAL <--> S2
+  TEMPORAL <--> S3
+```
+
+Rendered diagram:
+
+![Multi-microservice with API Gateway](diagrams/svg/multi_microservice_gateway.svg)
+
+### 3) Choreography (event-driven) between services
+
+```mermaid
+sequenceDiagram
+  participant Users
+  participant Orders
+  participant Payments
+  participant Kafka as Kafka Bus
+
+  Users->>Kafka: emit UserRegistered
+  Kafka-->>Orders: UserRegistered
+  Orders->>Kafka: emit OrderCreated
+  Kafka-->>Payments: OrderCreated
+  Payments->>Kafka: emit PaymentCaptured
+  Kafka-->>Orders: PaymentCaptured
+  Orders-->>Users: update status
+```
+
+Rendered diagram:
+
+![Choreography (event-driven)](diagrams/svg/choreography_kafka.svg)
+
+### 4) Orchestration (Temporal) across services
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Temporal as Temporal Workflow
+  participant Users
+  participant Orders
+  participant Payments
+
+  Client->>Temporal: start hybrid workflow
+  Temporal->>Users: activity: createUser
+  Users-->>Temporal: ok
+  Temporal->>Orders: activity: createOrder
+  Orders-->>Temporal: ok
+  Temporal->>Payments: activity: capturePayment
+  Payments-->>Temporal: ok
+  Note over Temporal: Wait for external signals if needed
+  Temporal-->>Client: result SUCCESS
+```
+
+Rendered diagram:
+
+![Orchestration (Temporal)](diagrams/svg/orchestration_temporal.svg)
+
 ## 🎆 **Production Development Readiness**
 
 ## ✅ **Completed Features**

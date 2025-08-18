@@ -1,0 +1,15 @@
+sequenceDiagram
+  autonumber
+  participant C as Caller/Schedule
+  participant W as Workflow (hybridWorkflow)
+  participant A1 as Activity: action1
+  participant A2 as Activity: action2
+  participant A3 as Activity: action3
+  C->>W: start(input)
+  W->>A1: action1(input)
+  A1-->>W: ok
+  W->>A2: action2(input)
+  A2-->>W: ok
+  W->>A3: action3(input)
+  A3-->>W: ok
+  Note over W: Compensations on failure (reaction1/reaction2)

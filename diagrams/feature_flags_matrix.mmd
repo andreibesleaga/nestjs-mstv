@@ -1,0 +1,9 @@
+flowchart LR
+  FF[Feature Flags] --> Storage[ENABLE_STORAGE]
+  FF --> OTel[ENABLE_OPENTELEMETRY]
+  FF --> Jaeger[ENABLE_JAEGER_TRACING]
+  FF --> Consul[ENABLE_CONSUL_DISCOVERY]
+  FF --> Redis[ENABLE_REDIS_CACHE]
+
+  Storage --> Providers[S3/Azure/GCS/Memory]
+  OTel --> Exports[OTLP/Prometheus]

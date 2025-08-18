@@ -1,0 +1,7 @@
+flowchart LR
+  App[StorageService]
+  App --> Mem[In-Memory]
+  App --> S3[AWS S3]
+  App --> Azure[Azure Blob]
+  App --> GCS[Google Cloud Storage]
+  S3 -. optional endpoint .- MinIO[MinIO]

@@ -1,0 +1,50 @@
+graph TB
+    Client[Client Applications]
+    Gateway[API Gateway Service]
+
+    subgraph "Business Services"
+        UserService[User Service\nPort: 3001]
+        AuthService[Auth Service\nPort: 3002]
+        NotificationService[Notification Service\nPort: 3003]
+        PaymentService[Payment Service\nPort: 3004]
+    end
+
+    subgraph "Infrastructure Services"
+        DB1[(User DB\nPostgreSQL)]
+        DB2[(Auth DB\nRedis)]
+        DB3[(Notification DB\nMongoDB)]
+        DB4[(Payment DB\nPostgreSQL)]
+    end
+
+    subgraph "Shared Infrastructure"
+        Consul[Service Discovery\nConsul]
+        Jaeger[Distributed Tracing\nJaeger]
+        Kafka[Event Streaming\nKafka]
+        MessageQueue[Message Queue]
+    end
+
+    Client --> Gateway
+    Gateway --> UserService
+    Gateway --> AuthService
+    Gateway --> NotificationService
+    Gateway --> PaymentService
+
+    UserService --> DB1
+    AuthService --> DB2
+    NotificationService --> DB3
+    PaymentService --> DB4
+
+    UserService --> Consul
+    AuthService --> Consul
+    NotificationService --> Consul
+    PaymentService --> Consul
+
+    UserService --> Jaeger
+    AuthService --> Jaeger
+    NotificationService --> Jaeger
+    PaymentService --> Jaeger
+
+    UserService --> Kafka
+    AuthService --> Kafka
+    NotificationService --> Kafka
+    PaymentService --> Kafka

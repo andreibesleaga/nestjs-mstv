@@ -1,0 +1,13 @@
+sequenceDiagram
+  participant Users
+  participant Orders
+  participant Payments
+  participant Kafka as Kafka Bus
+
+  Users->>Kafka: emit UserRegistered
+  Kafka-->>Orders: UserRegistered
+  Orders->>Kafka: emit OrderCreated
+  Kafka-->>Payments: OrderCreated
+  Payments->>Kafka: emit PaymentCaptured
+  Kafka-->>Orders: PaymentCaptured
+  Orders-->>Users: update status

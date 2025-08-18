@@ -1,0 +1,13 @@
+flowchart LR
+  GW[API Gateway] -->|scale out| Apps[App replicas HPA]
+  Apps --> DB[(DB with connection pool/PgBouncer)]
+  Apps --> Cache[(Redis Cache)]
+  Apps <--> Kafka[(Kafka Cluster)]
+  subgraph Patterns
+    CB[Circuit Breaker]
+    RL[Rate Limit]
+    CachePat[Cache Aside]
+  end
+  Apps --- CB
+  GW --- RL
+  Apps --- CachePat

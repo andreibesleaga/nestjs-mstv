@@ -1,0 +1,8 @@
+flowchart LR
+  App[Application] --> OTel[OpenTelemetry SDK]
+  OTel --> OTLP[OTLP Exporter]
+  OTLP --> Jaeger[Jaeger]
+  OTLP --> SigNoz[SigNoz]
+  OTLP --> Datadog[Datadog]
+  OTel -->|metrics| Prom[Prometheus Exporter]
+  Prom --> Prometheus[Prometheus Server]

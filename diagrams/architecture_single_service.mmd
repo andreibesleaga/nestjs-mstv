@@ -1,0 +1,30 @@
+graph TB
+    Client[Client Applications]
+    LB[Load Balancer]
+
+    subgraph "NestJS MSTV Service"
+        API[API Gateway]
+        Auth[Auth Module]
+        Users[Users Module]
+        Protocols[Protocol Layer]
+    end
+
+    subgraph "Infrastructure"
+        DB[(PostgreSQL)]
+        MongoDB[(MongoDB)]
+        Redis[(Redis Cache)]
+        Consul[Consul]
+        Jaeger[Jaeger Tracing]
+    end
+
+    Client --> LB
+    LB --> API
+    API --> Auth
+    API --> Users
+    API --> Protocols
+
+    Auth --> Redis
+    Users --> DB
+    Users --> MongoDB
+    API --> Consul
+    API --> Jaeger

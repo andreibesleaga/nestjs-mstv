@@ -204,6 +204,10 @@ graph TB
     API --> Jaeger
 ```
 
+Rendered diagram:
+
+![Single Service Deployment](diagrams/svg/architecture_single_service.svg)
+
 ### 2. Multi-Service Microservices Architecture
 
 ```mermaid
@@ -259,6 +263,10 @@ graph TB
     PaymentService --> Kafka
 ```
 
+Rendered diagram:
+
+![Multi-Service Microservices Architecture](diagrams/svg/architecture_multi_service.svg)
+
 ### 3. Event-Driven Architecture with CQRS
 
 ```mermaid
@@ -303,6 +311,10 @@ graph TB
     QueryHandlers --> ReadDB
     QueryHandlers --> Cache
 ```
+
+Rendered diagram:
+
+![Event-Driven Architecture with CQRS](diagrams/svg/architecture_event_driven_cqrs.svg)
 
 ## Deployment Examples
 
@@ -517,3 +529,35 @@ The template emphasizes:
 - **Production Readiness**: Built-in observability and reliability features
 - **Flexibility**: Multiple protocols and deployment options
 - **Scalability**: Microservices-ready architecture with event-driven patterns
+
+## Diagrams Index
+
+Quick links to all rendered SVG diagrams:
+
+- [Single Service Deployment](diagrams/svg/architecture_single_service.svg)
+- [Multi-Service Microservices Architecture](diagrams/svg/architecture_multi_service.svg)
+- [Event-Driven Architecture with CQRS](diagrams/svg/architecture_event_driven_cqrs.svg)
+- [Core Architecture Overview](diagrams/svg/core_architecture.svg)
+- [Multi-Microservice Gateway](diagrams/svg/multi_microservice_gateway.svg)
+- [Choreography (Kafka)](diagrams/svg/choreography_kafka.svg)
+- [Orchestration (Temporal)](diagrams/svg/orchestration_temporal.svg)
+- [Coordination: Orchestration Flow](diagrams/svg/coordination_orchestration.svg)
+- [Coordination: Signals Flow](diagrams/svg/coordination_signals.svg)
+- [Coordination: Cron/Schedule](diagrams/svg/coordination_cron.svg)
+
+Additional diagrams:
+
+- [Request Lifecycle](diagrams/svg/request_lifecycle.svg)
+- [JWT Authentication Flow](diagrams/svg/auth_jwt_flow.svg)
+- [Authorization (CASL) Flow](diagrams/svg/authorization_casl_flow.svg)
+- [Circuit Breaker State Machine](diagrams/svg/circuit_breaker_state_machine.svg)
+- [Observability Pipeline (OTel → OTLP)](diagrams/svg/observability_pipeline.svg)
+- [Storage Adapters](diagrams/svg/storage_adapters.svg)
+- [Data Flow: User Profile](diagrams/svg/data_flow_user_profile.svg)
+- [Deployment Options](diagrams/svg/deployment_options.svg)
+- [Scalability Patterns](diagrams/svg/scalability_patterns.svg)
+- [src Structure](diagrams/svg/src_structure.svg)
+- [Overall System Architecture](diagrams/svg/overall_system_architecture.svg)
+- [Microservice Run Modes](diagrams/svg/microservice_run_modes.svg)
+- [Feature Flags Matrix](diagrams/svg/feature_flags_matrix.svg)
+- [Coordination Topologies](diagrams/svg/coordination_topologies.svg)

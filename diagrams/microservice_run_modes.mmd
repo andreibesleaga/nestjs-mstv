@@ -1,0 +1,14 @@
+flowchart TB
+  Monolith[Single Service Monolith] --> API1[API Gateway plus Modules]
+
+  Gateway[API Gateway Service] --> UsersSvc[Users Service]
+  Gateway --> AuthSvc[Auth Service]
+
+  subgraph Optional
+    Temporal[Temporal Worker]
+    Kafka[Kafka Bus]
+    Redis[Redis]
+  end
+
+  classDef opt fill:#eef,stroke:#66f,stroke-width:1px
+  class Temporal,Kafka,Redis opt

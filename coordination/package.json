@@ -1,0 +1,31 @@
+{
+  "name": "nestjs-mstv-coordination",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hybrid Temporal.io coordination (cron + orchestration + signals) for nestjs-mstv template.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start:worker": "node dist/worker.js",
+    "dev:worker": "ts-node src/worker.ts",
+    "create:schedule": "ts-node src/scheduler.ts",
+    "create:health-schedule": "ts-node src/schedule-health.ts",
+    "smoke": "ts-node src/smoke.ts",
+    "test": "jest --config jest.config.js --ci"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "@temporalio/client": "^1.9.3",
+    "@temporalio/worker": "^1.9.3",
+    "@temporalio/workflow": "^1.9.3",
+    "undici": "^6.20.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.12.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  }
+}

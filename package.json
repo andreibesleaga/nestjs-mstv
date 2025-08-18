@@ -21,8 +21,8 @@
     "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
     "docker:down": "docker-compose -f docker/docker-compose.yml down",
     "docker:full": "docker-compose -f docker/docker-compose.full.yml up -d",
-    "lint": "eslint '{src,test}/**/*.{js,ts}' --fix",
-    "format": "prettier --write '{src,test}/**/*.{js,ts,json}'",
+    "lint": "eslint '{src,test,coordination/{src,test}}/**/*.{js,ts}' --fix",
+    "format": "prettier --write '{src,test,coordination/{src,test}}/**/*.{js,ts,json}'",
     "prepare": "husky",
     "prisma:generate": "node scripts/switch-prisma-provider.js && prisma generate",
     "prisma:migrate:dev": "prisma migrate dev --name init --preview-feature",
@@ -30,7 +30,13 @@
     "mongodb:migrate": "ts-node mongodb/migration-runner.ts up",
     "mongodb:rollback": "ts-node mongodb/migration-runner.ts down",
     "mongodb:seed": "ts-node mongodb/seed-runner.ts",
-    "test:performance": "jest test/performance/load.test.ts"
+    "test:performance": "jest test/performance/load.test.ts",
+    "diagrams:render": "bash scripts/render-diagrams.sh",
+    "coordination:temporal:up": "docker compose -f coordination/docker-compose.temporal.yml up -d",
+    "coordination:temporal:down": "docker compose -f coordination/docker-compose.temporal.yml down -v",
+    "coordination:worker": "pnpm -F nestjs-mstv-coordination run dev:worker",
+    "coordination:smoke": "pnpm -F nestjs-mstv-coordination run smoke",
+    "coordination:smoke:local": "bash scripts/coordination-smoke.sh"
   },
   "lint-staged": {
     "*.ts": [

@@ -1,0 +1,21 @@
+sequenceDiagram
+  participant Client
+  participant API as API Gateway
+  participant Controller
+  participant Service
+  participant Repo as Repository
+  participant DB as Database
+  participant Redis as Cache Redis
+  participant Kafka as Kafka Bus
+
+  Client->>API: HTTP request
+  API->>Controller: route handler
+  Controller->>Service: validate and call
+  Service->>Repo: persist or query
+  Repo-->>DB: query or write
+  DB-->>Repo: result
+  Service-->>Redis: cache read or write
+  Service-->>Kafka: emit domain event
+  Service-->>Controller: response data
+  Controller-->>API: HTTP response
+  API-->>Client: response 200

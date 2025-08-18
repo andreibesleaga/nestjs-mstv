@@ -1,0 +1,10 @@
+sequenceDiagram
+  participant ES1 as External Service 1
+  participant ES2 as External Service 2
+  participant ES3 as External Service 3
+  participant W as Workflow (hybridWorkflow)
+  ES1-->>W: signal progress ACTION1_DONE
+  ES2-->>W: signal progress ACTION2_DONE
+  ES3-->>W: signal progress ACTION3_DONE
+  W-->>W: condition(() => all done)
+  W-->ES1: completes

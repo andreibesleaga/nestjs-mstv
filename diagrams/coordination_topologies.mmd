@@ -1,0 +1,20 @@
+flowchart LR
+  subgraph Temporal[Temporal Coordination]
+    Sched[Schedules]
+    WF[Workflows]
+    Sig[Signals]
+  end
+
+  subgraph Services[Microservices]
+    U[Users]
+    A[Auth]
+    N[Notifications]
+    P[Payments]
+  end
+
+  Sched --> WF
+  Sig -.-> WF
+  WF --> U
+  WF --> A
+  WF --> N
+  WF --> P

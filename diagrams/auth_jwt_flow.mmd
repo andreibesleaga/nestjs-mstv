@@ -1,0 +1,30 @@
+sequenceDiagram
+  participant User
+  participant API as API Gateway
+  participant Auth as Auth Controller
+  participant AuthSvc as Auth Service
+  participant Prisma as Database
+  participant Redis as Redis Blacklist
+
+  User->>API: POST /auth/login
+  API->>Auth: forward login
+  Auth->>AuthSvc: validate credentials
+  AuthSvc->>Prisma: find user
+  Prisma-->>AuthSvc: user ok
+  AuthSvc-->>Auth: issue access and refresh tokens
+  Auth-->>API: tokens
+  API-->>User: 200 with tokens
+
+  User->>API: GET /profile with JWT
+  API->>Auth: verify JWT
+  Auth->>Redis: check revoked
+  Redis-->>Auth: not revoked
+  Auth-->>API: ok
+  API-->>User: profile data
+
+  User->>API: POST /auth/logout
+  API->>Auth: revoke token
+  Auth->>Redis: add to blacklist
+  Redis-->>Auth: ok
+  Auth-->>API: 204
+  API-->>User: logged out

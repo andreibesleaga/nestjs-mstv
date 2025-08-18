@@ -1,0 +1,27 @@
+flowchart LR
+  C[Clients] --> GW[API Gateway]
+  GW --> M1[Module Auth]
+  GW --> M2[Module Users]
+  GW --> M3[Module Emails]
+
+  subgraph Infra
+    DB[(PostgreSQL/MySQL/MongoDB)]
+    REDIS[(Redis)]
+    KAFKA[(Kafka)]
+    STORE[(S3/Azure/GCS/Memory)]
+  end
+
+  M1 --- DB
+  M2 --- DB
+  M3 --- DB
+  GW --- REDIS
+  GW --- STORE
+  GW <--> KAFKA
+
+  subgraph Observability
+    JAEGER[Jaeger]
+    CONSUL[Consul]
+  end
+
+  GW --- JAEGER
+  GW --- CONSUL
