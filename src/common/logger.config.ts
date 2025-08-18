@@ -1,5 +1,6 @@
 import { LoggerService } from '@nestjs/common';
 import pino from 'pino';
+import { getTraceId, getRequestId, getUserId, getMethod, getUrl, getIp } from './request-context';
 
 export class CustomLogger implements LoggerService {
   private logger: pino.Logger;
@@ -27,6 +28,24 @@ export class CustomLogger implements LoggerService {
         res: pino.stdSerializers.res,
         err: pino.stdSerializers.err,
       },
+      base: {
+        service: process.env.SERVICE_NAME || 'nestjs-mstv',
+        env: process.env.NODE_ENV || 'development',
+      },
+      // Include request-scoped context automatically in every log line
+      mixin: () => {
+        const ctx = {
+          traceId: getTraceId(),
+          requestId: getRequestId(),
+          userId: getUserId(),
+          method: getMethod(),
+          url: getUrl(),
+          ip: getIp(),
+        } as Record<string, unknown>;
+        // Remove undefined fields to keep logs clean
+        Object.keys(ctx).forEach((k) => (ctx[k] === undefined ? delete ctx[k] : undefined));
+        return ctx;
+      },
     });
   }
 
@@ -48,5 +67,12 @@ export class CustomLogger implements LoggerService {
 
   verbose(message: any, context?: string) {
     this.logger.trace({ context }, message);
+  }
+
+  /**
+   * Expose underlying pino instance so Fastify can reuse the same logger
+   */
+  getPino(): pino.Logger {
+    return this.logger;
   }
 }

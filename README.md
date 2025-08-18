@@ -376,6 +376,67 @@ All tests use comprehensive mocking (Prisma, Redis, bcrypt) and run without exte
 - **Jaeger UI**: `http://localhost:16686` (when enabled)
 - **Consul UI**: `http://localhost:8500` (when enabled)
 
+## Observability (OpenTelemetry + Logging)
+
+This template includes OpenTelemetry (OTel) support for distributed tracing and metrics, plus structured logs enriched with correlation metadata.
+
+### Enable OTel
+
+Set the following in your `.env`:
+
+```env
+ENABLE_OPENTELEMETRY=true
+SERVICE_NAME=nestjs-mstv
+
+# Traces (OTLP over HTTP)
+OTEL_TRACES_EXPORTER=otlp
+OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
+# Optional auth headers (JSON or comma-separated key=value pairs)
+# OTEL_EXPORTER_OTLP_HEADERS=api-key=xxx
+
+# Metrics (choose one)
+OTEL_METRICS_EXPORTER=none     # prometheus | otlp | none
+ENABLE_PROMETHEUS_METRICS=false
+PROMETHEUS_HOST=0.0.0.0
+PROMETHEUS_PORT=9464
+
+# Convenience endpoints (OTLP-compatible)
+# SigNoz
+ENABLE_SIGNOZ_TRACING=false
+SIGNOZ_ENDPOINT=http://localhost:4318/v1/traces
+
+# Datadog
+ENABLE_DATADOG_TRACING=false
+DATADOG_OTLP_ENDPOINT=http://localhost:4318/v1/traces
+```
+
+The app auto-initializes OTel at startup when `ENABLE_OPENTELEMETRY=true`.
+
+### Exporters
+
+- Jaeger (via OTLP): set `OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger-collector:4318`
+- SigNoz: set `SIGNOZ_ENDPOINT=http://signoz-otel-collector:4318/v1/traces` (or use `OTEL_EXPORTER_OTLP_ENDPOINT`)
+- Datadog: set `DATADOG_OTLP_ENDPOINT=http://datadog-agent:4318/v1/traces` (or use `OTEL_EXPORTER_OTLP_ENDPOINT` and headers)
+- Prometheus metrics: set `ENABLE_PROMETHEUS_METRICS=true` (scrape `http://host:9464/metrics`)
+- OTLP metrics: set `OTEL_METRICS_EXPORTER=otlp` and `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+Notes
+
+- All three backends (Jaeger, SigNoz, Datadog) can ingest OTLP; pick the URL that matches your setup.
+- Optional headers for auth can be provided via `OTEL_EXPORTER_OTLP_HEADERS`.
+
+### Log Correlation
+
+Pino logs automatically include these fields per request:
+
+- `traceId`, `requestId`, `userId`, `method`, `url`, `ip`, plus `service` and `env`.
+
+Every HTTP response also includes the headers:
+
+- `x-trace-id` and `x-request-id` for cross-system correlation.
+
+If OpenTelemetry is enabled, the logger will reuse the active OTel trace id, aligning logs with traces.
+
 ## API Examples
 
 ### REST Endpoints

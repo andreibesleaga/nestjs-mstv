@@ -69,6 +69,39 @@ export const EnvironmentSchema = z.object({
     .string()
     .transform((val) => val === 'true')
     .default('true'),
+
+  // Observability - OpenTelemetry & Exporters
+  ENABLE_OPENTELEMETRY: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  SERVICE_NAME: z.string().default('nestjs-mstv'),
+  OTEL_EXPORTER_OTLP_ENDPOINT: z.string().optional(),
+  OTEL_EXPORTER_OTLP_HEADERS: z.string().optional(),
+  OTEL_TRACES_EXPORTER: z.enum(['otlp', 'none']).default('otlp'),
+  OTEL_METRICS_EXPORTER: z.enum(['prometheus', 'otlp', 'none']).default('none'),
+
+  // Prometheus
+  ENABLE_PROMETHEUS_METRICS: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  PROMETHEUS_HOST: z.string().default('0.0.0.0'),
+  PROMETHEUS_PORT: z.string().transform(Number).default('9464'),
+
+  // SigNoz (OTLP-compatible)
+  ENABLE_SIGNOZ_TRACING: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  SIGNOZ_ENDPOINT: z.string().optional(),
+
+  // Datadog (OTLP-compatible)
+  ENABLE_DATADOG_TRACING: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  DATADOG_OTLP_ENDPOINT: z.string().optional(),
 });
 
 // Kafka event schemas

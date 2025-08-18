@@ -6,6 +6,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from '../../modules/auth/filters/global-exception.filter';
 import { HttpsService } from '../../protocols/https.service';
+import { CustomLogger } from '../../common/logger.config';
+import { RequestContextInterceptor } from '../../common/request-context.interceptor';
+import { initOpenTelemetry } from '../../common/opentelemetry';
 
 import {
   UserSchema,
@@ -17,21 +20,27 @@ import {
 } from '../../schemas/openapi.schemas';
 
 async function bootstrap() {
+  // Start OpenTelemetry (if enabled)
+  initOpenTelemetry();
   const context = await NestFactory.createApplicationContext(AppModule, {
     logger: false,
   });
   const httpsService = context.get(HttpsService);
   const httpsOptions = httpsService.getHttpsOptions();
 
+  const customLogger = new CustomLogger();
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({
-      logger: true,
+      logger: customLogger.getPino(),
       trustProxy: true,
       bodyLimit: parseInt(process.env.BODY_LIMIT || '1048576', 10),
       https: httpsOptions,
     })
   );
+
+  // Use our custom logger for Nest as well
+  app.useLogger(customLogger);
 
   // Security headers
   await app.register(require('@fastify/helmet'), {
@@ -86,6 +95,9 @@ async function bootstrap() {
 
   // Global exception filter
   app.useGlobalFilters(new GlobalExceptionFilter());
+
+  // Request context (traceId + metadata) interceptor
+  app.useGlobalInterceptors(new RequestContextInterceptor());
 
   // Security headers via Fastify hooks
   app

@@ -47,6 +47,11 @@ export class FeatureFlagsService {
     return this.config.ENABLE_EMAIL_SERVICE;
   }
 
+  // Observability
+  get isOpenTelemetryEnabled(): boolean {
+    return this.config.ENABLE_OPENTELEMETRY;
+  }
+
   // Utility methods
   isProtocolEnabled(protocol: 'websocket' | 'mqtt' | 'https' | 'grpc'): boolean {
     switch (protocol) {

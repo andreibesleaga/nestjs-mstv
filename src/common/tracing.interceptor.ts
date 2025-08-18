@@ -1,5 +1,6 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { JaegerService } from './jaeger.service';
+import { RequestContext } from './request-context';
 
 @Injectable()
 export class TracingInterceptor implements NestInterceptor {
@@ -15,6 +16,15 @@ export class TracingInterceptor implements NestInterceptor {
       span.setTag('http.method', request.method);
       span.setTag('http.url', request.url);
       span.setTag('user.agent', request.headers['user-agent']);
+      try {
+        const traceId = span.context()?.traceIdStr || span.context()?.toTraceId?.();
+        const store = RequestContext.getStore();
+        if (traceId && store) {
+          store.traceId = traceId;
+        }
+      } catch {
+        // Failed to read or propagate trace id; continue without updating RequestContext
+      }
     }
 
     const result = next.handle();
