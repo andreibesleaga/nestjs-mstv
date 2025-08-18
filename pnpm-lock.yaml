@@ -20,6 +20,9 @@ importers:
       '@casl/ability':
         specifier: ^6.7.0
         version: 6.7.3
+      '@fastify/circuit-breaker':
+        specifier: ^3.2.0
+        version: 3.2.0
       '@fastify/compress':
         specifier: ^7.0.3
         version: 7.0.3
@@ -718,6 +721,9 @@ packages:
 
   '@fastify/ajv-compiler@3.6.0':
     resolution: {integrity: sha512-LwdXQJjmMD+GwLOkP7TVC68qa+pSSogeWWmznRJ/coyTcfe9qA05AHFSe1eZFwK6q+xVRpChnvFUkf1iYaSZsQ==}
+
+  '@fastify/circuit-breaker@3.2.0':
+    resolution: {integrity: sha512-hQ/RK5w60+//ofZ4y6R9nq8H+6aF7qyKDR2KkT3X4L6WsHK2jdR8YFK9EN7xr2iHPZYiXDTTDoApS7ei6TwTBA==}
 
   '@fastify/compress@7.0.3':
     resolution: {integrity: sha512-xa9fo5/DgK1s0bkS6xrYgNn8HmofO5tJvbCDk8QuXshSgLd2cFZANv1ox/Qv7zswS7JroHwTlCVv/XGTVO98tg==}
@@ -4902,6 +4908,10 @@ packages:
   through2@2.0.5:
     resolution: {integrity: sha512-/mrRod8xqpA+IHSLyGCQ2s8SPHiCDEeQJSep1jqLYeEUClOFG2Qsh+4FU6G9VeqpZnGW/Su8LQGc4YKni5rYSQ==}
 
+  tiny-lru@10.4.1:
+    resolution: {integrity: sha512-buLIzw7ppqymuO3pt10jHk/6QMeZLbidihMQU+N6sogF6EnBzG0qtDWIHuhw1x3dyNgVL/KTGIZsTK81+yCzLg==}
+    engines: {node: '>=12'}
+
   tmpl@1.0.5:
     resolution: {integrity: sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==}
 
@@ -6108,6 +6118,12 @@ snapshots:
       ajv: 8.17.1
       ajv-formats: 2.1.1(ajv@8.17.1)
       fast-uri: 2.4.0
+
+  '@fastify/circuit-breaker@3.2.0':
+    dependencies:
+      '@fastify/error': 3.4.1
+      fastify-plugin: 4.5.1
+      tiny-lru: 10.4.1
 
   '@fastify/compress@7.0.3':
     dependencies:
@@ -11250,6 +11266,8 @@ snapshots:
     dependencies:
       readable-stream: 2.3.8
       xtend: 4.0.2
+
+  tiny-lru@10.4.1: {}
 
   tmpl@1.0.5: {}
 

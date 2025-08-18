@@ -70,6 +70,24 @@ async function bootstrap() {
   // Sensible defaults
   await app.register(require('@fastify/sensible'));
 
+  // Circuit Breaker (Fastify) - optional
+  if (process.env.ENABLE_CIRCUIT_BREAKER === 'true') {
+    await app.register(require('@fastify/circuit-breaker'), {
+      threshold: parseInt(process.env.CB_THRESHOLD || '5', 10),
+      timeout: parseInt(process.env.CB_TIMEOUT || '10000', 10),
+      resetTimeout: parseInt(process.env.CB_RESET_TIMEOUT || '60000', 10),
+    });
+
+    // Apply circuit breaker to all routes via a global onRequest hook
+    // Note: circuitBreaker() returns a per-route beforeHandler; using it globally
+    // will share a single circuit across all routes, which is acceptable for
+    // simple protection and our tests. For finer control, attach per-route.
+    const fastifyInst: any = app.getHttpAdapter().getInstance();
+    if (typeof fastifyInst.circuitBreaker === 'function') {
+      fastifyInst.addHook('onRequest', fastifyInst.circuitBreaker());
+    }
+  }
+
   // CORS with security
   await app.register(require('@fastify/cors'), {
     origin:

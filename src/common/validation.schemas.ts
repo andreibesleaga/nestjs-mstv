@@ -62,6 +62,18 @@ export const EnvironmentSchema = z.object({
     .string()
     .transform((val) => val === 'true')
     .default('false'),
+  CB_THRESHOLD: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
+  CB_TIMEOUT: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
+  CB_RESET_TIMEOUT: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
   ENABLE_PERFORMANCE_MONITORING: z
     .string()
     .transform((val) => val === 'true')

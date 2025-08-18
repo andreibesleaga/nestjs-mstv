@@ -6,11 +6,13 @@ import { ConsulService } from './consul.service';
 import { EmailingService } from './emailing.service';
 import { JaegerService } from './jaeger.service';
 import { PerformanceInterceptor } from './performance.interceptor';
+import { HttpClientService } from './http-client.service';
 
 @Global()
 @Module({
   providers: [
     FeatureFlagsService,
+    HttpClientService,
     ...(process.env.ENABLE_REDIS_CACHE === 'true' ? [CacheService] : []),
     ...(process.env.ENABLE_CIRCUIT_BREAKER === 'true' ? [CircuitBreakerService] : []),
     ...(process.env.ENABLE_CONSUL_DISCOVERY === 'true' ? [ConsulService] : []),
@@ -20,6 +22,7 @@ import { PerformanceInterceptor } from './performance.interceptor';
   ],
   exports: [
     FeatureFlagsService,
+    HttpClientService,
     ...(process.env.ENABLE_REDIS_CACHE === 'true' ? [CacheService] : []),
     ...(process.env.ENABLE_CIRCUIT_BREAKER === 'true' ? [CircuitBreakerService] : []),
     ...(process.env.ENABLE_CONSUL_DISCOVERY === 'true' ? [ConsulService] : []),
