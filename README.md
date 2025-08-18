@@ -393,11 +393,14 @@ Notes: Uses @fastify/circuit-breaker (Fastify v4 compatible). E2E tests cover op
 
 ## Storage (S3 / Azure Blob / GCS / In-memory)
 
-A pluggable storage service with a simple interface for upload/download/list/delete and signed URLs. By default, an in-memory adapter is used (great for tests). Cloud adapters are scaffolded and can be wired to real SDKs when you’re ready.
+A pluggable storage service with a simple interface for upload/download/list/delete and signed URLs. By default, an in-memory adapter is used (great for tests). Cloud adapters are wired to their real SDKs but are disabled by default behind a feature flag.
 
 Env flags:
 
 ```env
+# Master on/off switch (defaults to false → memory adapter)
+ENABLE_STORAGE=false
+
 # Select provider: aws | azure | gcp | none (defaults to none → in-memory)
 STORAGE_PROVIDER=none
 
@@ -422,7 +425,14 @@ GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
 GCP_APPLICATION_CREDENTIALS=/path/to/key.json
 ```
 
-Usage example:
+Streaming usage (large files) via demo endpoints in development/test environments:
+
+- Upload (optionally gzip on the fly):
+  - curl -X POST --data-binary @bigfile.bin "<http://localhost:3000/demo/upload-stream?key=big.bin&gzip=1>"
+- Download (optionally gunzip on the fly):
+  - curl -L "<http://localhost:3000/demo/download-stream?key=big.bin&gunzip=1>" -o out.bin
+
+Programmatic usage example:
 
 ```ts
 import { Controller, Post, Get, Param, Body } from '@nestjs/common';

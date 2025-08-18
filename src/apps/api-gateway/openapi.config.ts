@@ -13,7 +13,7 @@ export const swaggerConfig = new DocumentBuilder()
     - **REST**: Complete REST API with OpenAPI docs
     - **Messaging**: Kafka event streaming
     - **Background Jobs**: BullMQ worker processing
-  - **Database**: Prisma ORM with PostgreSQL or MySQL/MariaDB
+    - **Database**: Prisma ORM with PostgreSQL or MySQL/MariaDB
     - **Testing**: Comprehensive test suites
   `
   )

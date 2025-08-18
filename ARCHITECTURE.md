@@ -2,7 +2,7 @@
 
 ## Overview
 
-The NestJS MSTV (Microservices Template Variant) is a NestJs/Node.js based template implementing clean Architecture principles with comprehensive microservices support. It provides a scalable foundation for building distributed applications with built-in observability, caching, circuit breakers, and multiple protocol support.
+The NestJS MSTV (Microservices Template Variant) is a NestJs/Node.js based template implementing clean architecture principles with comprehensive microservices support. It provides a scalable foundation for building both modular monolith and distributed microservice domain driven applications back-ends with built-in observability, caching, circuit breakers, event-driven messaging, and multiple protocol and adapters support.
 
 ## Architecture Principles
 
@@ -496,6 +496,16 @@ ENCRYPTION_KEY=your-encryption-key
 - Monitor service health
 - Set up alerting for critical metrics
 - Log structured data for analysis
+
+### Other supported services
+
+- Request-scoped context and Pino logs enriched with correlation IDs and traceId propagation.
+- OpenTelemetry SDK with OTLP exporters (traces/metrics), optional Prometheus, and docs for Jaeger/SigNoz/Datadog.
+- Circuit breaker via Fastify plugin and programmatic wrapper for outbound HTTP; `/health/circuit/:name` introspection.
+- Database hardening: PgBouncer support for Postgres; MariaDB/MySQL support via Prisma with env-driven provider switching.
+- Pluggable Storage Service with adapters: Memory, S3, Azure Blob, and GCS; gated by `ENABLE_STORAGE` and `STORAGE_PROVIDER`.
+- Real cloud SDK wiring (AWS/Azure/GCP) with mocked unit tests to keep CI offline.
+- Large file support: streaming upload/download with optional transform pipelines (e.g., gzip) and demo endpoints enabled in dev/test.
 
 ## Conclusion
 
