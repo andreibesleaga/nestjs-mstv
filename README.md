@@ -1,6 +1,7 @@
 # NestJS Microservice Template Variant
 
 A NestJS microservice template variant implementing basic DDD, clean architecture principles with comprehensive features and microservices common design patterns for versatility and performance.
+You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 
 ## ⚡ **Feature Flags & Performance**
 
