@@ -7,6 +7,7 @@ import { UsersModule } from '../../modules/users/interface/users.module';
 import { AuthModule } from '../../modules/auth/auth.module';
 import { HealthController } from './health.controller';
 import { SchemasController } from './schemas.controller';
+import { DemoController } from './demo.controller';
 import { HealthService } from '../../common/health.service';
 import { PrismaService } from '../../common/prisma.service';
 import { MongoDbService } from '../../common/mongodb.service';
@@ -20,6 +21,7 @@ import { PerformanceInterceptor } from '../../common/performance.interceptor';
 import { CircuitBreakerService } from '../../common/circuit-breaker.service';
 import { CacheService } from '../../common/cache.service';
 import { ProtocolsModule } from '../../protocols/protocols.module';
+import { CommonModule } from '../../common/common.module';
 
 const databaseProviders =
   process.env.NODE_ENV === 'test'
@@ -33,6 +35,7 @@ const databaseProviders =
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    CommonModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schemas/schema.gql'),
@@ -52,7 +55,7 @@ const databaseProviders =
     UsersModule,
     ProtocolsModule,
   ],
-  controllers: [HealthController, SchemasController],
+  controllers: [HealthController, SchemasController, DemoController],
   providers: [
     HealthService,
     RedisClient,

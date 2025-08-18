@@ -354,6 +354,43 @@ KAFKA_BROKERS=localhost:9092
 REDIS_URL=redis://localhost:6379
 ```
 
+### Circuit Breaker (Fastify + programmatic)
+
+Enable a service-wide circuit breaker to protect endpoints and wrap outbound calls.
+
+Env flags:
+
+```env
+ENABLE_CIRCUIT_BREAKER=true
+# Trip circuit after N consecutive failures
+CB_THRESHOLD=5
+# Per-request timeout (ms) before considering a failure
+CB_TIMEOUT_MS=2000
+# Time (ms) to stay open before trying a half-open probe
+CB_RESET_TIMEOUT_MS=10000
+```
+
+Behavior:
+
+- When the threshold is reached, requests get HTTP 503 with message "Circuit open" until reset timeout elapses.
+- After `CB_RESET_TIMEOUT_MS`, one request is allowed in half-open state to probe recovery.
+- The Fastify plugin is applied globally to all routes when enabled.
+
+Programmatic usage for outbound HTTP calls (via `HttpClientService`):
+
+```ts
+// Example
+await httpClient.fetchWithCircuit('upstreamA', 'https://api.example.com', { timeoutMs: 1500 });
+```
+
+Introspection endpoint:
+
+```bash
+curl http://localhost:3000/health/circuit/global
+```
+
+Notes: Uses @fastify/circuit-breaker (Fastify v4 compatible). E2E tests cover open/half-open/close semantics.
+
 ## 🛠️ **Development Workflow**
 
 ### Code Quality
@@ -616,7 +653,7 @@ helm upgrade --install nestjs-api ./helm/nest-ddd-chart -f values.prod.yaml
 - **Health checks**: Kubernetes readiness and liveness probes
 - **Rolling updates**: Zero-downtime deployments
 
-# 🧪 **Testing Guide**
+## 🧪 **Testing Guide**
 
 Comprehensive testing strategy with multiple test types and environments.
 
@@ -724,7 +761,7 @@ pnpm test:unit test/auth.service.spec.ts
 
 ## Test Structure
 
-```
+```text
 test/
 ├── e2e/                    # End-to-end tests
 │   ├── mock.e2e.spec.ts   # Basic app startup tests
@@ -779,7 +816,7 @@ docker-compose -f docker/docker-compose.test.yml config
 - **docker-compose.test.yml** - Testing with real database services
 - **docker-compose.simple-test.yml** - Testing without external dependencies
 
-# 🏢 **CQRS Architecture**
+## 🏢 **CQRS Architecture**
 
 ## 📝 **CQRS Implementation**
 
@@ -792,7 +829,7 @@ docker-compose -f docker/docker-compose.test.yml config
 
 ### **Architecture Flow**
 
-```
+```text
 Commands → CommandBus → CommandHandlers → Repository → Events
 Queries → QueryBus → QueryHandlers → Repository → Results
 Events → EventBus → EventHandlers → Side Effects
@@ -891,7 +928,7 @@ export class YourCommandHandler implements ICommandHandler<YourCommand> {
 export class YourModule {}
 ```
 
-# 🌐 **Multi-Protocol Examples**
+## 🌐 **Multi-Protocol Examples**
 
 ## **Protocol Usage Examples**
 
@@ -932,7 +969,7 @@ MQTT_USERNAME=your_username
 MQTT_PASSWORD=your_password
 ```
 
-```typescript
+```ts
 // Publish user events
 mqttService.publishUserEvent('user123', 'login', { ip: '192.168.1.1' });
 
@@ -950,7 +987,7 @@ mqttService.subscribe('sensors/temperature');
 GRPC_PORT=5000
 ```
 
-```typescript
+```ts
 // gRPC client usage
 const client = new UserServiceClient('localhost:5000');
 
@@ -975,7 +1012,7 @@ pnpm test test/protocols.spec.ts
 pnpm test:unit
 ```
 
-# 🔒 **Security Implementation**
+## 🔒 **Security Implementation**
 
 ## 🛡️ **Multi-Layer Security**
 
@@ -1020,12 +1057,12 @@ pnpm test:unit
 
 ## CORS Configuration
 
-### Development
+### Development (CORS)
 
 - **Origin**: Allow all origins
 - **Credentials**: Enabled
 
-### Production
+### Production (CORS)
 
 - **Origin**: Restricted to `ALLOWED_ORIGINS` env var
 - **Methods**: GET, POST, PUT, DELETE, OPTIONS only
@@ -1129,7 +1166,7 @@ Regular updates of dependencies and security patches:
 
 ---
 
-# 🎆 **Production Development Readiness**
+## 🎆 **Production Development Readiness**
 
 ## ✅ **Completed Features**
 
