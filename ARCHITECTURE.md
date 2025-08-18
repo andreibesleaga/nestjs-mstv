@@ -532,32 +532,76 @@ The template emphasizes:
 
 ## Diagrams Index
 
-Quick links to all rendered SVG diagrams:
+Embedded diagrams:
 
-- [Single Service Deployment](diagrams/svg/architecture_single_service.svg)
-- [Multi-Service Microservices Architecture](diagrams/svg/architecture_multi_service.svg)
-- [Event-Driven Architecture with CQRS](diagrams/svg/architecture_event_driven_cqrs.svg)
-- [Core Architecture Overview](diagrams/svg/core_architecture.svg)
-- [Multi-Microservice Gateway](diagrams/svg/multi_microservice_gateway.svg)
-- [Choreography (Kafka)](diagrams/svg/choreography_kafka.svg)
-- [Orchestration (Temporal)](diagrams/svg/orchestration_temporal.svg)
-- [Coordination: Orchestration Flow](diagrams/svg/coordination_orchestration.svg)
-- [Coordination: Signals Flow](diagrams/svg/coordination_signals.svg)
-- [Coordination: Cron/Schedule](diagrams/svg/coordination_cron.svg)
+**Single Service Deployment**
+![Single Service Deployment](diagrams/svg/architecture_single_service.svg)
 
-Additional diagrams:
+**Multi-Service Microservices Architecture**
+![Multi-Service Microservices Architecture](diagrams/svg/architecture_multi_service.svg)
 
-- [Request Lifecycle](diagrams/svg/request_lifecycle.svg)
-- [JWT Authentication Flow](diagrams/svg/auth_jwt_flow.svg)
-- [Authorization (CASL) Flow](diagrams/svg/authorization_casl_flow.svg)
-- [Circuit Breaker State Machine](diagrams/svg/circuit_breaker_state_machine.svg)
-- [Observability Pipeline (OTel → OTLP)](diagrams/svg/observability_pipeline.svg)
-- [Storage Adapters](diagrams/svg/storage_adapters.svg)
-- [Data Flow: User Profile](diagrams/svg/data_flow_user_profile.svg)
-- [Deployment Options](diagrams/svg/deployment_options.svg)
-- [Scalability Patterns](diagrams/svg/scalability_patterns.svg)
-- [src Structure](diagrams/svg/src_structure.svg)
-- [Overall System Architecture](diagrams/svg/overall_system_architecture.svg)
-- [Microservice Run Modes](diagrams/svg/microservice_run_modes.svg)
-- [Feature Flags Matrix](diagrams/svg/feature_flags_matrix.svg)
-- [Coordination Topologies](diagrams/svg/coordination_topologies.svg)
+**Event-Driven Architecture with CQRS**
+![Event-Driven Architecture with CQRS](diagrams/svg/architecture_event_driven_cqrs.svg)
+
+**Core Architecture Overview**
+![Core Architecture Overview](diagrams/svg/core_architecture.svg)
+
+**Multi-Microservice Gateway**
+![Multi-Microservice Gateway](diagrams/svg/multi_microservice_gateway.svg)
+
+**Choreography (Kafka)**
+![Choreography (Kafka)](diagrams/svg/choreography_kafka.svg)
+
+**Orchestration (Temporal)**
+![Orchestration (Temporal)](diagrams/svg/orchestration_temporal.svg)
+
+**Coordination: Orchestration Flow**
+![Coordination: Orchestration Flow](diagrams/svg/coordination_orchestration.svg)
+
+**Coordination: Signals Flow**
+![Coordination: Signals Flow](diagrams/svg/coordination_signals.svg)
+
+**Coordination: Cron/Schedule**
+![Coordination: Cron/Schedule](diagrams/svg/coordination_cron.svg)
+
+**Request Lifecycle**
+![Request Lifecycle](diagrams/svg/request_lifecycle.svg)
+
+**JWT Authentication Flow**
+![JWT Authentication Flow](diagrams/svg/auth_jwt_flow.svg)
+
+**Authorization (CASL) Flow**
+![Authorization (CASL) Flow](diagrams/svg/authorization_casl_flow.svg)
+
+**Circuit Breaker State Machine**
+![Circuit Breaker State Machine](diagrams/svg/circuit_breaker_state_machine.svg)
+
+**Observability Pipeline (OTel → OTLP)**
+![Observability Pipeline (OTel → OTLP)](diagrams/svg/observability_pipeline.svg)
+
+**Storage Adapters**
+![Storage Adapters](diagrams/svg/storage_adapters.svg)
+
+**Data Flow: User Profile**
+![Data Flow: User Profile](diagrams/svg/data_flow_user_profile.svg)
+
+**Deployment Options**
+![Deployment Options](diagrams/svg/deployment_options.svg)
+
+**Scalability Patterns**
+![Scalability Patterns](diagrams/svg/scalability_patterns.svg)
+
+**src Structure**
+![src Structure](diagrams/svg/src_structure.svg)
+
+**Overall System Architecture**
+![Overall System Architecture](diagrams/svg/overall_system_architecture.svg)
+
+**Microservice Run Modes**
+![Microservice Run Modes](diagrams/svg/microservice_run_modes.svg)
+
+**Feature Flags Matrix**
+![Feature Flags Matrix](diagrams/svg/feature_flags_matrix.svg)
+
+**Coordination Topologies**
+![Coordination Topologies](diagrams/svg/coordination_topologies.svg)
