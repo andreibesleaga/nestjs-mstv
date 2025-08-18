@@ -17,7 +17,7 @@ export class HealthService {
   async checkDatabase(): Promise<{ status: string; responseTime: number }> {
     const start = Date.now();
     try {
-      if (DatabaseConfig.isPostgreSQL() && this.prisma) {
+      if ((DatabaseConfig.isPostgreSQL() || DatabaseConfig.isMySQL()) && this.prisma) {
         await this.prisma.$queryRaw`SELECT 1`;
       } else if (DatabaseConfig.isMongoDb() && this.mongodb) {
         await this.mongodb.getDb().command({ ping: 1 });

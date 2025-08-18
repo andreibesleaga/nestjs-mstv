@@ -6,8 +6,25 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private readonly logger = new Logger(PrismaService.name);
 
   constructor() {
+    // Optionally allow overriding Prisma DB URL at runtime.
+    // Pool sizing for Prisma is typically managed by an external pooler (PgBouncer).
+    // You can point DATABASE_URL to a PgBouncer endpoint and control pool size there.
+    const dbType = (process.env.DATABASE_TYPE || 'postgresql').toLowerCase();
+    const effectiveUrl =
+      process.env.DATABASE_URL ||
+      ((dbType === 'mysql' || dbType === 'mariadb') && process.env.MYSQL_URL
+        ? process.env.MYSQL_URL
+        : undefined);
+
     super({
       log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+      datasources: effectiveUrl
+        ? {
+            db: {
+              url: effectiveUrl,
+            },
+          }
+        : undefined,
     });
   }
 

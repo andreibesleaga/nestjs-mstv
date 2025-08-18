@@ -18,7 +18,7 @@ A NestJS microservice template variant implementing basic DDD, clean architectur
 
 ## 🗄️ **Database & Persistence**
 
-- **Flexible Database Support** - SQL/NoSQL/PostgreSQL (via Prisma) or direct MongoDB with runtime selection
+- **Flexible Database Support** - SQL/NoSQL: PostgreSQL or MySQL/MariaDB (via Prisma), plus direct MongoDB with runtime selection
 - **Database Migrations** - Prisma/MongoDB migrations and seed scripts
 - **Repository Pattern** - Clean abstraction over data access
 - **Connection Management** - Proper connection pooling and health checks
@@ -90,9 +90,11 @@ src/
 # Copy environment template
 cp .env.example .env
 
-# Configure database type (postgresql or mongodb)
-DATABASE_TYPE=postgresql  # or mongodb
+# Configure database type (postgresql, mysql/mariadb or mongodb)
+DATABASE_TYPE=postgresql  # or mysql | mariadb | mongodb
 DATABASE_URL=postgresql://dev:dev@localhost:5432/dev
+# For MySQL/MariaDB:
+# MYSQL_URL=mysql://dev:dev@localhost:3306/dev
 # MONGODB_URL=mongodb://dev:dev@localhost:27017/nestjs-app
 
 # Security (REQUIRED)
@@ -147,8 +149,9 @@ ENABLE_EMAIL_SERVICE=true
 
 ### Database Configuration
 
-- `DATABASE_TYPE`: Database type selection (`postgresql` or `mongodb`)
+- `DATABASE_TYPE`: Database type selection (`postgresql`, `mysql`, `mariadb` or `mongodb`)
 - `DATABASE_URL`: PostgreSQL connection string
+- `MYSQL_URL`: MySQL/MariaDB connection string (used when `DATABASE_TYPE` is `mysql` or `mariadb`)
 - `MONGODB_URL`: MongoDB connection string
 
 ### Authentication & Security
@@ -232,7 +235,7 @@ pnpm prisma:seed
 
 ```bash
 pnpm mongodb:migrate
-pnpm mongodb:seed
+MONGODB_URL=mongodb://user:pass@localhost:27017/db
 ```
 
 ### 5. Start Application
@@ -243,16 +246,25 @@ pnpm start:dev
 
 ### 6. Run Tests
 
-```bash
+````bash
 # Unit tests only
 pnpm test:unit
 
 # All tests (unit + e2e)
 pnpm test:all
 
+To use MariaDB in the full stack, a `mariadb` service is included. Uncomment and set in the `api` service environment:
+
+```yaml
+# DATABASE_TYPE: "mariadb"
+# MYSQL_URL: "mysql://dev:dev@mariadb:3306/dev"
+````
+
 # Full test suite (requires database)
+
 pnpm test:full
-```
+
+````
 
 ## 🗄️ **Database Configuration**
 
@@ -261,16 +273,58 @@ pnpm test:full
 ```bash
 DATABASE_TYPE=postgresql
 DATABASE_URL=postgresql://user:pass@localhost:5432/db
+````
+
+### MySQL / MariaDB
+
+Set the database type and URL, then generate Prisma client and run migrations:
+
+```bash
+DATABASE_TYPE=mysql # or mariadb
+MYSQL_URL=mysql://user:pass@localhost:3306/db
 ```
+
+Notes:
+
+- Prisma schema provider must match the selected engine. This repo includes a small helper script that switches the Prisma datasource `provider` based on `DATABASE_TYPE` automatically before `prisma generate` and `start:dev`.
+- For a fresh MySQL/MariaDB setup, run:
+  - pnpm prisma:generate
+  - pnpm prisma:migrate:dev --name init
+  - pnpm prisma:seed (optional)
+- Existing PostgreSQL migrations won’t apply to MySQL. Create new migrations when switching engines in development.
 
 ### MongoDB
 
 ```bash
 DATABASE_TYPE=mongodb
-MONGODB_URL=mongodb://user:pass@localhost:27017/db
 ```
 
+To use MariaDB in the full stack, a `mariadb` service is included. Uncomment and set in the `api` service environment:
+
+#
+
+````yaml
+
 The application automatically selects the appropriate repository implementation based on `DATABASE_TYPE`.
+
+- Prisma (PostgreSQL): Prisma manages connections internally. In production, it’s recommended to front Postgres with PgBouncer and point `DATABASE_URL` to the pooler for robust pooling at scale.
+  - You can override the datasource URL at runtime via `DATABASE_URL` (already wired in `PrismaService`).
+- MongoDB: The driver’s pool is enabled by default. You can tune with optional envs:
+  - `MONGODB_MAX_POOL_SIZE`, `MONGODB_MIN_POOL_SIZE`, `MONGODB_MAX_IDLE_TIME_MS`, `MONGODB_WAIT_QUEUE_TIMEOUT_MS`
+
+Docker full stack includes a PgBouncer service. The app is preconfigured to use it in `docker/docker-compose.full.yml`:
+
+```yaml
+DATABASE_URL: "postgresql://dev:dev@pgbouncer:6432/dev?pgbouncer=true"
+To use MariaDB in the full stack, a `mariadb` service is included. Uncomment and set in the `api` service environment:
+
+```yaml
+# DATABASE_TYPE: "mariadb"
+# MYSQL_URL: "mysql://dev:dev@mariadb:3306/dev"
+````
+
+````
+
 
 ## 🔧 **Microservice Features**
 
@@ -280,7 +334,7 @@ The application automatically selects the appropriate repository implementation 
 CONSUL_HOST=localhost
 CONSUL_PORT=8500
 SERVICE_NAME=nestjs-api
-```
+````
 
 ### Distributed Tracing (Jaeger)
 

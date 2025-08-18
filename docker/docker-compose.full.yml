@@ -11,6 +11,20 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
+  pgbouncer:
+    image: bitnami/pgbouncer:latest
+    environment:
+      POSTGRESQL_HOST: db
+      POSTGRESQL_PORT_NUMBER: 5432
+      POSTGRESQL_USERNAME: dev
+      POSTGRESQL_PASSWORD: dev
+      POSTGRESQL_DATABASE: dev
+      PGBOUNCER_LISTEN_PORT: 6432
+    depends_on:
+      - db
+    ports:
+      - '6432:6432'
+
   mongodb:
     image: mongo:7
     environment:
@@ -20,6 +34,18 @@ services:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
+
+  mariadb:
+    image: mariadb:11
+    environment:
+      MARIADB_ROOT_PASSWORD: dev
+      MARIADB_USER: dev
+      MARIADB_PASSWORD: dev
+      MARIADB_DATABASE: dev
+    ports:
+      - '3306:3306'
+    volumes:
+      - mariadb-data:/var/lib/mysql
 
   redis:
     image: redis:7
@@ -64,22 +90,27 @@ services:
     ports:
       - '3000:3000'
     environment:
-      DATABASE_URL: postgresql://dev:dev@db:5432/dev
-      MONGODB_URL: mongodb://dev:dev@mongodb:27017/nestjs-app
-      REDIS_URL: redis://redis:6379
-      KAFKA_BROKERS: kafka:9092
-      CONSUL_HOST: consul
-      JAEGER_ENDPOINT: http://jaeger:14268/api/traces
-      JWT_SECRET: ${JWT_SECRET:-development-secret}
-      NODE_ENV: development
+      DATABASE_URL: "postgresql://dev:dev@pgbouncer:6432/dev?pgbouncer=true"
+      # DATABASE_TYPE: "mariadb"
+      # MYSQL_URL: "mysql://dev:dev@mariadb:3306/dev"
+      MONGODB_URL: "mongodb://dev:dev@mongodb:27017/nestjs-app"
+      REDIS_URL: "redis://redis:6379"
+      KAFKA_BROKERS: "kafka:9092"
+      CONSUL_HOST: "consul"
+      JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
+      JWT_SECRET: "${JWT_SECRET:-development-secret}"
+      NODE_ENV: "development"
     depends_on:
       - db
+      - pgbouncer
       - mongodb
+      - mariadb
       - redis
       - kafka
       - consul
       - jaeger
 
 volumes:
-  db-data:
-  mongo-data:
+  db-data: {}
+  mongo-data: {}
+  mariadb-data: {}

@@ -4,4 +4,6 @@ packages:
   - src/modules/*
 
 onlyBuiltDependencies:
+  - '@nestjs/core'
   - bcrypt
+  - protobufjs

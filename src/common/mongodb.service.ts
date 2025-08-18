@@ -12,7 +12,19 @@ export class MongoDbService implements OnModuleInit, OnModuleDestroy {
     // Add auth source for authentication with Docker MongoDB
     const options = {
       authSource: 'admin', // Use admin database for authentication
-    };
+      maxPoolSize: process.env.MONGODB_MAX_POOL_SIZE
+        ? Number(process.env.MONGODB_MAX_POOL_SIZE)
+        : undefined,
+      minPoolSize: process.env.MONGODB_MIN_POOL_SIZE
+        ? Number(process.env.MONGODB_MIN_POOL_SIZE)
+        : undefined,
+      maxIdleTimeMS: process.env.MONGODB_MAX_IDLE_TIME_MS
+        ? Number(process.env.MONGODB_MAX_IDLE_TIME_MS)
+        : undefined,
+      waitQueueTimeoutMS: process.env.MONGODB_WAIT_QUEUE_TIMEOUT_MS
+        ? Number(process.env.MONGODB_WAIT_QUEUE_TIMEOUT_MS)
+        : undefined,
+    } as const;
     this.client = new MongoClient(url, options);
   }
 

@@ -20,9 +20,10 @@ export const RefreshTokenSchema = z.object({
 export const EnvironmentSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().transform(Number).default('3000'),
-  DATABASE_TYPE: z.enum(['postgresql', 'mongodb']).default('postgresql'),
+  DATABASE_TYPE: z.enum(['postgresql', 'mongodb', 'mysql', 'mariadb']).default('postgresql'),
   DATABASE_URL: z.string().optional(),
   MONGODB_URL: z.string().optional(),
+  MYSQL_URL: z.string().optional(),
   JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
   REDIS_URL: z.string().default('redis://localhost:6379'),
 
@@ -69,6 +70,34 @@ export const EnvironmentSchema = z.object({
     .string()
     .transform((val) => val === 'true')
     .default('true'),
+
+  // Database Pooling (Prisma/PostgreSQL)
+  PRISMA_CONNECTION_LIMIT: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
+  PRISMA_POOL_TIMEOUT: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
+
+  // Database Pooling (MongoDB)
+  MONGODB_MAX_POOL_SIZE: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
+  MONGODB_MIN_POOL_SIZE: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
+  MONGODB_MAX_IDLE_TIME_MS: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
+  MONGODB_WAIT_QUEUE_TIMEOUT_MS: z
+    .string()
+    .transform((v) => (v ? Number(v) : undefined))
+    .optional(),
 
   // Observability - OpenTelemetry & Exporters
   ENABLE_OPENTELEMETRY: z
