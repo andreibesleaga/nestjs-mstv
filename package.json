@@ -1,6 +1,6 @@
 {
   "name": "nestjs-mstv",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "author": {
     "name": "Andrei Besleaga"
@@ -8,11 +8,11 @@
   "scripts": {
     "start:dev": "node scripts/switch-prisma-provider.js && ts-node -r tsconfig-paths/register src/apps/api-gateway/main.ts",
     "build": "tsc -p tsconfig.json",
-    "test": "jest --runInBand",
-    "test:unit": "jest --config jest.unit.config.js --ci",
-    "test:integration": "jest --config jest.integration.config.js --ci",
-    "test:e2e": "jest --config jest.e2e.config.js --ci",
-    "test:e2e:full": "jest --config jest.e2e.full.config.js --ci",
+    "test": "COLUMNS=120 FORCE_COLOR=0 jest --runInBand",
+    "test:unit": "COLUMNS=120 FORCE_COLOR=0 jest --config jest.unit.config.js --ci",
+    "test:integration": "COLUMNS=120 FORCE_COLOR=0 jest --config jest.integration.config.js --ci",
+    "test:e2e": "COLUMNS=120 FORCE_COLOR=0 jest --config jest.e2e.config.js --ci",
+    "test:e2e:full": "COLUMNS=120 FORCE_COLOR=0 jest --config jest.e2e.full.config.js --ci",
     "test:all": "pnpm test:unit && pnpm test:e2e",
     "test:full": "pnpm test:unit && pnpm test:integration && pnpm test:e2e:full",
     "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
@@ -79,6 +79,9 @@
     "@apollo/gateway": "^2.0.0",
     "@apollo/server": "^4.12.2",
     "@as-integrations/fastify": "^2.1.1",
+    "@aws-sdk/client-s3": "^3.864.0",
+    "@aws-sdk/s3-request-presigner": "^3.864.0",
+    "@azure/storage-blob": "^12.28.0",
     "@casl/ability": "^6.7.0",
     "@fastify/circuit-breaker": "^3.2.0",
     "@fastify/compress": "^7.0.3",
@@ -86,6 +89,7 @@
     "@fastify/helmet": "^11.1.1",
     "@fastify/rate-limit": "^9.1.0",
     "@fastify/sensible": "^5.6.0",
+    "@google-cloud/storage": "^7.16.0",
     "@grpc/grpc-js": "^1.9.0",
     "@grpc/proto-loader": "^0.7.0",
     "@nestjs/apollo": "^12.2.2",

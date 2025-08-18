@@ -55,7 +55,12 @@ const databaseProviders =
     UsersModule,
     ProtocolsModule,
   ],
-  controllers: [HealthController, SchemasController, DemoController],
+  controllers: [
+    HealthController,
+    SchemasController,
+    // Expose demo routes in test and development, hide in production
+    ...(process.env.NODE_ENV !== 'production' ? [DemoController] : []),
+  ],
   providers: [
     HealthService,
     RedisClient,

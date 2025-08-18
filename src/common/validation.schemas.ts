@@ -27,6 +27,37 @@ export const EnvironmentSchema = z.object({
   JWT_SECRET: z.string().min(1, 'JWT_SECRET is required'),
   REDIS_URL: z.string().default('redis://localhost:6379'),
 
+  // Storage
+  ENABLE_STORAGE: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  STORAGE_PROVIDER: z.enum(['aws', 'azure', 'gcp', 'none']).default('none'),
+  // AWS S3
+  S3_BUCKET: z.string().optional(),
+  S3_REGION: z.string().optional(),
+  S3_ACCESS_KEY_ID: z.string().optional(),
+  S3_SECRET_ACCESS_KEY: z.string().optional(),
+  S3_ENDPOINT: z.string().optional(),
+  S3_FORCE_PATH_STYLE: z
+    .string()
+    .transform((v) => v === 'true')
+    .optional(),
+  // Azure Blob
+  AZURE_STORAGE_CONNECTION_STRING: z.string().optional(),
+  AZURE_BLOB_CONNECTION_STRING: z.string().optional(),
+  AZURE_STORAGE_ACCOUNT: z.string().optional(),
+  AZURE_STORAGE_ACCOUNT_KEY: z.string().optional(),
+  AZURE_ACCOUNT_NAME: z.string().optional(),
+  AZURE_ACCOUNT_KEY: z.string().optional(),
+  AZURE_BLOB_CONTAINER: z.string().optional(),
+  // GCP
+  GCP_PROJECT_ID: z.string().optional(),
+  GCS_BUCKET: z.string().optional(),
+  GOOGLE_APPLICATION_CREDENTIALS: z.string().optional(),
+  GCP_APPLICATION_CREDENTIALS: z.string().optional(),
+  GOOGLE_APPLICATION_CREDENTIALS_JSON: z.string().optional(),
+
   // Feature Flags - Protocols
   ENABLE_WEBSOCKET: z
     .string()

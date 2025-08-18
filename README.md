@@ -391,7 +391,64 @@ curl http://localhost:3000/health/circuit/global
 
 Notes: Uses @fastify/circuit-breaker (Fastify v4 compatible). E2E tests cover open/half-open/close semantics.
 
-## 🛠️ **Development Workflow**
+## Storage (S3 / Azure Blob / GCS / In-memory)
+
+A pluggable storage service with a simple interface for upload/download/list/delete and signed URLs. By default, an in-memory adapter is used (great for tests). Cloud adapters are scaffolded and can be wired to real SDKs when you’re ready.
+
+Env flags:
+
+```env
+# Select provider: aws | azure | gcp | none (defaults to none → in-memory)
+STORAGE_PROVIDER=none
+
+# AWS S3 (when STORAGE_PROVIDER=aws)
+S3_BUCKET=your-bucket
+S3_REGION=us-east-1
+S3_ACCESS_KEY_ID=...
+S3_SECRET_ACCESS_KEY=...
+# Optional for S3-compatible stores (e.g., MinIO):
+S3_ENDPOINT=http://localhost:9000
+
+# Azure Blob (when STORAGE_PROVIDER=azure)
+AZURE_BLOB_CONNECTION_STRING=...
+AZURE_BLOB_CONTAINER=your-container
+
+# Google Cloud Storage (when STORAGE_PROVIDER=gcp)
+GCP_PROJECT_ID=your-project
+GCS_BUCKET=your-bucket
+# One of these (standard GCP ways to auth):
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
+# or
+GCP_APPLICATION_CREDENTIALS=/path/to/key.json
+```
+
+Usage example:
+
+```ts
+import { Controller, Post, Get, Param, Body } from '@nestjs/common';
+import { StorageService } from '@/common/storage/storage.service';
+
+@Controller('files')
+export class FilesController {
+  constructor(private readonly storage: StorageService) {}
+
+  @Post()
+  async upload(@Body() body: { key: string; content: string }) {
+    await this.storage.upload(body.key, Buffer.from(body.content, 'utf8'), {
+      contentType: 'text/plain',
+    });
+    return { ok: true };
+  }
+
+  @Get(':key')
+  async get(@Param('key') key: string) {
+    const buf = await this.storage.download(key);
+    return buf.toString('utf8');
+  }
+}
+```
+
+## �🛠️ **Development Workflow**
 
 ### Code Quality
 
