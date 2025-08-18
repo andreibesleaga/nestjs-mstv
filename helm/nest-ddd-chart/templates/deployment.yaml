@@ -28,6 +28,40 @@ spec:
           env:
             - name: DATABASE_URL
               value: "{{ .Values.env.DATABASE_URL }}"
+            - name: REDIS_URL
+              value: "{{ .Values.env.REDIS_URL }}"
+            - name: KAFKA_BROKERS
+              value: "{{ .Values.env.KAFKA_BROKERS }}"
+            - name: JWT_SECRET
+              value: "{{ .Values.env.JWT_SECRET }}"
+            - name: NODE_ENV
+              value: "{{ .Values.env.NODE_ENV }}"
+            - name: ALLOWED_ORIGINS
+              value: "{{ .Values.env.ALLOWED_ORIGINS }}"
+            - name: ENABLE_CIRCUIT_BREAKER
+              value: "{{ .Values.env.ENABLE_CIRCUIT_BREAKER }}"
+            - name: CB_THRESHOLD
+              value: "{{ .Values.env.CB_THRESHOLD }}"
+            - name: CB_TIMEOUT
+              value: "{{ .Values.env.CB_TIMEOUT }}"
+            - name: CB_RESET_TIMEOUT
+              value: "{{ .Values.env.CB_RESET_TIMEOUT }}"
+            - name: ENABLE_OPENTELEMETRY
+              value: "{{ .Values.env.ENABLE_OPENTELEMETRY }}"
+            - name: OTEL_TRACES_EXPORTER
+              value: "{{ .Values.env.OTEL_TRACES_EXPORTER }}"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "{{ .Values.env.OTEL_EXPORTER_OTLP_ENDPOINT }}"
+            - name: ENABLE_PROMETHEUS_METRICS
+              value: "{{ .Values.env.ENABLE_PROMETHEUS_METRICS }}"
+            - name: PROMETHEUS_HOST
+              value: "{{ .Values.env.PROMETHEUS_HOST }}"
+            - name: PROMETHEUS_PORT
+              value: "{{ .Values.env.PROMETHEUS_PORT }}"
+            - name: ENABLE_STORAGE
+              value: "{{ .Values.env.ENABLE_STORAGE }}"
+            - name: STORAGE_PROVIDER
+              value: "{{ .Values.env.STORAGE_PROVIDER }}"
           livenessProbe:
             httpGet:
               path: /health/live

@@ -1,8 +1,17 @@
 
 name: CI
-on: [push, pull_request]
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+  schedule:
+    # Nightly leak scan
+    - cron: '0 2 * * *'
+
 jobs:
   build:
+    name: Build, Lint, Unit+Integration+E2E
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -24,7 +33,62 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
-      - run: pnpm install
-      - run: pnpm prisma:generate
-      - run: pnpm build
-      - run: pnpm test:all
+      - name: Install dependencies
+        run: pnpm install
+      - name: Generate Prisma client
+        run: pnpm prisma:generate
+      - name: Lint
+        run: pnpm lint
+      - name: Build
+        run: pnpm build
+      - name: Tests (unit + integration + e2e)
+        run: pnpm test:full
+
+  helm-lint:
+    name: Helm Lint and Template
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: latest
+      - name: Lint chart
+        run: helm lint ./helm/nest-ddd-chart
+      - name: Render templates
+        run: helm template ci-render ./helm/nest-ddd-chart -f ./helm/nest-ddd-chart/values.yaml
+
+  leak-scan:
+    name: Leak Scan (detectOpenHandles)
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: dev
+          POSTGRES_USER: dev
+          POSTGRES_PASSWORD: dev
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
+      - name: Generate Prisma client
+        run: pnpm prisma:generate
+      - name: Unit leak scan
+        run: pnpm test:unit:leaks || true
+      - name: Integration leak scan
+        run: pnpm test:integration:leaks || true
+      - name: E2E leak scan
+        run: pnpm test:e2e:leaks || true

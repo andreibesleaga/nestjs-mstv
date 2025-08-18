@@ -13,13 +13,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { MongoDbService } from '../../common/mongodb.service';
 import { RedisClient } from '../../modules/auth/redis.client';
 import { DatabaseConfig } from '../../common/database.config';
-import { ConsulService } from '../../common/consul.service';
-import { JaegerService } from '../../common/jaeger.service';
 import { MicroserviceConfig } from '../../common/microservice.config';
-import { TracingInterceptor } from '../../common/tracing.interceptor';
-import { PerformanceInterceptor } from '../../common/performance.interceptor';
-import { CircuitBreakerService } from '../../common/circuit-breaker.service';
-import { CacheService } from '../../common/cache.service';
 import { ProtocolsModule } from '../../protocols/protocols.module';
 import { CommonModule } from '../../common/common.module';
 
@@ -65,12 +59,7 @@ const databaseProviders =
     HealthService,
     RedisClient,
     MicroserviceConfig,
-    ConsulService,
-    JaegerService,
-    TracingInterceptor,
-    PerformanceInterceptor,
-    CircuitBreakerService,
-    CacheService,
+    // Feature-flagged services are provided/exported by CommonModule
     ...databaseProviders,
   ],
 })

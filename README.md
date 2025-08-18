@@ -39,7 +39,7 @@ A NestJS microservice template variant implementing basic DDD, clean architectur
 - **Event Streaming** - Kafka producer/consumer for user lifecycle events
 - **Background Jobs** - BullMQ for async tasks (TODO: desired email provider implementation)
 
-## 🔧 **Microservice Features**
+## 🔧 Microservice features (details)
 
 - **Service Discovery** - Consul integration for service registration
 - **Distributed Tracing** - Jaeger integration for request tracing
@@ -67,7 +67,7 @@ A NestJS microservice template variant implementing basic DDD, clean architectur
 
 ### **Clean Architecture Implementation**
 
-```
+```text
 src/
 ├── apps/
 │   └── api-gateway/          # Application entry point (flattened)
@@ -246,25 +246,16 @@ pnpm start:dev
 
 ### 6. Run Tests
 
-````bash
+```bash
 # Unit tests only
 pnpm test:unit
 
 # All tests (unit + e2e)
 pnpm test:all
 
-To use MariaDB in the full stack, a `mariadb` service is included. Uncomment and set in the `api` service environment:
-
-```yaml
-# DATABASE_TYPE: "mariadb"
-# MYSQL_URL: "mysql://dev:dev@mariadb:3306/dev"
-````
-
-# Full test suite (requires database)
-
+# Full test suite (requires databases running)
 pnpm test:full
-
-````
+```
 
 ## 🗄️ **Database Configuration**
 
@@ -273,7 +264,7 @@ pnpm test:full
 ```bash
 DATABASE_TYPE=postgresql
 DATABASE_URL=postgresql://user:pass@localhost:5432/db
-````
+```
 
 ### MySQL / MariaDB
 
@@ -299,12 +290,6 @@ Notes:
 DATABASE_TYPE=mongodb
 ```
 
-To use MariaDB in the full stack, a `mariadb` service is included. Uncomment and set in the `api` service environment:
-
-#
-
-````yaml
-
 The application automatically selects the appropriate repository implementation based on `DATABASE_TYPE`.
 
 - Prisma (PostgreSQL): Prisma manages connections internally. In production, it’s recommended to front Postgres with PgBouncer and point `DATABASE_URL` to the pooler for robust pooling at scale.
@@ -315,16 +300,8 @@ The application automatically selects the appropriate repository implementation 
 Docker full stack includes a PgBouncer service. The app is preconfigured to use it in `docker/docker-compose.full.yml`:
 
 ```yaml
-DATABASE_URL: "postgresql://dev:dev@pgbouncer:6432/dev?pgbouncer=true"
-To use MariaDB in the full stack, a `mariadb` service is included. Uncomment and set in the `api` service environment:
-
-```yaml
-# DATABASE_TYPE: "mariadb"
-# MYSQL_URL: "mysql://dev:dev@mariadb:3306/dev"
-````
-
-````
-
+DATABASE_URL: 'postgresql://dev:dev@pgbouncer:6432/dev?pgbouncer=true'
+```
 
 ## 🔧 **Microservice Features**
 
@@ -334,7 +311,7 @@ To use MariaDB in the full stack, a `mariadb` service is included. Uncomment and
 CONSUL_HOST=localhost
 CONSUL_PORT=8500
 SERVICE_NAME=nestjs-api
-````
+```
 
 ### Distributed Tracing (Jaeger)
 
@@ -365,22 +342,22 @@ ENABLE_CIRCUIT_BREAKER=true
 # Trip circuit after N consecutive failures
 CB_THRESHOLD=5
 # Per-request timeout (ms) before considering a failure
-CB_TIMEOUT_MS=2000
+CB_TIMEOUT=2000
 # Time (ms) to stay open before trying a half-open probe
-CB_RESET_TIMEOUT_MS=10000
+CB_RESET_TIMEOUT=10000
 ```
 
 Behavior:
 
 - When the threshold is reached, requests get HTTP 503 with message "Circuit open" until reset timeout elapses.
-- After `CB_RESET_TIMEOUT_MS`, one request is allowed in half-open state to probe recovery.
+- After `CB_RESET_TIMEOUT`, one request is allowed in half-open state to probe recovery.
 - The Fastify plugin is applied globally to all routes when enabled.
 
 Programmatic usage for outbound HTTP calls (via `HttpClientService`):
 
 ```ts
 // Example
-await httpClient.fetchWithCircuit('upstreamA', 'https://api.example.com', { timeoutMs: 1500 });
+await httpClient.fetch('https://api.example.com', { timeoutMs: 1500, cbName: 'upstreamA' });
 ```
 
 Introspection endpoint:
