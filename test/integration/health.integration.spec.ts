@@ -106,7 +106,7 @@ describe('HealthService Integration Tests', () => {
       
       expect(health.status).toBe('healthy');
       expect(health.responseTime).toBeGreaterThanOrEqual(0);
-      expect(prismaService.$queryRaw).toHaveBeenCalledWith`SELECT 1`;
+      expect(prismaService.$queryRaw).toHaveBeenCalledWith(`SELECT 1`);
       } finally {
         process.env.DATABASE_TYPE = prev;
       }
