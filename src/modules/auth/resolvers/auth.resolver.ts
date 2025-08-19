@@ -12,12 +12,12 @@ import {
   LoginInput,
   RefreshTokenInput,
 } from '../dto/auth.dto';
-import { ZodValidationPipe } from '../../../common/zod-validation.pipe';
+import { ZodValidationPipe } from '../../../common/middlewares/zod-validation.pipe';
 import {
   UserRegistrationSchema,
   UserLoginSchema,
   RefreshTokenSchema,
-} from '../../../common/validation.schemas';
+} from '../../../common/types/validation.schemas';
 
 @Resolver()
 export class AuthResolver {

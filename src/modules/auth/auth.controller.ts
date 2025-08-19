@@ -2,14 +2,15 @@ import { Controller, Post, Body, UseGuards, Get, Request, UsePipes } from '@nest
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CheckPolicies, PoliciesGuard } from './policies.guard';
-import { AppAbility } from './abilities/user.ability';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { AppAbility, UserEntity } from './abilities/user.ability';
 import { RegisterInput, LoginInput, RefreshTokenInput, User } from './dto/auth.dto';
-import { ZodValidationPipe } from '../../common/zod-validation.pipe';
+import { ZodValidationPipe } from '../../common/middlewares/zod-validation.pipe';
 import {
   UserRegistrationSchema,
   UserLoginSchema,
   RefreshTokenSchema,
-} from '../../common/validation.schemas';
+} from '../../common/types/validation.schemas';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -219,8 +220,8 @@ export class AuthController {
     return { message: 'Successfully logged out' };
   }
 
-  @UseGuards(PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can('read', 'all'))
+  @UseGuards(JwtAuthGuard, PoliciesGuard)
+  @CheckPolicies((ability: AppAbility) => ability.can('read', UserEntity))
   @Get('profile')
   @ApiBearerAuth()
   @ApiOperation({

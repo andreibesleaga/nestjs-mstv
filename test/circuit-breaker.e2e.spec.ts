@@ -28,6 +28,8 @@ describe('Circuit Breaker (Fastify) e2e', () => {
     process.env.CB_THRESHOLD = '5';
     process.env.CB_TIMEOUT = '10';
     process.env.CB_RESET_TIMEOUT = '200';
+    // Disable MQTT to avoid dependency issues
+    process.env.ENABLE_MQTT = 'false';
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
@@ -53,7 +55,9 @@ describe('Circuit Breaker (Fastify) e2e', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   it('opens the circuit after threshold failures and then resets after resetTimeout', async () => {

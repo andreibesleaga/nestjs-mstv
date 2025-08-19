@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import * as mqtt from 'mqtt';
-import { FeatureFlagsService } from '../common/feature-flags.service';
+import { FeatureFlagsService } from '../common/services/feature-flags.service';
+import { MqttUserEventData, MqttSystemAlert, MqttPublishPayload } from '../common/types';
 
 @Injectable()
 export class MqttService implements OnModuleInit, OnModuleDestroy {
@@ -53,15 +54,14 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  publish(topic: string, message: string | object): void {
-    if (!this.isEnabled || !this.client) return;
-
-    const payload = typeof message === 'string' ? message : JSON.stringify(message);
-    this.client.publish(topic, payload, (error) => {
+  private publish(topic: string, payload: MqttPublishPayload): void {
+    if (!this.client || !this.isEnabled) return;
+    
+    this.client.publish(topic, JSON.stringify(payload), (error) => {
       if (error) {
         this.logger.error(`Failed to publish to ${topic}:`, error);
       } else {
-        this.logger.log(`Published to ${topic}: ${payload}`);
+        this.logger.debug(`Published to ${topic}`);
       }
     });
   }
@@ -78,18 +78,28 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
-  publishUserEvent(userId: string, event: string, data: any): void {
+  publishUserEvent(userId: string, event: string, data: Record<string, unknown>): void {
     if (!this.isEnabled) return;
-    this.publish(`users/${userId}/${event}`, {
+    
+    const payload: MqttUserEventData = {
       userId,
       event,
       data,
       timestamp: new Date().toISOString(),
-    });
+    };
+    
+    this.publish(`users/${userId}/${event}`, payload);
   }
 
-  publishSystemAlert(level: string, message: string): void {
+  publishSystemAlert(level: 'info' | 'warning' | 'error' | 'critical', message: string): void {
     if (!this.isEnabled) return;
-    this.publish(`system/alerts/${level}`, { level, message, timestamp: new Date().toISOString() });
+    
+    const payload: MqttSystemAlert = {
+      level,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+    
+    this.publish(`system/alerts/${level}`, payload);
   }
 }

@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AppModule } from '../../src/apps/api-gateway/app.module';
-import { PrismaService } from '../../src/common/prisma.service';
-import { MongoDbService } from '../../src/common/mongodb.service';
+import { PrismaService } from '../../src/common/services/prisma.service';
+import { MongoDbService } from '../../src/common/services/mongodb.service';
 import { RedisClient } from '../../src/modules/auth/redis.client';
 
 describe('Mock E2E Tests (No Database)', () => {

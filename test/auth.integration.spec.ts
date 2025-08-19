@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../src/modules/auth/auth.service';
-import { PrismaService } from '../src/common/prisma.service';
+import { PrismaService } from '../src/common/services/prisma.service';
 import { RedisClient } from '../src/modules/auth/redis.client';
 
 describe.skip('Auth Integration Tests', () => {

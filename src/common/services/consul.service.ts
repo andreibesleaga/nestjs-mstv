@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { MicroserviceConfig } from './microservice.config';
+import { MicroserviceConfig } from '../config/microservice.config';
 import { FeatureFlagsService } from './feature-flags.service';
 
 @Injectable()

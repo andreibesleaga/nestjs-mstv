@@ -6,7 +6,7 @@ export interface User {
   role: string;
 }
 
-class UserEntity {
+export class UserEntity {
   id: string;
   email: string;
   role: string;

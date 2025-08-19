@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Collection } from 'mongodb';
-import { MongoDbService } from '../../common/mongodb.service';
+import { MongoDbService } from '../../common/services/mongodb.service';
 
 interface RefreshTokenDocument {
   _id?: string;

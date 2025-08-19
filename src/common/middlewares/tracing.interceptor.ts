@@ -1,5 +1,5 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
-import { JaegerService } from './jaeger.service';
+import { JaegerService } from '../services/jaeger.service';
 import { RequestContext } from './request-context';
 
 @Injectable()

@@ -4,7 +4,6 @@ import {
   Get, 
   Body, 
   Param, 
-  Query,
   Logger,
   BadRequestException,
   NotFoundException,
@@ -192,7 +191,7 @@ export class MicroserviceController {
    * Publish MQTT message
    */
   @Post('mqtt/message')
-  async publishMqttMessage(@Body() request: { topic: string; message: string }) {
+  async publishMqttMessage(@Body() request: { topic: string; message: Record<string, unknown> }) {
     try {
       await this.microserviceService.publishMqttMessage(request.topic, request.message);
       
@@ -378,9 +377,9 @@ export class MicroserviceController {
       
       // Send a test message
       const result = await this.microserviceService.sendMessage(
-        transport,
         'test.ping',
-        testData
+        testData,
+        transport
       );
       
       return {

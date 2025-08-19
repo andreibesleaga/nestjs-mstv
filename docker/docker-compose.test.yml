@@ -11,21 +11,21 @@ services:
     volumes:
       - test-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U test"]
+      test: ['CMD-SHELL', 'pg_isready -U test']
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
   redis-test:
     image: redis:7
     ports:
       - '6380:6379'
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
   app-test:
     build:
       context: ..

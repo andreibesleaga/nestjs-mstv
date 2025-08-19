@@ -1,8 +1,8 @@
 import { Controller, Get, Param, NotFoundException, Optional } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { HealthResponseSchema } from '../../schemas/openapi.schemas';
-import { HealthService } from '../../common/health.service';
-import { CircuitBreakerService } from '../../common/circuit-breaker.service';
+import { HealthService } from '../../common/services/health.service';
+import { CircuitBreakerService } from '../../common/services/circuit-breaker.service';
 
 @ApiTags('Health')
 @Controller('health')

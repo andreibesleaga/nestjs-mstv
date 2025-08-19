@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { GrpcMethod } from '@nestjs/microservices';
-import { AuthService } from '../../modules/auth/auth.service';
-import { FeatureFlagsService } from '../../common/feature-flags.service';
+import { AuthService } from '../modules/auth/auth.service';
+import { FeatureFlagsService } from '../common/services/feature-flags.service';
 
 interface GetUserRequest {
   id: string;

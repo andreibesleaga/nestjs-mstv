@@ -8,16 +8,19 @@ import { AuthModule } from '../../modules/auth/auth.module';
 import { HealthController } from './health.controller';
 import { SchemasController } from './schemas.controller';
 import { DemoController } from './demo.controller';
+import { EmailController } from './email.controller';
+import { StorageController } from './storage.controller';
 import { MicroserviceController } from '../../common/microservice/microservice.controller';
-import { HealthService } from '../../common/health.service';
-import { PrismaService } from '../../common/prisma.service';
-import { MongoDbService } from '../../common/mongodb.service';
+import { HealthService } from '../../common/services/health.service';
+import { PrismaService } from '../../common/services/prisma.service';
+import { MongoDbService } from '../../common/services/mongodb.service';
 import { RedisClient } from '../../modules/auth/redis.client';
-import { DatabaseConfig } from '../../common/database.config';
-import { MicroserviceConfig } from '../../common/microservice.config';
+import { DatabaseConfig } from '../../common/config/database.config';
+import { MicroserviceConfig } from '../../common/config/microservice.config';
 import { ProtocolsModule } from '../../protocols/protocols.module';
 import { CommonModule } from '../../common/common.module';
 import { MicroserviceModule } from '../../common/microservice/microservice.module';
+import { MessagingModule } from '../../common/messaging/messaging.module';
 
 const databaseProviders =
   process.env.NODE_ENV === 'test'
@@ -51,11 +54,14 @@ const databaseProviders =
     UsersModule,
     ProtocolsModule,
     MicroserviceModule,
+    MessagingModule,
   ],
   controllers: [
     HealthController,
     SchemasController,
     MicroserviceController,
+    EmailController,
+    StorageController,
     // Expose demo routes in test and development, hide in production
     ...(process.env.NODE_ENV !== 'production' ? [DemoController] : []),
   ],

@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { RedisClient } from '../modules/auth/redis.client';
+import { RedisClient } from '../../modules/auth/redis.client';
 import { FeatureFlagsService } from './feature-flags.service';
 
 @Injectable()

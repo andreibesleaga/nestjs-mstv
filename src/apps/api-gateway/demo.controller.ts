@@ -1,5 +1,5 @@
 import { Controller, Get, Inject, Query, Post, Req, Res } from '@nestjs/common';
-import { HttpClientService } from '../../common/http-client.service';
+import { HttpClientService } from '../../common/services/http-client.service';
 import { StorageService } from '../../common/storage/storage.service';
 import { createGzip, createGunzip } from 'zlib';
 import type { FastifyRequest, FastifyReply } from 'fastify';

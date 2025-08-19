@@ -10,7 +10,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
-import { FeatureFlagsService } from '../common/feature-flags.service';
+import { FeatureFlagsService } from '../common/services/feature-flags.service';
+import { WebSocketMessage, WebSocketResponse } from '../common/types';
 
 @WebSocketGateway({
   cors: { origin: '*' },
@@ -55,31 +56,54 @@ export class AppWebSocketGateway
   }
 
   @SubscribeMessage('message')
-  handleMessage(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-    if (!this.isEnabled) return;
+  handleMessage(
+    @MessageBody() data: WebSocketMessage, 
+    @ConnectedSocket() client: Socket
+  ): WebSocketResponse<string> {
+    if (!this.isEnabled) return this.createErrorResponse<string>('WebSocket service is disabled');
 
     this.logger.log(`Message from ${client.id}:`, data);
-    return { event: 'response', data: `Echo: ${JSON.stringify(data)}` };
+    return this.createSuccessResponse(`Echo: ${JSON.stringify(data)}`);
   }
 
   @SubscribeMessage('join-room')
-  handleJoinRoom(@MessageBody() room: string, @ConnectedSocket() client: Socket) {
-    if (!this.isEnabled) return;
+  handleJoinRoom(@MessageBody() room: string, @ConnectedSocket() client: Socket): WebSocketResponse<{ room: string }> {
+    if (!this.isEnabled) return this.createErrorResponse<{ room: string }>('WebSocket service is disabled');
 
     client.join(room);
     client.emit('joined-room', { room });
     this.logger.log(`Client ${client.id} joined room: ${room}`);
+    return this.createSuccessResponse({ room });
   }
 
-  broadcastToRoom(room: string, event: string, data: any) {
+  broadcastToRoom<T = Record<string, unknown>>(room: string, event: string, data: T): void {
     if (!this.isEnabled) return;
 
     this.server.to(room).emit(event, data);
   }
 
-  broadcast(event: string, data: any) {
+  broadcast<T = Record<string, unknown>>(event: string, data: T): void {
     if (!this.isEnabled) return;
 
     this.server.emit(event, data);
+  }
+
+  private createSuccessResponse<T = Record<string, unknown>>(
+    data: T, 
+    _type = 'response'
+  ): WebSocketResponse<T> {
+    return {
+      success: true,
+      data,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  private createErrorResponse<T = Record<string, unknown>>(error: string): WebSocketResponse<T> {
+    return {
+      success: false,
+      error,
+      timestamp: new Date().toISOString(),
+    } as WebSocketResponse<T>;
   }
 }

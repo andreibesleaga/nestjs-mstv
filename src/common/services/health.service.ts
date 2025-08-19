@@ -1,8 +1,8 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { MongoDbService } from './mongodb.service';
-import { RedisClient } from '../modules/auth/redis.client';
-import { DatabaseConfig } from './database.config';
+import { RedisClient } from '../../modules/auth/redis.client';
+import { DatabaseConfig } from '../config/database.config';
 
 @Injectable()
 export class HealthService {

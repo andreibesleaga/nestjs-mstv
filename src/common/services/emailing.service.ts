@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
-import { BullMQService, JobData } from './messaging/bullmq.service';
+import { BullMQService, JobData } from '../messaging/bullmq.service';
 import * as nodemailer from 'nodemailer';
 import { Job } from 'bullmq';
 import { FeatureFlagsService } from './feature-flags.service';

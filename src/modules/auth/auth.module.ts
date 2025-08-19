@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { AuthResolver } from './resolvers/auth.resolver';
 import { RedisClient } from './redis.client';
 import { PoliciesGuard } from './policies.guard';
-import { PrismaService } from '../../common/prisma.service';
+import { PrismaService } from '../../common/services/prisma.service';
 import { UserMessagingModule } from '../../modules/users/messaging/user-messaging.module';
 
 @Module({

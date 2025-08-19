@@ -1,5 +1,5 @@
 import { UserEmailService } from '../src/modules/users/messaging/user-email.service';
-import { EmailingService } from '../src/common/emailing.service';
+import { EmailingService } from '../src/common/services/emailing.service';
 
 describe('UserEmailService', () => {
   let userEmailService: UserEmailService;

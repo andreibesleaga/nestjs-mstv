@@ -28,12 +28,13 @@ import { UsersService } from '../application/users.service';
 import { CreateUserDto, UpdateUserDto, UserResponseDto } from './dto';
 import { UserMapper } from './mappers/user.mapper';
 import { PoliciesGuard, CheckPolicies } from '../../auth/policies.guard';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { AppAbility } from '../../auth/abilities/user.ability';
 
 @ApiTags('Users')
 @Controller('users')
 @ApiBearerAuth()
-@UseGuards(PoliciesGuard)
+@UseGuards(JwtAuthGuard, PoliciesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 

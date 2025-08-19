@@ -1,6 +1,6 @@
-import { EmailingService } from '../src/common/emailing.service';
+import { EmailingService } from '../src/common/services/emailing.service';
 import { BullMQService } from '../src/common/messaging/bullmq.service';
-import { FeatureFlagsService } from '../src/common/feature-flags.service';
+import { FeatureFlagsService } from '../src/common/services/feature-flags.service';
 
 describe('EmailingService', () => {
   let emailingService: EmailingService;

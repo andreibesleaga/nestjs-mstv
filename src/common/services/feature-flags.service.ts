@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { validateEnvironment } from './environment.validation';
+import { SimplifiedEnvironmentSchema } from '../types/validation.schemas';
 
 @Injectable()
 export class FeatureFlagsService {
-  private readonly config = validateEnvironment();
+  private readonly config = SimplifiedEnvironmentSchema.parse(process.env);
 
   // Protocol Feature Flags
   get isWebSocketEnabled(): boolean {
@@ -22,17 +22,34 @@ export class FeatureFlagsService {
     return this.config.ENABLE_GRPC;
   }
 
+  // Microservice Transport Feature Flags
+  get isTcpMicroserviceEnabled(): boolean {
+    return this.config.ENABLE_TCP_MICROSERVICE;
+  }
+
+  get isRedisMicroserviceEnabled(): boolean {
+    return this.config.ENABLE_REDIS_MICROSERVICE;
+  }
+
+  get isNatsMicroserviceEnabled(): boolean {
+    return this.config.ENABLE_NATS_MICROSERVICE;
+  }
+
+  get isRabbitMqMicroserviceEnabled(): boolean {
+    return this.config.ENABLE_RABBITMQ_MICROSERVICE;
+  }
+
   // Service Feature Flags
   get isJaegerTracingEnabled(): boolean {
     return this.config.ENABLE_JAEGER_TRACING;
   }
 
   get isRedisCacheEnabled(): boolean {
-    return this.config.ENABLE_REDIS_CACHE;
+    return this.config.ENABLE_CACHING;
   }
 
   get isConsulDiscoveryEnabled(): boolean {
-    return this.config.ENABLE_CONSUL_DISCOVERY;
+    return this.config.ENABLE_MESSAGING; // Using messaging instead of Consul
   }
 
   get isCircuitBreakerEnabled(): boolean {
@@ -40,16 +57,16 @@ export class FeatureFlagsService {
   }
 
   get isPerformanceMonitoringEnabled(): boolean {
-    return this.config.ENABLE_PERFORMANCE_MONITORING;
+    return this.config.ENABLE_PERFORMANCE_METRICS;
   }
 
   get isEmailServiceEnabled(): boolean {
-    return this.config.ENABLE_EMAIL_SERVICE;
+    return this.config.ENABLE_MESSAGING; // Using messaging for email service
   }
 
   // Observability
   get isOpenTelemetryEnabled(): boolean {
-    return this.config.ENABLE_OPENTELEMETRY;
+    return this.config.ENABLE_DISTRIBUTED_TRACING;
   }
 
   // Utility methods

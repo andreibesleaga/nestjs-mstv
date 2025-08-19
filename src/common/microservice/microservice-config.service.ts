@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Transport } from '@nestjs/microservices';
 
 export interface TransportConfig {
   enabled: boolean;
@@ -37,7 +36,7 @@ export class MicroserviceConfigService {
    */
   getRedisConfig(): TransportConfig {
     return {
-      enabled: this.configService.get<boolean>('ENABLE_REDIS_MICROSERVICE', true),
+      enabled: this.configService.get<boolean>('ENABLE_REDIS_MICROSERVICE', false),
       options: {
         host: this.configService.get<string>('REDIS_HOST', 'localhost'),
         port: this.configService.get<number>('REDIS_PORT', 6379),
@@ -99,7 +98,7 @@ export class MicroserviceConfigService {
       enabled: this.configService.get<boolean>('ENABLE_GRPC', false),
       options: {
         package: this.configService.get<string>('GRPC_PACKAGE', 'nestjs'),
-        protoPath: this.configService.get<string>('GRPC_PROTO_PATH', './src/protocols/grpc/proto/user.proto'),
+        protoPath: this.configService.get<string>('GRPC_PROTO_PATH', './src/schemas/user.proto'),
         url: `${this.configService.get<string>('GRPC_HOST', 'localhost')}:${this.configService.get<number>('GRPC_PORT', 5000)}`,
         maxSendMessageLength: this.configService.get<number>('GRPC_MAX_SEND_MESSAGE_LENGTH', 4 * 1024 * 1024),
         maxReceiveMessageLength: this.configService.get<number>('GRPC_MAX_RECEIVE_MESSAGE_LENGTH', 4 * 1024 * 1024),

@@ -1,7 +1,7 @@
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { FeatureFlagsService } from './feature-flags.service';
+import { FeatureFlagsService } from '../services/feature-flags.service';
 
 @Injectable()
 export class PerformanceInterceptor implements NestInterceptor {

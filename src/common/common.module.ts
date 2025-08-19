@@ -1,23 +1,27 @@
 import { Module, Global } from '@nestjs/common';
-import { FeatureFlagsService } from './feature-flags.service';
-import { CacheService } from './cache.service';
-import { CircuitBreakerService } from './circuit-breaker.service';
-import { ConsulService } from './consul.service';
-import { EmailingService } from './emailing.service';
-import { JaegerService } from './jaeger.service';
-import { PerformanceInterceptor } from './performance.interceptor';
-import { HttpClientService } from './http-client.service';
+import { FeatureFlagsService } from './services/feature-flags.service';
+import { CacheService } from './services/cache.service';
+import { CircuitBreakerService } from './services/circuit-breaker.service';
+import { ConsulService } from './services/consul.service';
+import { JaegerService } from './services/jaeger.service';
+import { PerformanceInterceptor } from './middlewares/performance.interceptor';
+import { HttpClientService } from './services/http-client.service';
 import { StorageService } from './storage/storage.service';
 import { MemoryStorageAdapter } from './storage/adapters/memory.adapter';
 import { S3StorageAdapter } from './storage/adapters/s3.adapter';
 import { AzureBlobStorageAdapter } from './storage/adapters/azure.adapter';
 import { GCSStorageAdapter } from './storage/adapters/gcs.adapter';
+import { ConfigValidationService } from './services/config.validation.service';
+import { RedisClient } from '../modules/auth/redis.client';
+import { MicroserviceConfig } from './config/microservice.config';
 
 @Global()
 @Module({
   providers: [
     FeatureFlagsService,
     HttpClientService,
+    RedisClient,
+    MicroserviceConfig,
     {
       provide: StorageService,
       useFactory: () => {
@@ -45,23 +49,25 @@ import { GCSStorageAdapter } from './storage/adapters/gcs.adapter';
         return new StorageService(adapter as any);
       },
     },
-    ...(process.env.ENABLE_REDIS_CACHE === 'true' ? [CacheService] : []),
-    ...(process.env.ENABLE_CIRCUIT_BREAKER === 'true' ? [CircuitBreakerService] : []),
-    ...(process.env.ENABLE_CONSUL_DISCOVERY === 'true' ? [ConsulService] : []),
-    ...(process.env.ENABLE_EMAIL_SERVICE === 'true' ? [EmailingService] : []),
-    ...(process.env.ENABLE_JAEGER_TRACING === 'true' ? [JaegerService] : []),
-    ...(process.env.ENABLE_PERFORMANCE_MONITORING === 'true' ? [PerformanceInterceptor] : []),
+  CacheService,
+  CircuitBreakerService,
+  ConsulService,
+  JaegerService,
+    PerformanceInterceptor,
+    ConfigValidationService,
   ],
   exports: [
     FeatureFlagsService,
     HttpClientService,
+    RedisClient,
+    MicroserviceConfig,
     StorageService,
-    ...(process.env.ENABLE_REDIS_CACHE === 'true' ? [CacheService] : []),
-    ...(process.env.ENABLE_CIRCUIT_BREAKER === 'true' ? [CircuitBreakerService] : []),
-    ...(process.env.ENABLE_CONSUL_DISCOVERY === 'true' ? [ConsulService] : []),
-    ...(process.env.ENABLE_EMAIL_SERVICE === 'true' ? [EmailingService] : []),
-    ...(process.env.ENABLE_JAEGER_TRACING === 'true' ? [JaegerService] : []),
-    ...(process.env.ENABLE_PERFORMANCE_MONITORING === 'true' ? [PerformanceInterceptor] : []),
+    ConfigValidationService,
+    CacheService,
+    CircuitBreakerService,
+    ConsulService,
+    JaegerService,
+    PerformanceInterceptor,
   ],
 })
 export class CommonModule {}

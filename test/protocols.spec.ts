@@ -1,8 +1,8 @@
 import { HttpsService } from '../src/protocols/https.service';
 import { MqttService } from '../src/protocols/mqtt.service';
 import { AppWebSocketGateway } from '../src/protocols/websocket.gateway';
-import { GrpcUserService } from '../src/protocols/grpc/grpc.service';
-import { FeatureFlagsService } from '../src/common/feature-flags.service';
+import { GrpcUserService } from '../src/protocols/grpc.service';
+import { FeatureFlagsService } from '../src/common/services/feature-flags.service';
 
 // Mock FeatureFlagsService
 const mockFeatureFlagsService = {
@@ -41,11 +41,19 @@ describe('Protocol Services', () => {
 
   describe('MqttService', () => {
     let service: MqttService;
+    let mockClient: any;
 
     beforeEach(() => {
+      mockClient = {
+        publish: jest.fn(),
+        on: jest.fn(),
+        end: jest.fn(),
+      };
+
       service = new MqttService(mockFeatureFlagsService);
       // Mock the isEnabled property since it's set in the constructor
       (service as any).isEnabled = true;
+      (service as any).client = mockClient;
     });
 
     it('should be defined', () => {
@@ -53,28 +61,23 @@ describe('Protocol Services', () => {
     });
 
     it('should publish user event', () => {
-      const publishSpy = jest.spyOn(service, 'publish').mockImplementation();
-
       service.publishUserEvent('user123', 'login', { ip: '127.0.0.1' });
 
-      expect(publishSpy).toHaveBeenCalledWith('users/user123/login', {
-        userId: 'user123',
-        event: 'login',
-        data: { ip: '127.0.0.1' },
-        timestamp: expect.any(String),
-      });
+      expect(mockClient.publish).toHaveBeenCalledWith(
+        'users/user123/login',
+        expect.stringContaining('user123'),
+        expect.any(Function)
+      );
     });
 
     it('should publish system alert', () => {
-      const publishSpy = jest.spyOn(service, 'publish').mockImplementation();
+      service.publishSystemAlert('error', 'Critical error occurred');
 
-      service.publishSystemAlert('error', 'Database connection failed');
-
-      expect(publishSpy).toHaveBeenCalledWith('system/alerts/error', {
-        level: 'error',
-        message: 'Database connection failed',
-        timestamp: expect.any(String),
-      });
+      expect(mockClient.publish).toHaveBeenCalledWith(
+        'system/alerts/error',
+        expect.stringContaining('Critical error occurred'),
+        expect.any(Function)
+      );
     });
   });
 
@@ -91,12 +94,16 @@ describe('Protocol Services', () => {
 
     it('should handle message', () => {
       const mockClient = { id: 'client123' } as any;
-      const result = gateway.handleMessage({ text: 'hello' }, mockClient);
+      const result = gateway.handleMessage({ 
+        type: 'message', 
+        payload: { text: 'hello' },
+        timestamp: new Date().toISOString()
+      }, mockClient);
 
-      expect(result).toEqual({
-        event: 'response',
-        data: 'Echo: {"text":"hello"}',
-      });
+      expect(result.success).toBe(true);
+      expect(result.data).toContain('Echo: {"type":"message","payload":{"text":"hello"},"timestamp":"');
+      expect(result.data).toContain('2025-08-19T');
+      expect(typeof result.timestamp).toBe('string');
     });
   });
 

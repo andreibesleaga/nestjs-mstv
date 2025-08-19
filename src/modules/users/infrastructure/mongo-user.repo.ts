@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Collection, ObjectId } from 'mongodb';
 import { IUserRepository } from '../repositories/user.repository';
 import { User } from '../domain/user.entity';
-import { MongoDbService } from '../../../common/mongodb.service';
+import { MongoDbService } from '../../../common/services/mongodb.service';
 
 interface UserDocument {
   _id?: ObjectId | string;

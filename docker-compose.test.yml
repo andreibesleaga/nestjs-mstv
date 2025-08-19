@@ -10,12 +10,71 @@ services:
       - '5433:5432'
     volumes:
       - test-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   
   redis-test:
     image: redis:7
     ports:
       - '6380:6379'
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
   
+  zookeeper-test:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - '2182:2181'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  kafka-test:
+    image: confluentinc/cp-kafka:7.4.0
+    depends_on:
+      zookeeper-test:
+        condition: service_healthy
+    ports:
+      - '9093:9093'
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-test:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-test:29092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9093", "--list"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  mongodb-test:
+    image: mongo:7
+    ports:
+      - '27018:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: test
+      MONGO_INITDB_DATABASE: test
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   app-test:
     build:
       context: .
@@ -23,13 +82,24 @@ services:
     environment:
       DATABASE_URL: postgresql://test:test@db-test:5432/test
       REDIS_URL: redis://redis-test:6379
+      KAFKA_BROKERS: kafka-test:29092
+      MONGODB_URL: mongodb://test:test@mongodb-test:27017/test?authSource=admin
       JWT_SECRET: test-secret
       NODE_ENV: test
+      ENABLE_KAFKA: 'true'
+      ENABLE_REDIS: 'true'
+      ENABLE_MONGODB: 'true'
     ports:
       - '3001:3000'
     depends_on:
-      - db-test
-      - redis-test
+      db-test:
+        condition: service_healthy
+      redis-test:
+        condition: service_healthy
+      kafka-test:
+        condition: service_healthy
+      mongodb-test:
+        condition: service_healthy
     command: >
       sh -c "
         pnpm prisma:generate &&

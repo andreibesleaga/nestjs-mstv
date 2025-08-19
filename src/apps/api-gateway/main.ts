@@ -6,9 +6,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from '../../modules/auth/filters/global-exception.filter';
 import { HttpsService } from '../../protocols/https.service';
-import { CustomLogger } from '../../common/logger.config';
-import { RequestContextInterceptor } from '../../common/request-context.interceptor';
-import { initOpenTelemetry } from '../../common/opentelemetry';
+import { CustomLogger } from '../../common/config/logger.config';
+import { RequestContextInterceptor } from '../../common/middlewares/request-context.interceptor';
+import { initOpenTelemetry } from '../../common/services/opentelemetry.service';
 
 import {
   UserSchema,

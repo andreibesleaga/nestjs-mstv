@@ -1,7 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as https from 'https';
 import * as fs from 'fs';
-import { FeatureFlagsService } from '../common/feature-flags.service';
+import { FeatureFlagsService } from '../common/services/feature-flags.service';
+import { HttpsRequestOptions, HttpsResponse } from '../common/types';
 
 @Injectable()
 export class HttpsService {
@@ -37,32 +38,64 @@ export class HttpsService {
     }
   }
 
-  async makeSecureRequest(url: string, data?: any): Promise<any> {
+  async makeSecureRequest<T = Record<string, unknown>>(
+    url: string, 
+    data?: Record<string, unknown>,
+    options: HttpsRequestOptions = {}
+  ): Promise<HttpsResponse<T> | null> {
     if (!this.isEnabled) {
       this.logger.warn('HTTPS service is disabled - request ignored');
       return null;
     }
 
     return new Promise((resolve, reject) => {
-      const options = {
-        method: data ? 'POST' : 'GET',
-        headers: data ? { 'Content-Type': 'application/json' } : {},
+      const requestOptions = {
+        method: options.method || (data ? 'POST' : 'GET'),
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+          ...(data ? { 'Content-Type': 'application/json' } : {}),
+        },
+        timeout: options.timeout || 5000,
       };
 
-      const req = https.request(url, options, (res) => {
+      const req = https.request(url, requestOptions, (res) => {
         let body = '';
         res.on('data', (chunk) => (body += chunk));
         res.on('end', () => {
           try {
-            resolve(JSON.parse(body));
+            const parsedData = JSON.parse(body) as T;
+            resolve({
+              data: parsedData,
+              status: res.statusCode || 0,
+              headers: res.headers as Record<string, string>,
+              success: (res.statusCode || 0) >= 200 && (res.statusCode || 0) < 300,
+            });
           } catch {
-            resolve(body);
+            resolve({
+              data: body as T,
+              status: res.statusCode || 0,
+              headers: res.headers as Record<string, string>,
+              success: (res.statusCode || 0) >= 200 && (res.statusCode || 0) < 300,
+            });
           }
         });
       });
 
-      req.on('error', reject);
-      if (data) req.write(JSON.stringify(data));
+      req.on('error', (error) => {
+        this.logger.error('HTTPS request failed:', error);
+        reject(error);
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error('Request timeout'));
+      });
+
+      if (data) {
+        req.write(JSON.stringify(data));
+      }
+      
       req.end();
     });
   }

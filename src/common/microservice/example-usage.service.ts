@@ -19,16 +19,16 @@ export class ExampleMicroserviceUsageService {
     try {
       // 1. Send user data via Redis for immediate processing
       const userCreated = await this.microserviceService.sendMessage(
-        'redis',
         'user.create',
-        userData
+        userData,
+        'redis'
       );
 
       // 2. Emit event for other services to react
       await this.microserviceService.emitEvent(
-        'tcp',
         'user.registered',
-        { userId: userCreated.id, email: userData.email }
+        { userId: userCreated.id, email: userData.email },
+        'tcp'
       );
 
       // 3. Send Kafka message for analytics
@@ -93,32 +93,32 @@ export class ExampleMicroserviceUsageService {
       let orderResult;
       try {
         orderResult = await this.microserviceService.sendMessage(
-          'grpc',
           'order.process',
-          orderData
+          orderData,
+          'grpc'
         );
-      } catch (error) {
+      } catch {
         // Fallback to Redis if gRPC is not available
         orderResult = await this.microserviceService.sendMessage(
-          'redis',
           'order.process',
-          orderData
+          orderData,
+          'redis'
         );
       }
 
       // 2. Send to inventory system via NATS (if enabled)
       try {
         await this.microserviceService.emitEvent(
-          'nats',
           'inventory.reserve',
-          { orderId: orderResult.id, items: orderData.items }
+          { orderId: orderResult.id, items: orderData.items },
+          'nats'
         );
       } catch (error) {
         this.logger.warn('NATS not available, using Redis for inventory', error);
         await this.microserviceService.emitEvent(
-          'redis',
           'inventory.reserve',
-          { orderId: orderResult.id, items: orderData.items }
+          { orderId: orderResult.id, items: orderData.items },
+          'redis'
         );
       }
 
@@ -126,11 +126,11 @@ export class ExampleMicroserviceUsageService {
       try {
         await this.microserviceService.publishMqttMessage(
           `warehouse/orders/${orderResult.id}`,
-          JSON.stringify({
+          {
             action: 'prepare_shipment',
             orderId: orderResult.id,
             priority: orderData.priority || 'normal'
-          })
+          }
         );
       } catch (error) {
         this.logger.warn('MQTT not available for warehouse notification', error);
@@ -171,9 +171,9 @@ export class ExampleMicroserviceUsageService {
       for (const transport of transports) {
         try {
           await this.microserviceService.sendMessage(
-            transport,
             'health.ping',
-            { timestamp: new Date() }
+            { timestamp: new Date() },
+            transport
           );
           healthData.checks[transport] = 'healthy';
         } catch (error) {
@@ -205,15 +205,15 @@ export class ExampleMicroserviceUsageService {
 
       // 1. Get data from multiple sources
       const userData = await this.microserviceService.sendMessage(
-        'redis',
         'user.getAll',
-        {}
+        {},
+        'redis'
       );
 
       const orderData = await this.microserviceService.sendMessage(
-        'tcp',
         'order.getAll',
-        {}
+        {},
+        'tcp'
       );
 
       // 2. Send to analytics service via Kafka
@@ -276,9 +276,9 @@ export class ExampleMicroserviceUsageService {
 
       // 1. Notify services about backup start
       await this.microserviceService.emitEvent(
-        'redis',
         'system.backup.start',
-        { timestamp: new Date() }
+        { timestamp: new Date() },
+        'redis'
       );
 
       // 2. Stream backup progress
@@ -349,9 +349,9 @@ export class ExampleMicroserviceUsageService {
 
       // 1. Send to metrics service
       await this.microserviceService.sendMessage(
-        'redis',
         'metrics.collect',
-        metrics
+        metrics,
+        'redis'
       );
 
       // 2. Stream real-time metrics
@@ -415,18 +415,18 @@ export class ExampleMicroserviceUsageService {
   private async handleUserLogin(data: any) {
     // Update user activity via Redis
     await this.microserviceService.emitEvent(
-      'redis',
       'user.activity.login',
-      data
+      data,
+      'redis'
     );
   }
 
   private async handleUserLogout(data: any) {
     // Update user activity via Redis
     await this.microserviceService.emitEvent(
-      'redis',
       'user.activity.logout',
-      data
+      data,
+      'redis'
     );
   }
 }

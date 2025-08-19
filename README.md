@@ -1,44 +1,54 @@
 # NestJS Microservice Template Variant
 
-A NestJS microservice template variant implementing basic DDD, clean architecture principles with comprehensive features and microservices common design patterns for versatility and performance.
+A clean, maintainable NestJS microservice template implementing essential microservice patterns with optional advanced features. Designed for rapid development with production-ready defaults.
 You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 
-## ⚡ **Feature Flags & Performance**
 
-- **🎯 Feature Flags System** - Enable/disable protocols and services for optimal performance
+**🎯 Philosophy:** Simple by default, scalable by choice. Enable only what you need.
+
+## ⚡ **Core Features**
+
+- **�️ Feature Flags System** - Flags to enable/disable services as needed
+- **🚀 Fast Startup** - Lightweight by default, everything optional
+- **� Modular Design** - Focused managers for transport, streaming, scheduling, caching
+- **🔧 Type Safety** - Comprehensive TypeScript interfaces eliminate runtime errors
 - **🚀 Fast Startup** - Minimal resource usage with selective service loading
 - **📊 Performance Monitoring** - Optional performance interceptors and metrics
 - **🔧 Environment-Specific Configs** - Different feature sets for dev/test/prod
 
-## 🏗️ **Architecture & Design**
 
-- **DDD/Clean Architecture** - Domain entities, value objects, repositories
-- **Hexagonal Architecture** - Clear separation of concerns with ports and adapters
+## 🏗️ **Architecture** 
+
+- **Clean Services** - Single responsibility focused managers
+- **Protocol Support** - HTTP/REST, GraphQL, WebSocket, MQTT (gRPC optional)
+- **Microservice Ready** - Optional TCP, Redis, NATS, RabbitMQ transports  
+- **Configuration Diet** - Essential configs only, no complexity bloat
 - **SOLID Principles** - Maintainable and extensible codebase
 - **Event-Driven Architecture** - Kafka integration for scalable messaging
 
 ## 🗄️ **Database & Persistence**
 
-- **Flexible Database Support** - SQL/NoSQL: PostgreSQL or MySQL/MariaDB (via Prisma), plus direct MongoDB with runtime selection
+- **Database Support** - PostgreSQL (via Prisma) or MongoDB with runtime selection
+- **Simple Repository Pattern** - Clean data access abstraction
+- **Connection Management** - Health checks and proper connection handling
 - **Database Migrations** - Prisma/MongoDB migrations and seed scripts
-- **Repository Pattern** - Clean abstraction over data access
 - **Connection Management** - Proper connection pooling and health checks
 
 ## 🔐 **Authentication & Security**
 
-- **JWT Authentication** - Access and refresh tokens with Redis revocation
-- **CASL Authorization** - Fine-grained role-based access control
-- **Password Security** - bcrypt hashing with salt rounds
-- **Security Headers** - Helmet, CORS, rate limiting, and CSP
-- **Input Validation** - Comprehensive validation with class-validator
+- **JWT Authentication** - Access and refresh tokens
+- **CASL Authorization** - Role-based access control
+- **Password Security** - bcrypt hashing
+- **Security Headers** - Helmet, CORS, rate limiting
+- **Input Validation** - class-validator integration
 
 ## 🚀 **APIs & Communication**
 
-- **REST API** - Fastify-based REST endpoints
-- **GraphQL API** - Full GraphQL schema with resolvers
+- **REST API** - Fastify Clean HTTP endpoints
+- **GraphQL API** - Optional GraphQL schema with resolvers
 - **OpenAPI/Swagger** - Interactive API documentation
 - **Event Streaming** - Kafka producer/consumer for user lifecycle events
-- **Background Jobs** - BullMQ for async tasks (TODO: desired email provider implementation)
+- **Background Jobs** - BullMQ for async tasks
 
 ## 🔧 Microservice features (details)
 
@@ -47,6 +57,21 @@ You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 - **Health Checks** - Comprehensive health monitoring endpoints
 - **Configuration Management** - Environment-based configuration
 - **Graceful Shutdown** - Proper resource cleanup on termination
+- **Message Queues** - Optional Kafka/BullMQ for async tasks
+- **Real-time** - WebSocket support for live updates
+
+## 🔧 **Optional Advanced Features** 
+
+All features disabled by default - enable what you need:
+
+- **Microservice Transports** - TCP, Redis, NATS, RabbitMQ (set `ENABLE_*_MICROSERVICE=true`)
+- **Service Discovery** - Consul integration (set `ENABLE_CONSUL_DISCOVERY=true`)
+- **Distributed Tracing** - Jaeger integration (set `ENABLE_JAEGER_TRACING=true`)
+- **Circuit Breakers** - Resilience patterns (set `ENABLE_CIRCUIT_BREAKER=true`)
+- **Performance Monitoring** - Metrics collection (set `ENABLE_PERFORMANCE_MONITORING=true`)
+- **Advanced Caching** - Redis cache (set `ENABLE_REDIS_CACHE=true`)
+
+**Philosophy:** Template includes everything but enables only essentials by default.
 
 ## 🧪 **Testing & Quality**
 
@@ -66,30 +91,15 @@ You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 
 ## 🚀 **Quick Start**
 
-### **Clean Architecture Implementation**
-
-```text
-src/
-├── apps/
-│   └── api-gateway/          # Application entry point (flattened)
-├── modules/                  # Domain modules (flattened)
-│   ├── auth/                 # Authentication domain
-│   └── users/                # User domain
-│       ├── application/
-│       ├── domain/
-│       ├── infrastructure/
-│       ├── interface/
-│       └── messaging/
-├── common/                   # Shared utilities
-├── protocols/                # Communication protocols
-└── schemas/                  # Data schemas
-```
 
 ### 1. Required Environment Setup
 
 ```bash
-# Copy environment template
+# Copy environment template (simplified configuration)
 cp .env.example .env
+
+# For advanced features (MQTT, NATS, gRPC, advanced observability):
+# cp .env.example.legacy .env
 
 # Configure database type (postgresql, mysql/mariadb or mongodb)
 DATABASE_TYPE=postgresql  # or mysql | mariadb | mongodb

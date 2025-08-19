@@ -44,8 +44,9 @@ export class PoliciesGuard implements CanActivate {
     const user = request?.user;
 
     if (!user) {
-      // For testing, allow access with a mock user
-      if (process.env.NODE_ENV === 'test') {
+      // For testing, only allow access if this is a unit test with no request headers
+      // E2E tests with headers should still be properly validated
+      if (process.env.NODE_ENV === 'test' && (!request.headers || !request.headers.authorization)) {
         const mockUser = { id: '1', email: 'test@example.com', role: 'admin' };
         const ability = defineAbilityFor(mockUser);
         return policyHandlers.every((handler) => handler(ability));

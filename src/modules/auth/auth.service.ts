@@ -8,7 +8,7 @@ import {
   InvalidTokenError,
   ValidationError,
 } from './exceptions/auth.exceptions';
-import { PrismaService } from '../../common/prisma.service';
+import { PrismaService } from '../../common/services/prisma.service';
 import { UserKafkaService } from '../../modules/users/messaging/user-kafka.service';
 import { UserEmailService } from '../../modules/users/messaging/user-email.service';
 
