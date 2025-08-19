@@ -42,7 +42,7 @@ describe('Database Integration Tests', () => {
       if (configService.get('DATABASE_TYPE') === 'postgresql') {
         await prismaService.$queryRaw`DELETE FROM users WHERE email LIKE '%@test.integration%'`;
       }
-    } catch (error) {
+    } catch {
       // Ignore cleanup errors
     }
 

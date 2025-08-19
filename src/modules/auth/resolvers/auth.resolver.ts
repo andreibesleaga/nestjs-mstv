@@ -2,7 +2,7 @@ import { Resolver, Mutation, Query, Args, Context } from '@nestjs/graphql';
 import { UseGuards, UsePipes } from '@nestjs/common';
 import { AuthService } from '../auth.service';
 import { CheckPolicies, PoliciesGuard } from '../policies.guard';
-import { AppAbility } from '../abilities/user.ability';
+import { AppAbility, UserEntity } from '../abilities/user.ability';
 import {
   User,
   AuthPayload,
@@ -78,28 +78,28 @@ export class AuthResolver {
 
   @Query(() => User)
   @UseGuards(PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can('read', 'all'))
+  @CheckPolicies((ability: AppAbility) => ability.can('read', UserEntity))
   async me(@Context() context: any): Promise<User> {
     return context.req.user;
   }
 
   @Query(() => [User])
   @UseGuards(PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can('read', 'all'))
+  @CheckPolicies((ability: AppAbility) => ability.can('read', UserEntity))
   async users(): Promise<User[]> {
     return this.authService.getAllUsers();
   }
 
   @Query(() => [User])
   @UseGuards(PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can('read', 'all'))
+  @CheckPolicies((ability: AppAbility) => ability.can('read', UserEntity))
   async getAllUsers(): Promise<User[]> {
     return this.authService.getAllUsers();
   }
 
   @Query(() => User, { nullable: true })
   @UseGuards(PoliciesGuard)
-  @CheckPolicies((ability: AppAbility) => ability.can('read', 'all'))
+  @CheckPolicies((ability: AppAbility) => ability.can('read', UserEntity))
   async getUser(@Args('id') id: string): Promise<User | null> {
     const users = await this.authService.getAllUsers();
     return users.find((user) => user.id === id) || null;

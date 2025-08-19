@@ -23,7 +23,6 @@ type MockedRedisClient = {
 
 describe('HealthService Integration Tests', () => {
   let healthService: HealthService;
-  let configService: ConfigService;
   let prismaService: MockedPrismaService;
   let mongoService: MockedMongoService;
   let redisClient: MockedRedisClient;
@@ -82,7 +81,6 @@ describe('HealthService Integration Tests', () => {
     }).compile();
 
     healthService = module.get<HealthService>(HealthService);
-    configService = module.get<ConfigService>(ConfigService);
     prismaService = module.get(PrismaService) as MockedPrismaService;
     mongoService = module.get(MongoDbService) as MockedMongoService;
     redisClient = module.get(RedisClient) as MockedRedisClient;
@@ -107,7 +105,7 @@ describe('HealthService Integration Tests', () => {
       const health = await healthService.checkDatabase();
       
       expect(health.status).toBe('healthy');
-  expect(health.responseTime).toBeGreaterThanOrEqual(0);
+      expect(health.responseTime).toBeGreaterThanOrEqual(0);
       expect(prismaService.$queryRaw).toHaveBeenCalledWith`SELECT 1`;
       } finally {
         process.env.DATABASE_TYPE = prev;

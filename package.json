@@ -32,8 +32,8 @@
     "mongodb:seed": "ts-node mongodb/seed-runner.ts",
     "test:performance": "jest test/performance/load.test.ts",
     "diagrams:render": "bash scripts/render-diagrams.sh",
-    "coordination:temporal:up": "docker compose -f coordination/docker-compose.temporal.yml up -d",
-    "coordination:temporal:down": "docker compose -f coordination/docker-compose.temporal.yml down -v",
+    "coordination:temporal:up": "docker-compose -f coordination/docker-compose.temporal.yml up -d",
+    "coordination:temporal:down": "docker-compose -f coordination/docker-compose.temporal.yml down -v",
     "coordination:worker": "pnpm -F nestjs-mstv-coordination run dev:worker",
     "coordination:smoke": "pnpm -F nestjs-mstv-coordination run smoke",
     "coordination:smoke:local": "bash scripts/coordination-smoke.sh"

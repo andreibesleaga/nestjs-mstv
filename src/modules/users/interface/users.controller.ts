@@ -30,6 +30,7 @@ import { UserMapper } from './mappers/user.mapper';
 import { PoliciesGuard, CheckPolicies } from '../../auth/policies.guard';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { AppAbility } from '../../auth/abilities/user.ability';
+import { UserEntity } from '../../auth/abilities/user.ability';
 
 @ApiTags('Users')
 @Controller('users')
@@ -39,7 +40,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @CheckPolicies((ability: AppAbility) => ability.can('read', 'all'))
+  @CheckPolicies((ability: AppAbility) => ability.can('read', UserEntity))
   @ApiOperation({
     summary: 'Get all users',
     description: 'Retrieve a list of all users with optional pagination',
@@ -82,7 +83,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  @CheckPolicies((ability: AppAbility) => ability.can('read', 'all'))
+  @CheckPolicies((ability: AppAbility) => ability.can('read', UserEntity))
   @ApiOperation({
     summary: 'Get user by ID',
     description: 'Retrieve a specific user by their unique identifier',

@@ -9,6 +9,25 @@ import { RedisClient } from '../../src/modules/auth/redis.client';
 describe('Users E2E', () => {
   let app: NestFastifyApplication;
 
+  // Helper function to get authentication token
+  async function getAuthToken(email = `test-${Date.now()}@example.com`, password = 'password123', role = 'admin') {
+    // Register user with admin role for testing
+    await request(app.getHttpServer()).post('/auth/register').send({
+      email,
+      password,
+      name: 'Test User',
+      role, // Include role in registration
+    });
+
+    // Login to get token
+    const loginRes = await request(app.getHttpServer()).post('/auth/login').send({
+      email,
+      password,
+    });
+
+    return loginRes.body.access_token;
+  }
+
   beforeAll(async () => {
     // Create dynamic mock services that handle different emails properly
     const createdUsers = new Map();
@@ -144,8 +163,11 @@ describe('Users E2E', () => {
 
   describe('GET /users/:id', () => {
     it('should get user by id', async () => {
-      // Create a user first
+      // Create a user and get auth token for admin
       const uniqueEmail = `test-${Date.now()}@example.com`;
+      const authToken = await getAuthToken(`admin-${Date.now()}@example.com`);
+      
+      // Register a test user to fetch
       const registerRes = await request(app.getHttpServer()).post('/auth/register').send({
         email: uniqueEmail,
         password: 'password123',
@@ -156,6 +178,7 @@ describe('Users E2E', () => {
 
       return request(app.getHttpServer())
         .get(`/users/${userId}`)
+        .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
         .expect((res) => {
           expect(res.body.id).toBe(userId);
@@ -164,10 +187,16 @@ describe('Users E2E', () => {
         });
     });
 
-    it('should return 404 for non-existent user', () => {
+    it('should return 404 for non-existent user', async () => {
+      // Get auth token for admin
+      const authToken = await getAuthToken();
+      
       // Use a valid UUID format that doesn't exist in our mock
       const nonExistentUUID = '123e4567-e89b-12d3-a456-426614174999';
-      return request(app.getHttpServer()).get(`/users/${nonExistentUUID}`).expect(404);
+      return request(app.getHttpServer())
+        .get(`/users/${nonExistentUUID}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(404);
     });
   });
 });

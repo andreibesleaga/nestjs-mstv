@@ -178,7 +178,7 @@ describe('Simple E2E Tests', () => {
       return request(app.getHttpServer())
         .get(`/users/${testUUID}`)
         .expect((res) => {
-          expect([200, 404, 500].includes(res.status)).toBe(true);
+          expect([200, 401, 404, 500].includes(res.status)).toBe(true);
         });
     });
   });

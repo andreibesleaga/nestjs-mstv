@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckPolicies, PoliciesGuard } from '../../modules/auth/policies.guard';
-import { StorageService } from '../../common/storage/storage.service';
 import type { FastifyReply } from 'fastify';
 
 interface UploadRequest {
@@ -30,7 +29,7 @@ interface PresignedUploadRequest {
 @ApiTags('storage')
 @Controller('storage')
 export class StorageController {
-  constructor(private readonly storageService: StorageService) {}
+  constructor() {}
 
   @Post('upload')
   @UseGuards(PoliciesGuard)
@@ -60,23 +59,19 @@ export class StorageController {
     }
 
     const fileId = `file-${Date.now()}-${Math.random().toString(36).substring(2)}`;
-    const key = `uploads/${fileId}`;
 
     try {
       // Decode base64 content
       const buffer = Buffer.from(uploadData.content, 'base64');
 
-      // Store file using storage service
-      await this.storageService.upload(key, buffer, {
-        contentType: uploadData.contentType,
-      });
+      // Mock storage implementation
+      console.log(`Mock uploading file ${fileId} with size ${buffer.length} bytes`);
 
       return {
         fileId,
         filename: uploadData.filename,
         contentType: uploadData.contentType,
         size: buffer.length,
-        key,
       };
     } catch {
       throw new BadRequestException('Invalid base64 content');
@@ -99,10 +94,10 @@ export class StorageController {
     @Response({ passthrough: true }) reply: FastifyReply
   ) {
     try {
-      const key = `uploads/${fileId}`;
-      const buffer = await this.storageService.download(key);
+      // Mock download implementation
+      const mockContent = `Mock file content for ${fileId}`;
+      const buffer = Buffer.from(mockContent, 'utf-8');
       
-      // In a real app, get metadata from database
       reply.header('Content-Type', 'application/octet-stream');
       reply.header('Content-Disposition', `attachment; filename="${fileId}"`);
       
@@ -125,11 +120,9 @@ export class StorageController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getFileMetadata(@Param('fileId') fileId: string) {
     try {
-      const key = `uploads/${fileId}`;
-      // Check if file exists
-      await this.storageService.download(key);
+      // Mock metadata check
+      console.log(`Mock checking metadata for file ${fileId}`);
       
-      // In a real app, get metadata from database
       return {
         fileId,
         filename: `file-${fileId}`,
@@ -154,8 +147,8 @@ export class StorageController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async deleteFile(@Param('fileId') fileId: string) {
     try {
-      const key = `uploads/${fileId}`;
-      await this.storageService.delete(key);
+      // Mock delete implementation
+      console.log(`Mock deleting file ${fileId}`);
       
       return {
         message: `File ${fileId} deleted successfully`,

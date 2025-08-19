@@ -167,20 +167,16 @@ export class CacheManager {
     factory: () => Promise<T> | T, 
     ttlMs?: number
   ): Promise<T> {
-    try {
-      // Try to get from cache first
-      const cached = this.get<T>(key);
-      if (cached !== undefined) {
-        return cached;
-      }
-
-      // Not in cache, create value
-      const value = await factory();
-      this.set(key, value, ttlMs);
-      return value;
-    } catch (error) {
-      throw error;
+    // Try to get from cache first
+    const cached = this.get<T>(key);
+    if (cached !== undefined) {
+      return cached;
     }
+
+    // Not in cache, create value
+    const value = await factory();
+    this.set(key, value, ttlMs);
+    return value;
   }
 
   mget<T>(keys: string[]): Map<string, T> {

@@ -32,7 +32,7 @@ const mockPrismaClient = {
         email: data.email,
         name: data.name,
         password: data.password,
-        role: data.role || 'user',
+        role: data.role || (userCounter === 1 ? 'admin' : 'user'), // First user gets admin role
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -64,6 +64,26 @@ const mockPrismaClient = {
         return Promise.resolve(user);
       }
       return Promise.resolve(null);
+    }),
+    count: jest.fn().mockImplementation(() => {
+      return Promise.resolve(createdUsers.size);
+    }),
+    createMany: jest.fn().mockImplementation(({ data }) => {
+      const created = data.map((userData) => {
+        userCounter++;
+        const newUser = {
+          id: userCounter.toString(),
+          email: userData.email,
+          name: userData.name,
+          password: userData.password,
+          role: userData.role || 'user',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+        createdUsers.set(userData.email, newUser);
+        return newUser;
+      });
+      return Promise.resolve({ count: created.length });
     }),
   },
   refreshToken: {
@@ -104,7 +124,29 @@ const mockPrismaClient = {
     deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
   },
   $disconnect: jest.fn(),
-  $connect: jest.fn(),
+  $connect: jest.fn().mockResolvedValue(undefined),
+  $transaction: jest.fn().mockImplementation((callback) => {
+    // Provide a transaction context with the same API
+    return Promise.resolve(callback(mockPrismaClient));
+  }),
+  $queryRaw: jest.fn().mockImplementation((query) => {
+    // Mock common database queries
+    if (typeof query === 'string' || query?.strings) {
+      const queryStr = typeof query === 'string' ? query : query.strings.join('');
+      
+      if (queryStr.includes('SELECT 1')) {
+        return Promise.resolve([{ result: 1 }]);
+      }
+      if (queryStr.includes('DELETE FROM users')) {
+        return Promise.resolve({ count: 0 });
+      }
+      if (queryStr.includes('SELECT version()')) {
+        return Promise.resolve([{ version: 'PostgreSQL 14.0 (Mock)' }]);
+      }
+    }
+    return Promise.resolve([]);
+  }),
+  $executeRaw: jest.fn().mockImplementation(() => Promise.resolve(0)),
 };
 
 // Mock @prisma/client to return our mock client

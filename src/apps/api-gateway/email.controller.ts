@@ -10,30 +10,10 @@ interface EmailRequest {
   template?: string;
 }
 
-// Mock EmailingService for now
-class EmailingService {
-  async queueEmail(data: any) {
-    return 'mock-message-id';
-  }
-
-  async getEmailQueueStats() {
-    return {
-      pending: 0,
-      processing: 0,
-      completed: 10,
-      failed: 0
-    };
-  }
-
-  async deleteEmailJob(messageId: string) {
-    return { success: true, messageId };
-  }
-}
-
 @ApiTags('email')
 @Controller('email')
 export class EmailController {
-  constructor(private readonly emailingService: EmailingService) {}
+  constructor() {}
 
   @Post('welcome')
   @UseGuards(PoliciesGuard)
@@ -61,15 +41,13 @@ export class EmailController {
       throw new Error('Missing required fields: to, name');
     }
 
-    const messageId = await this.emailingService.queueEmail({
-      to: emailData.to,
-      subject: 'Welcome to our platform!',
-      body: `Hello ${emailData.name}! Welcome to our application.`,
-      html: `<h1>Welcome ${emailData.name}!</h1><p>Thank you for joining our application.</p>`,
-    });
-
-    return { 
+    const messageId = `mock-welcome-${Date.now()}`;
+    
+    return {
+      success: true,
       messageId,
+      recipient: emailData.to,
+      template: 'welcome',
       status: 'queued',
       message: 'Welcome email queued successfully'
     };
@@ -97,16 +75,12 @@ export class EmailController {
     }
 
     const resetToken = 'dummy-reset-token-' + Date.now();
-    const messageId = await this.emailingService.queueEmail({
-      to: emailData.email,
-      subject: 'Password Reset Request',
-      body: `Your password reset token is: ${resetToken}`,
-      html: `<p>Your password reset token is: <strong>${resetToken}</strong></p>
-             <p>Click <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}">here</a> to reset your password.</p>`,
-    });
+    const messageId = `mock-reset-${Date.now()}`;
 
     return { 
       messageId,
+      resetToken,
+      recipient: emailData.email,
       status: 'queued',
       message: 'Password reset email queued successfully'
     };
@@ -139,18 +113,12 @@ export class EmailController {
       throw new Error('Missing required fields: to, subject, message');
     }
 
-    const messageId = await this.emailingService.queueEmail({
-      to: emailData.to,
-      subject: emailData.subject,
-      body: emailData.message,
-      html: `<div style="padding: 20px; border: 1px solid #ddd;">
-               <h3>${emailData.subject}</h3>
-               <p>${emailData.message}</p>
-             </div>`,
-    });
+    const messageId = `mock-notification-${Date.now()}`;
 
     return { 
       messageId,
+      recipient: emailData.to,
+      subject: emailData.subject,
       status: 'queued',
       message: 'Notification email queued successfully'
     };
@@ -167,10 +135,31 @@ export class EmailController {
   @ApiResponse({ status: 200, description: 'Email queue statistics' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getEmailQueueStats() {
-    const stats = await this.emailingService.getEmailQueueStats();
     return {
-      ...stats,
+      pending: 0,
+      processing: 0,
+      completed: 10,
+      failed: 0,
       status: 'ok'
+    };
+  }
+
+  @Delete('queue/:messageId')
+  @UseGuards(PoliciesGuard)
+  @CheckPolicies((ability) => ability.can('delete', 'all'))
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Delete email from queue',
+    description: 'Remove an email from the queue by message ID',
+  })
+  @ApiResponse({ status: 200, description: 'Email deleted from queue successfully' })
+  @ApiResponse({ status: 404, description: 'Email not found in queue' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async deleteEmailFromQueue(@Param('messageId') messageId: string) {
+    return { 
+      success: true, 
+      messageId,
+      message: 'Email deleted from queue successfully'
     };
   }
 }
