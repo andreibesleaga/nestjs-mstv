@@ -204,9 +204,6 @@ graph TB
     API --> Jaeger
 ```
 
-Rendered diagram:
-
-![Single Service Deployment](diagrams/svg/architecture_single_service.svg)
 
 ### 2. Multi-Service Microservices Architecture
 
@@ -263,9 +260,6 @@ graph TB
     PaymentService --> Kafka
 ```
 
-Rendered diagram:
-
-![Multi-Service Microservices Architecture](diagrams/svg/architecture_multi_service.svg)
 
 ### 3. Event-Driven Architecture with CQRS
 
@@ -312,9 +306,6 @@ graph TB
     QueryHandlers --> Cache
 ```
 
-Rendered diagram:
-
-![Event-Driven Architecture with CQRS](diagrams/svg/architecture_event_driven_cqrs.svg)
 
 ## Deployment Examples
 
