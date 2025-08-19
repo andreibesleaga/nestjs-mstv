@@ -20,17 +20,7 @@ interface JaegerSpanContext {
   toSpanId(): string;
 }
 
-interface JaegerConfig {
-  serviceName: string;
-  sampler: {
-    type: string;
-    param: number;
-  };
-  reporter: {
-    collectorEndpoint: string;
-    logSpans: boolean;
-  };
-}
+// Note: JaegerConfig intentionally omitted to avoid unused type
 
 @Injectable()
 export class JaegerService implements OnModuleInit {

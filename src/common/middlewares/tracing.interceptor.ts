@@ -17,7 +17,8 @@ export class TracingInterceptor implements NestInterceptor {
       span.setTag('http.url', request.url);
       span.setTag('user.agent', request.headers['user-agent']);
       try {
-        const traceId = span.context()?.traceIdStr || span.context()?.toTraceId?.();
+        const ctx = span.context?.();
+        const traceId = typeof ctx?.toTraceId === 'function' ? ctx.toTraceId() : undefined;
         const store = RequestContext.getStore();
         if (traceId && store) {
           store.traceId = traceId;

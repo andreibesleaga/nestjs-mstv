@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AppModule } from '../../src/apps/api-gateway/app.module';
-import { PrismaService } from '../../src/common/services/prisma.service';
-import { MongoDbService } from '../../src/common/services/mongodb.service';
+// import { PrismaService } from '../../src/common/services/prisma.service';
+// import { MongoDbService } from '../../src/common/services/mongodb.service';
 
 describe('Full Stack E2E Tests', () => {
   let app: NestFastifyApplication;
-  let prismaService: PrismaService;
-  let mongoService: MongoDbService;
+  // let prismaService: PrismaService;
+  // let mongoService: MongoDbService;
   let authToken: string;
 
   beforeAll(async () => {
@@ -16,9 +16,7 @@ describe('Full Stack E2E Tests', () => {
       imports: [AppModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter()
-    );
+    app = moduleFixture.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
 
     // Get service instances
     // prismaService = app.get<PrismaService>(PrismaService);
@@ -49,7 +47,7 @@ describe('Full Stack E2E Tests', () => {
       const testUser = {
         email: 'full-e2e-test@example.com',
         password: 'TestPassword123!',
-        name: 'Full E2E Test User'
+        name: 'Full E2E Test User',
       };
 
       // 1. Register user
@@ -66,7 +64,7 @@ describe('Full Stack E2E Tests', () => {
         .post('/auth/login')
         .send({
           email: testUser.email,
-          password: testUser.password
+          password: testUser.password,
         })
         .expect(201);
 
@@ -98,19 +96,15 @@ describe('Full Stack E2E Tests', () => {
       const testUser = {
         email: 'user-mgmt-e2e-test@example.com',
         password: 'TestPassword123!',
-        name: 'User Management Test'
+        name: 'User Management Test',
       };
 
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(testUser);
+      await request(app.getHttpServer()).post('/auth/register').send(testUser);
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: testUser.email,
-          password: testUser.password
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: testUser.email,
+        password: testUser.password,
+      });
 
       authToken = loginResponse.body.access_token;
     });
@@ -120,7 +114,7 @@ describe('Full Stack E2E Tests', () => {
       const newUser = {
         email: 'crud-e2e-test@example.com',
         password: 'TestPassword123!',
-        name: 'CRUD Test User'
+        name: 'CRUD Test User',
       };
 
       const createResponse = await request(app.getHttpServer())
@@ -137,10 +131,10 @@ describe('Full Stack E2E Tests', () => {
         .expect(200);
 
       expect(listResponse.body).toBeInstanceOf(Array);
-      expect(listResponse.body.some(u => u.id === createdUserId)).toBe(true);
+      expect(listResponse.body.some((u) => u.id === createdUserId)).toBe(true);
 
       // READ - Get specific user
-  const getResponse = await request(app.getHttpServer())
+      const getResponse = await request(app.getHttpServer())
         .get(`/users/${createdUserId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
@@ -194,21 +188,21 @@ describe('Full Stack E2E Tests', () => {
         email: 'admin-e2e-test@example.com',
         password: 'AdminPassword123!',
         name: 'Admin Test User',
-        role: 'admin'
+        role: 'admin',
       };
 
-  const adminResponse = await request(app.getHttpServer())
+      const adminResponse = await request(app.getHttpServer())
         .post('/auth/register')
         .send(adminUser)
         .expect(201);
-  // Current implementation assigns default role regardless of payload
-  expect(adminResponse.body.role).toBe('user');
+      // Current implementation assigns default role regardless of payload
+      expect(adminResponse.body.role).toBe('user');
 
       // Test that regular users get default role
       const regularUser = {
         email: 'regular-e2e-test@example.com',
         password: 'RegularPassword123!',
-        name: 'Regular Test User'
+        name: 'Regular Test User',
       };
 
       const regularResponse = await request(app.getHttpServer())
@@ -225,19 +219,15 @@ describe('Full Stack E2E Tests', () => {
       const testUser = {
         email: 'demo-e2e-test@example.com',
         password: 'TestPassword123!',
-        name: 'Demo Test User'
+        name: 'Demo Test User',
       };
 
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(testUser);
+      await request(app.getHttpServer()).post('/auth/register').send(testUser);
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: testUser.email,
-          password: testUser.password
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: testUser.email,
+        password: testUser.password,
+      });
 
       authToken = loginResponse.body.access_token;
     });
@@ -265,9 +255,7 @@ describe('Full Stack E2E Tests', () => {
 
     it('should handle flaky service simulation', async () => {
       // First call should fail (simulated failure)
-      await request(app.getHttpServer())
-        .get('/demo/flaky?name=e2e-test&fail=1')
-        .expect(500);
+      await request(app.getHttpServer()).get('/demo/flaky?name=e2e-test&fail=1').expect(500);
 
       // Second call should succeed
       const successResponse = await request(app.getHttpServer())
@@ -284,27 +272,21 @@ describe('Full Stack E2E Tests', () => {
       const testUser = {
         email: 'perf-e2e-test@example.com',
         password: 'TestPassword123!',
-        name: 'Performance Test User'
+        name: 'Performance Test User',
       };
 
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(testUser);
+      await request(app.getHttpServer()).post('/auth/register').send(testUser);
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: testUser.email,
-          password: testUser.password
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: testUser.email,
+        password: testUser.password,
+      });
 
       authToken = loginResponse.body.access_token;
     });
 
     it('should handle health checks', async () => {
-      const healthResponse = await request(app.getHttpServer())
-        .get('/health')
-        .expect(200);
+      const healthResponse = await request(app.getHttpServer()).get('/health').expect(200);
 
       expect(healthResponse.body).toHaveProperty('status');
       expect(['healthy', 'unhealthy', 'unknown']).toContain(healthResponse.body.status);
@@ -337,8 +319,8 @@ describe('Full Stack E2E Tests', () => {
       const settled = await Promise.allSettled(requestPromises);
       const ok = settled
         .filter((r): r is PromiseFulfilledResult<request.Response> => r.status === 'fulfilled')
-        .map(r => r.value)
-        .filter(r => r.status === 200);
+        .map((r) => r.value)
+        .filter((r) => r.status === 200);
       expect(ok.length).toBeGreaterThanOrEqual(3);
     });
   });
@@ -348,19 +330,15 @@ describe('Full Stack E2E Tests', () => {
       const testUser = {
         email: 'error-e2e-test@example.com',
         password: 'TestPassword123!',
-        name: 'Error Test User'
+        name: 'Error Test User',
       };
 
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(testUser);
+      await request(app.getHttpServer()).post('/auth/register').send(testUser);
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: testUser.email,
-          password: testUser.password
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: testUser.email,
+        password: testUser.password,
+      });
 
       authToken = loginResponse.body.access_token;
     });
@@ -371,16 +349,14 @@ describe('Full Stack E2E Tests', () => {
         .set('Authorization', 'Bearer invalid-token')
         .expect(401);
 
-      await request(app.getHttpServer())
-        .get('/auth/profile')
-        .expect(401);
+      await request(app.getHttpServer()).get('/auth/profile').expect(401);
     });
 
     it('should handle validation errors', async () => {
       const invalidUser = {
         email: 'invalid-email',
         password: '123', // Too short
-        name: ''
+        name: '',
       };
 
       const response = await request(app.getHttpServer())
@@ -403,12 +379,12 @@ describe('Full Stack E2E Tests', () => {
         );
       }
       const settled = await Promise.allSettled(requests);
-  const rateLimited = settled
+      const rateLimited = settled
         .filter((r): r is PromiseFulfilledResult<request.Response> => r.status === 'fulfilled')
-        .map(r => r.value)
-        .filter(r => r.status === 429);
-  // In some environments rate-limit might not trigger; tolerate zero 429s
-  expect(rateLimited.length).toBeGreaterThanOrEqual(0);
+        .map((r) => r.value)
+        .filter((r) => r.status === 429);
+      // In some environments rate-limit might not trigger; tolerate zero 429s
+      expect(rateLimited.length).toBeGreaterThanOrEqual(0);
     });
 
     it('should handle resource not found', async () => {
@@ -433,26 +409,22 @@ describe('Full Stack E2E Tests', () => {
       const testUser = {
         email: 'graphql-e2e-test@example.com',
         password: 'TestPassword123!',
-        name: 'GraphQL Test User'
+        name: 'GraphQL Test User',
       };
 
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send(testUser);
+      await request(app.getHttpServer()).post('/auth/register').send(testUser);
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: testUser.email,
-          password: testUser.password
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: testUser.email,
+        password: testUser.password,
+      });
 
       authToken = loginResponse.body.access_token;
     });
 
-      it('should handle GraphQL queries', async () => {
-        // Use a stable query validated in dedicated GraphQL E2E
-        const query = `
+    it('should handle GraphQL queries', async () => {
+      // Use a stable query validated in dedicated GraphQL E2E
+      const query = `
           query {
             users {
               id
@@ -463,18 +435,18 @@ describe('Full Stack E2E Tests', () => {
           }
         `;
 
-        const response = await request(app.getHttpServer())
-          .post('/graphql')
-          // no auth header to mirror dedicated GraphQL tests
-          .send({ query })
-          .expect(200);
+      const response = await request(app.getHttpServer())
+        .post('/graphql')
+        // no auth header to mirror dedicated GraphQL tests
+        .send({ query })
+        .expect(200);
 
-        expect(response.body).toHaveProperty('data');
-        const data = response.body.data;
-        expect(data).toBeTruthy();
-        if (data && data.users) {
-          expect(Array.isArray(data.users)).toBe(true);
-        }
+      expect(response.body).toHaveProperty('data');
+      const data = response.body.data;
+      expect(data).toBeTruthy();
+      if (data && data.users) {
+        expect(Array.isArray(data.users)).toBe(true);
+      }
     });
 
     it('should handle GraphQL mutations', async () => {
@@ -494,8 +466,8 @@ describe('Full Stack E2E Tests', () => {
         input: {
           email: 'graphql-mutation-test@example.com',
           password: 'TestPassword123!',
-          name: 'GraphQL Mutation Test User'
-        }
+          name: 'GraphQL Mutation Test User',
+        },
       };
 
       const response = await request(app.getHttpServer())
