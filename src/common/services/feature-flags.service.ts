@@ -45,11 +45,11 @@ export class FeatureFlagsService {
   }
 
   get isRedisCacheEnabled(): boolean {
-    return this.config.ENABLE_CACHING;
+    return this.config.ENABLE_REDIS_CACHE;
   }
 
   get isConsulDiscoveryEnabled(): boolean {
-    return this.config.ENABLE_MESSAGING; // Using messaging instead of Consul
+    return this.config.ENABLE_CONSUL_DISCOVERY;
   }
 
   get isCircuitBreakerEnabled(): boolean {
@@ -61,12 +61,25 @@ export class FeatureFlagsService {
   }
 
   get isEmailServiceEnabled(): boolean {
-    return this.config.ENABLE_MESSAGING; // Using messaging for email service
+    return this.config.ENABLE_EMAIL_SERVICE;
   }
 
   // Observability
   get isOpenTelemetryEnabled(): boolean {
     return this.config.ENABLE_DISTRIBUTED_TRACING;
+  }
+
+  // Messaging and Queue systems
+  get isKafkaEnabled(): boolean {
+    return this.config.ENABLE_KAFKA;
+  }
+
+  get isBullMqEnabled(): boolean {
+    return this.config.ENABLE_BULLMQ;
+  }
+
+  get isStreamingEnabled(): boolean {
+    return this.config.ENABLE_STREAMING;
   }
 
   // Utility methods

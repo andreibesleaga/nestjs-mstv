@@ -94,15 +94,22 @@ describe('Protocol Services', () => {
 
     it('should handle message', () => {
       const mockClient = { id: 'client123' } as any;
-      const result = gateway.handleMessage({ 
-        type: 'message', 
-        payload: { text: 'hello' },
-        timestamp: new Date().toISOString()
-      }, mockClient);
+      const testTimestamp = new Date().toISOString();
+      const result = gateway.handleMessage(
+        {
+          type: 'message',
+          payload: { text: 'hello' },
+          timestamp: testTimestamp,
+        },
+        mockClient
+      );
 
       expect(result.success).toBe(true);
-      expect(result.data).toContain('Echo: {"type":"message","payload":{"text":"hello"},"timestamp":"');
-      expect(result.data).toContain('2025-08-19T');
+      expect(result.data).toContain(
+        'Echo: {"type":"message","payload":{"text":"hello"},"timestamp":"'
+      );
+      // Use the actual timestamp from the test instead of hardcoded date
+      expect(result.data).toContain(testTimestamp.substring(0, 10)); // Just check the date part YYYY-MM-DD
       expect(typeof result.timestamp).toBe('string');
     });
   });

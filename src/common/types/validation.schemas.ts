@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * Simplified Environment Validation Schema
- * 
+ *
  * Reduced from 367 lines to ~100 lines
  * Focuses on essential microservice configuration
  * Removes over-engineering while maintaining flexibility
@@ -52,17 +52,37 @@ const FeatureFlagsSchema = z.object({
     .string()
     .transform((val) => val === 'true')
     .default('false'),
+  ENABLE_KAFKA: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
+  ENABLE_BULLMQ: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
+  ENABLE_STREAMING: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
   ENABLE_JAEGER_TRACING: z
     .string()
     .transform((val) => val === 'true')
     .default('false'),
 
-  // Core Infrastructure (6 flags)
+  // Core Infrastructure (8 flags)
   ENABLE_CACHING: z
     .string()
     .transform((val) => val === 'true')
     .default('true'),
   ENABLE_MESSAGING: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
+  ENABLE_CONSUL_DISCOVERY: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  ENABLE_REDIS_CACHE: z
     .string()
     .transform((val) => val === 'true')
     .default('true'),
@@ -82,11 +102,13 @@ const FeatureFlagsSchema = z.object({
     .string()
     .transform((val) => val === 'true')
     .default('true'),
+  ENABLE_EMAIL_SERVICE: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('true'),
 
   // Storage & Data (3 flags)
-  STORAGE_PROVIDER: z
-    .enum(['memory', 's3', 'azure', 'gcs', 'disabled'])
-    .default('memory'),
+  STORAGE_PROVIDER: z.enum(['memory', 's3', 'azure', 'gcs', 'disabled']).default('memory'),
   ENABLE_FILE_UPLOADS: z
     .string()
     .transform((val) => val === 'true')
@@ -124,13 +146,19 @@ const FeatureFlagsSchema = z.object({
 // ===========================================
 
 const DatabaseSchema = z.object({
-  DATABASE_TYPE: z
-    .enum(['postgresql', 'mysql', 'mongodb', 'memory'])
-    .default('postgresql'),
+  DATABASE_TYPE: z.enum(['postgresql', 'mysql', 'mongodb', 'memory']).default('postgresql'),
   DATABASE_URL: z.string().optional(),
   MYSQL_URL: z.string().optional(),
   MONGODB_URL: z.string().optional(),
   REDIS_URL: z.string().default('redis://localhost:6379'),
+
+  // Database Pooling
+  PRISMA_CONNECTION_LIMIT: z.string().transform(Number).optional(),
+  PRISMA_POOL_TIMEOUT: z.string().transform(Number).optional(),
+  MONGODB_MAX_POOL_SIZE: z.string().transform(Number).optional(),
+  MONGODB_MIN_POOL_SIZE: z.string().transform(Number).optional(),
+  MONGODB_MAX_IDLE_TIME_MS: z.string().transform(Number).optional(),
+  MONGODB_WAIT_QUEUE_TIMEOUT_MS: z.string().transform(Number).optional(),
 });
 
 // ===========================================
@@ -163,14 +191,8 @@ const SecuritySchema = z.object({
   ACCESS_TOKEN_EXP: z.string().default('15m'),
   REFRESH_TOKEN_EXP: z.string().default('7d'),
   ALLOWED_ORIGINS: z.string().default('http://localhost:3000'),
-  RATE_LIMIT_MAX: z
-    .string()
-    .transform(Number)
-    .default('100'),
-  RATE_LIMIT_WINDOW: z
-    .string()
-    .transform(Number)
-    .default('60000'),
+  RATE_LIMIT_MAX: z.string().transform(Number).default('100'),
+  RATE_LIMIT_WINDOW: z.string().transform(Number).default('60000'),
 });
 
 // ===========================================
@@ -183,10 +205,7 @@ const MessagingSchema = z.object({
 
   // Email/SMTP
   SMTP_HOST: z.string().optional(),
-  SMTP_PORT: z
-    .string()
-    .transform(Number)
-    .default('587'),
+  SMTP_PORT: z.string().transform(Number).default('587'),
   SMTP_SECURE: z
     .string()
     .transform((val) => val === 'true')
@@ -202,44 +221,48 @@ const MessagingSchema = z.object({
 
 const ObservabilitySchema = z.object({
   JAEGER_ENDPOINT: z.string().default('http://localhost:14268/api/traces'),
-  
+
+  // OpenTelemetry
+  OTEL_EXPORTER_OTLP_ENDPOINT: z.string().optional(),
+  OTEL_EXPORTER_OTLP_HEADERS: z.string().optional(),
+  OTEL_TRACES_EXPORTER: z.string().optional(),
+  OTEL_METRICS_EXPORTER: z.string().optional(),
+
+  // Prometheus
+  ENABLE_PROMETHEUS_METRICS: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  PROMETHEUS_HOST: z.string().optional(),
+  PROMETHEUS_PORT: z.string().transform(Number).optional(),
+
+  // SigNoz
+  ENABLE_SIGNOZ_TRACING: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  SIGNOZ_ENDPOINT: z.string().optional(),
+
+  // Datadog
+  ENABLE_DATADOG_TRACING: z
+    .string()
+    .transform((val) => val === 'true')
+    .default('false'),
+  DATADOG_OTLP_ENDPOINT: z.string().optional(),
+
   // Circuit Breaker (if enabled)
-  CB_THRESHOLD: z
-    .string()
-    .transform(Number)
-    .default('5'),
-  CB_TIMEOUT: z
-    .string()
-    .transform(Number)
-    .default('10000'),
-  CB_RESET_TIMEOUT: z
-    .string()
-    .transform(Number)
-    .default('60000'),
+  CB_THRESHOLD: z.string().transform(Number).default('5'),
+  CB_TIMEOUT: z.string().transform(Number).default('10000'),
+  CB_RESET_TIMEOUT: z.string().transform(Number).default('60000'),
 
   // Health Checks (if enabled)
-  HEALTH_CHECK_INTERVAL: z
-    .string()
-    .transform(Number)
-    .default('30000'),
-  HEALTH_CHECK_TIMEOUT: z
-    .string()
-    .transform(Number)
-    .default('5000'),
+  HEALTH_CHECK_INTERVAL: z.string().transform(Number).default('30000'),
+  HEALTH_CHECK_TIMEOUT: z.string().transform(Number).default('5000'),
 
   // Retry Configuration (if enabled)
-  RETRY_ATTEMPTS: z
-    .string()
-    .transform(Number)
-    .default('3'),
-  RETRY_DELAY: z
-    .string()
-    .transform(Number)
-    .default('1000'),
-  RETRY_MAX_DELAY: z
-    .string()
-    .transform(Number)
-    .default('10000'),
+  RETRY_ATTEMPTS: z.string().transform(Number).default('3'),
+  RETRY_DELAY: z.string().transform(Number).default('1000'),
+  RETRY_MAX_DELAY: z.string().transform(Number).default('10000'),
 });
 
 // ===========================================
@@ -249,13 +272,8 @@ const ObservabilitySchema = z.object({
 export const SimplifiedEnvironmentSchema = z
   .object({
     // Application Basics
-    NODE_ENV: z
-      .enum(['development', 'production', 'test'])
-      .default('development'),
-    PORT: z
-      .string()
-      .transform(Number)
-      .default('3000'),
+    NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    PORT: z.string().transform(Number).default('3000'),
     SERVICE_NAME: z.string().default('nestjs-microservice'),
     APP_URL: z.string().default('http://localhost:3000'),
   })
@@ -280,7 +298,7 @@ export function validateSimplifiedEnvironment(): SimplifiedEnvironmentConfig {
       const formattedErrors = error.errors
         .map((err) => `${err.path.join('.')}: ${err.message}`)
         .join('\n');
-      
+
       throw new Error(`Environment validation failed:\n${formattedErrors}`);
     }
     throw error;
@@ -303,7 +321,7 @@ export function getValidationSummary(): {
   improvementSummary: string;
 } {
   const featureFlagFields = Object.keys(FeatureFlagsSchema._def.shape());
-  
+
   return {
     totalFields: Object.keys(SimplifiedEnvironmentSchema._def.shape()).length,
     flagCount: featureFlagFields.length,

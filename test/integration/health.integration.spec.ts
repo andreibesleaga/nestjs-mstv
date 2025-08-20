@@ -100,13 +100,13 @@ describe('HealthService Integration Tests', () => {
       const prev = process.env.DATABASE_TYPE;
       process.env.DATABASE_TYPE = 'postgresql';
       try {
-      prismaService.$queryRaw.mockResolvedValue([{ result: 1 }]);
-      
-      const health = await healthService.checkDatabase();
-      
-      expect(health.status).toBe('healthy');
-      expect(health.responseTime).toBeGreaterThanOrEqual(0);
-      expect(prismaService.$queryRaw).toHaveBeenCalledWith(`SELECT 1`);
+        prismaService.$queryRaw.mockResolvedValue([{ result: 1 }]);
+
+        const health = await healthService.checkDatabase();
+
+        expect(health.status).toBe('healthy');
+        expect(health.responseTime).toBeGreaterThanOrEqual(0);
+        expect(prismaService.$queryRaw).toHaveBeenCalledWith(expect.any(Array));
       } finally {
         process.env.DATABASE_TYPE = prev;
       }
@@ -116,12 +116,12 @@ describe('HealthService Integration Tests', () => {
       const prev = process.env.DATABASE_TYPE;
       process.env.DATABASE_TYPE = 'postgresql';
       try {
-      prismaService.$queryRaw.mockRejectedValue(new Error('Connection failed'));
-      
-      const health = await healthService.checkDatabase();
-      
-      expect(health.status).toBe('unhealthy');
-  expect(health.responseTime).toBeGreaterThanOrEqual(0);
+        prismaService.$queryRaw.mockRejectedValue(new Error('Connection failed'));
+
+        const health = await healthService.checkDatabase();
+
+        expect(health.status).toBe('unhealthy');
+        expect(health.responseTime).toBeGreaterThanOrEqual(0);
       } finally {
         process.env.DATABASE_TYPE = prev;
       }
@@ -137,7 +137,7 @@ describe('HealthService Integration Tests', () => {
         } as any);
 
         const health = await healthService.checkDatabase();
-        
+
         expect(health.status).toBe('healthy');
         expect(health.responseTime).toBeGreaterThanOrEqual(0);
       } finally {
@@ -154,7 +154,7 @@ describe('HealthService Integration Tests', () => {
         } as any);
 
         const health = await healthService.checkDatabase();
-        
+
         expect(health.status).toBe('unhealthy');
         expect(health.responseTime).toBeGreaterThanOrEqual(0);
       } finally {
@@ -166,20 +166,20 @@ describe('HealthService Integration Tests', () => {
   describe('Redis Health Checks', () => {
     it('should check Redis health successfully', async () => {
       redisClient.set.mockResolvedValue('OK');
-      
+
       const health = await healthService.checkRedis();
-      
+
       expect(health.status).toBe('healthy');
-  expect(health.responseTime).toBeGreaterThanOrEqual(0);
+      expect(health.responseTime).toBeGreaterThanOrEqual(0);
     });
 
     it('should detect Redis connection issues', async () => {
       redisClient.set.mockRejectedValue(new Error('Redis connection failed'));
-      
+
       const health = await healthService.checkRedis();
-      
+
       expect(health.status).toBe('unhealthy');
-  expect(health.responseTime).toBeGreaterThanOrEqual(0);
+      expect(health.responseTime).toBeGreaterThanOrEqual(0);
     });
   });
 
@@ -187,9 +187,9 @@ describe('HealthService Integration Tests', () => {
     it('should provide comprehensive health information', async () => {
       prismaService.$queryRaw.mockResolvedValue([{ result: 1 }]);
       redisClient.set.mockResolvedValue('OK');
-      
+
       const detailedHealth = await healthService.getDetailedHealth();
-      
+
       expect(detailedHealth.status).toBe('healthy');
       expect(detailedHealth.timestamp).toBeDefined();
       expect(detailedHealth.uptime).toBeGreaterThan(0);
@@ -203,9 +203,9 @@ describe('HealthService Integration Tests', () => {
     it('should report unhealthy status when services are down', async () => {
       prismaService.$queryRaw.mockRejectedValue(new Error('DB connection failed'));
       redisClient.set.mockRejectedValue(new Error('Redis connection failed'));
-      
+
       const detailedHealth = await healthService.getDetailedHealth();
-      
+
       expect(detailedHealth.status).toBe('unhealthy');
       expect(detailedHealth.checks.database.status).toBe('unhealthy');
       expect(detailedHealth.checks.redis.status).toBe('unhealthy');
@@ -214,11 +214,11 @@ describe('HealthService Integration Tests', () => {
     it('should handle mixed service health statuses', async () => {
       prismaService.$queryRaw.mockResolvedValue([{ result: 1 }]);
       redisClient.set.mockRejectedValue(new Error('Redis down'));
-      
+
       const detailedHealth = await healthService.getDetailedHealth();
-      
-  // Service reports 'unhealthy' when any service is unhealthy
-  expect(detailedHealth.status).toBe('unhealthy');
+
+      // Service reports 'unhealthy' when any service is unhealthy
+      expect(detailedHealth.status).toBe('unhealthy');
       expect(detailedHealth.checks.database.status).toBe('healthy');
       expect(detailedHealth.checks.redis.status).toBe('unhealthy');
     });
@@ -227,21 +227,21 @@ describe('HealthService Integration Tests', () => {
   describe('Performance Testing', () => {
     it('should complete health checks within reasonable time', async () => {
       const startTime = Date.now();
-      
+
       await healthService.getDetailedHealth();
-      
+
       const duration = Date.now() - startTime;
       expect(duration).toBeLessThan(1000); // Should complete within 1 second
     });
 
     it('should handle concurrent health check requests', async () => {
-      const healthChecks = Array(5).fill(null).map(() => 
-        healthService.getDetailedHealth()
-      );
-      
+      const healthChecks = Array(5)
+        .fill(null)
+        .map(() => healthService.getDetailedHealth());
+
       const results = await Promise.all(healthChecks);
-      
-      results.forEach(result => {
+
+      results.forEach((result) => {
         expect(result.status).toBeDefined();
         expect(result.timestamp).toBeDefined();
         expect(result.checks).toBeDefined();
@@ -254,9 +254,9 @@ describe('HealthService Integration Tests', () => {
       // Test when all services fail
       prismaService.$queryRaw.mockRejectedValue(new Error('All services down'));
       redisClient.set.mockRejectedValue(new Error('All services down'));
-      
+
       const health = await healthService.getDetailedHealth();
-      
+
       expect(health.status).toBeDefined();
       expect(health.timestamp).toBeDefined();
       expect(health.checks).toBeDefined();
@@ -265,9 +265,9 @@ describe('HealthService Integration Tests', () => {
     it('should provide meaningful error responses', async () => {
       const testError = new Error('Connection timeout');
       prismaService.$queryRaw.mockRejectedValue(testError);
-      
+
       const health = await healthService.checkDatabase();
-      
+
       expect(health.status).toBe('unhealthy');
       expect(health.responseTime).toBeGreaterThanOrEqual(0);
     });

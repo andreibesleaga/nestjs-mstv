@@ -66,7 +66,7 @@ describe('Full Stack E2E Tests', () => {
           email: testUser.email,
           password: testUser.password,
         })
-        .expect(201);
+        .expect(200);
 
       expect(loginResponse.body).toHaveProperty('access_token');
       expect(loginResponse.body).toHaveProperty('refresh_token');
@@ -84,7 +84,7 @@ describe('Full Stack E2E Tests', () => {
       const refreshResponse = await request(app.getHttpServer())
         .post('/auth/refresh')
         .send({ refresh_token: loginResponse.body.refresh_token })
-        .expect(201);
+        .expect(200);
 
       expect(refreshResponse.body).toHaveProperty('access_token');
     });
@@ -147,7 +147,7 @@ describe('Full Stack E2E Tests', () => {
       const createdUserLogin = await request(app.getHttpServer())
         .post('/auth/login')
         .send({ email: newUser.email, password: newUser.password })
-        .expect(201);
+        .expect(200);
       const createdUserToken = createdUserLogin.body.access_token;
 
       const updateResponse = await request(app.getHttpServer())

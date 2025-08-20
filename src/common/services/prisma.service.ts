@@ -29,7 +29,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async onModuleInit() {
-    if (process.env.NODE_ENV === 'test') {
+    // Only disable in test environment when explicitly requested
+    if (process.env.NODE_ENV === 'test' && process.env.CI_SKIP_DB === 'true') {
       this.logger.warn('Prisma disabled in test environment');
       return;
     }
@@ -47,7 +48,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   }
 
   async onModuleDestroy() {
-    if (process.env.NODE_ENV === 'test') {
+    // Only disable in test environment when explicitly requested
+    if (process.env.NODE_ENV === 'test' && process.env.CI_SKIP_DB === 'true') {
       return;
     }
 

@@ -6,15 +6,15 @@ export class JwtAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-    
+
     if (!token) {
       throw new UnauthorizedException('No token provided');
     }
 
     try {
-      const jwtSecret = process.env.JWT_SECRET || 'default-secret';
+      const jwtSecret = process.env.JWT_SECRET || 'changeme';
       const payload = jwt.verify(token, jwtSecret) as any;
-      
+
       // Populate user context for subsequent guards
       request.user = {
         id: payload.sub,
@@ -26,7 +26,8 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     return true;
-  }  private extractTokenFromHeader(request: any): string | undefined {
+  }
+  private extractTokenFromHeader(request: any): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }

@@ -11,7 +11,7 @@ import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 // Initialize OpenTelemetry according to env flags.
 // Returns an SDK instance or undefined if disabled.
 export function initOpenTelemetry(): NodeSDK | undefined {
-  if (process.env.ENABLE_OPENTELEMETRY !== 'true') return undefined;
+  if (process.env.ENABLE_DISTRIBUTED_TRACING !== 'true') return undefined;
 
   // Optional diagnostics
   if (process.env.OTEL_DEBUG === 'true') {

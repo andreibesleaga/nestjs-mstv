@@ -240,21 +240,19 @@ export type DeepPartial<T> = {
 
 //` Type Guards
 export function isErrorResponse(response: unknown): response is ApiResponse<never> {
-  return typeof response === 'object' && response !== null && 'success' in response && !(response as ApiResponse).success;
+  return (
+    typeof response === 'object' &&
+    response !== null &&
+    'success' in response &&
+    !(response as ApiResponse).success
+  );
 }
 
 export function isValidationError(error: unknown): error is ValidationError {
   return typeof error === 'object' && error !== null && 'field' in error && 'message' in error;
 }
 
-// ============================================================================
-// Streaming Types
-// ============================================================================
-
-// ============================================================================
 // Scheduler Types
-// ============================================================================
-
 export interface CronJobConfig {
   name: string;
   cronPattern: string;

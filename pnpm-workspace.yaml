@@ -6,5 +6,6 @@ packages:
 
 onlyBuiltDependencies:
   - '@nestjs/core'
+  - '@temporalio/core-bridge'
   - bcrypt
   - protobufjs
