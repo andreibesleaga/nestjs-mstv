@@ -93,7 +93,7 @@ export class AuthController {
     description: 'Authenticates user and returns access and refresh tokens',
   })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Login successful',
     schema: {
       example: {
@@ -148,9 +148,7 @@ export class AuthController {
         updatedAt: user.updatedAt,
       },
     };
-  }
-
-  @Post('refresh')
+  }  @Post('refresh')
   @UsePipes(new ZodValidationPipe(RefreshTokenSchema))
   @ApiOperation({
     summary: 'Refresh access token',

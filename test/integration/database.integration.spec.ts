@@ -416,14 +416,26 @@ describe('Database Integration Tests', () => {
           );
           // If we reach here, the storage doesn't enforce uniqueness (like in-memory)
           console.warn('Duplicate email was allowed - storage might not enforce uniqueness');
-          // Clean up both users
-          await usersService.deleteUser(user.id);
-          await usersService.deleteUser(duplicateUser.id);
+          // Clean up both users with error handling
+          try {
+            await usersService.deleteUser(user.id);
+          } catch {
+            console.warn('Failed to delete first user, might have been already deleted');
+          }
+          try {
+            await usersService.deleteUser(duplicateUser.id);
+          } catch {
+            console.warn('Failed to delete duplicate user, might have been already deleted');
+          }
         } catch (error) {
           // Expected behavior for real database with constraints
           expect(error).toBeDefined();
-          // Cleanup original user
-          await usersService.deleteUser(user.id);
+          // Cleanup original user with error handling
+          try {
+            await usersService.deleteUser(user.id);
+          } catch {
+            console.warn('Failed to delete user during cleanup, might have been already deleted');
+          }
         }
       }
     });

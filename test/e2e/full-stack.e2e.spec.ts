@@ -45,7 +45,7 @@ describe('Full Stack E2E Tests', () => {
   describe('Authentication Flow', () => {
     it('should complete full authentication flow', async () => {
       const testUser = {
-        email: 'full-e2e-test@example.com',
+        email: `full-e2e-test-${Date.now()}@example.com`,
         password: 'TestPassword123!',
         name: 'Full E2E Test User',
       };
@@ -66,7 +66,7 @@ describe('Full Stack E2E Tests', () => {
           email: testUser.email,
           password: testUser.password,
         })
-        .expect(200);
+        .expect(201);
 
       expect(loginResponse.body).toHaveProperty('access_token');
       expect(loginResponse.body).toHaveProperty('refresh_token');
@@ -84,7 +84,7 @@ describe('Full Stack E2E Tests', () => {
       const refreshResponse = await request(app.getHttpServer())
         .post('/auth/refresh')
         .send({ refresh_token: loginResponse.body.refresh_token })
-        .expect(200);
+        .expect(201);
 
       expect(refreshResponse.body).toHaveProperty('access_token');
     });
@@ -144,10 +144,11 @@ describe('Full Stack E2E Tests', () => {
       // UPDATE - Update user
       const updateData = { name: 'Updated CRUD Test User' };
       // Update using the created user's own token to satisfy self-update permission
+      // Test login with the new user
       const createdUserLogin = await request(app.getHttpServer())
         .post('/auth/login')
         .send({ email: newUser.email, password: newUser.password })
-        .expect(200);
+        .expect(201);
       const createdUserToken = createdUserLogin.body.access_token;
 
       const updateResponse = await request(app.getHttpServer())

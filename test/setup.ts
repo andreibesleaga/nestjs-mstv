@@ -151,8 +151,12 @@ jest.mock('ioredis', () => {
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashedPassword'),
-  compare: jest.fn().mockImplementation((plaintext, _hash) => {
-    // Mock password comparison - return true only for expected passwords
-    return Promise.resolve(plaintext === 'password123');
+  compare: jest.fn().mockImplementation((plaintext, hash) => {
+    // Mock password comparison - return true for expected test passwords and when hash matches 'hashedPassword'
+    const validPasswords = ['password123', 'TestPassword123!'];
+    const isValidPassword = validPasswords.includes(plaintext);
+    const isHashedPassword = hash === 'hashedPassword';
+    
+    return Promise.resolve(isValidPassword && isHashedPassword);
   }),
 }));
