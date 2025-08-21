@@ -66,7 +66,8 @@ describe('Performance and Load Tests', () => {
       // Accept 200, 401, or 400 depending on environment/auth guard
       expect([200, 400, 401]).toContain(response.status);
       if (response.status === 200) {
-        expect(response.body).toHaveProperty('email');
+        // Profile endpoint returns { user: {...} }
+        expect(response.body).toHaveProperty('user.email');
       }
     });
 
@@ -142,7 +143,7 @@ describe('Performance and Load Tests', () => {
       responses.forEach((response) => {
         expect([200, 401, 404]).toContain(response.status); // Allow auth variations
         if (response.status === 200) {
-          expect(response.body).toHaveProperty('email');
+          expect(response.body).toHaveProperty('user.email');
         }
       });
 

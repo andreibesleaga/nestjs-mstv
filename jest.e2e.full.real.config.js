@@ -1,8 +1,7 @@
 module.exports = {
   ...require('./jest.config.js'),
   testMatch: ['**/test/e2e/**/*.e2e.spec.ts'],
-  // For "full" E2E we target real dependencies; keep mock variant in jest.e2e.config.js
-  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/test/setup.e2e.real.ts'],
   testTimeout: 60000,
   maxWorkers: 1,
   forceExit: true,

@@ -167,7 +167,15 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT || 3000;
-  const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : 'localhost';
+  const isContainer =
+    process.env.IN_DOCKER === 'true' ||
+    process.env.DOCKER === 'true' ||
+    process.env.CONTAINER === 'true';
+  const host = isContainer
+    ? '0.0.0.0'
+    : process.env.NODE_ENV === 'production'
+      ? '0.0.0.0'
+      : 'localhost';
   await app.listen(port, host);
 
   // Graceful shutdown

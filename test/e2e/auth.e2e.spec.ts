@@ -124,7 +124,7 @@ describe('Auth E2E', () => {
       return request(app.getHttpServer())
         .post('/auth/refresh')
         .send({ refresh_token: refreshToken })
-        .expect(201)
+        .expect(200)
         .expect((res) => {
           expect(res.body.access_token).toBeDefined();
         });
@@ -150,7 +150,7 @@ describe('Auth E2E', () => {
       return request(app.getHttpServer())
         .post('/auth/logout')
         .send({ refresh_token: refreshToken })
-        .expect(201)
+        .expect(200)
         .expect((res) => {
           expect(res.body.message).toBe('Successfully logged out');
         });

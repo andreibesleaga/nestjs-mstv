@@ -37,6 +37,7 @@ services:
 
   mariadb:
     image: mariadb:11
+    profiles: [ "mysql" ]
     environment:
       MARIADB_ROOT_PASSWORD: dev
       MARIADB_USER: dev
@@ -46,6 +47,9 @@ services:
       - '3306:3306'
     volumes:
       - mariadb-data:/var/lib/mysql
+    # Only start when explicitly requested (saves resources)
+    deploy:
+      replicas: 0
 
   redis:
     image: redis:7
@@ -80,6 +84,7 @@ services:
     ports:
       - '16686:16686'
       - '14268:14268'
+      - '4318:4318'
     environment:
       COLLECTOR_OTLP_ENABLED: "true"
 
@@ -97,14 +102,18 @@ services:
       REDIS_URL: "redis://redis:6379"
       KAFKA_BROKERS: "kafka:9092"
       CONSUL_HOST: "consul"
+      # OpenTelemetry/Jaeger via OTLP
+      ENABLE_DISTRIBUTED_TRACING: "true"
+      OTEL_TRACES_EXPORTER: "otlp"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "http://jaeger:4318"
       JAEGER_ENDPOINT: "http://jaeger:14268/api/traces"
       JWT_SECRET: "${JWT_SECRET:-development-secret}"
       NODE_ENV: "development"
+      IN_DOCKER: "true"
     depends_on:
       - db
       - pgbouncer
       - mongodb
-      - mariadb
       - redis
       - kafka
       - consul

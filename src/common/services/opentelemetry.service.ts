@@ -11,7 +11,12 @@ import { PeriodicExportingMetricReader } from '@opentelemetry/sdk-metrics';
 // Initialize OpenTelemetry according to env flags.
 // Returns an SDK instance or undefined if disabled.
 export function initOpenTelemetry(): NodeSDK | undefined {
-  if (process.env.ENABLE_DISTRIBUTED_TRACING !== 'true') return undefined;
+  // Backward compatibility with older flag names
+  const tracingEnabled =
+    process.env.ENABLE_DISTRIBUTED_TRACING === 'true' ||
+    process.env.ENABLE_JAEGER_TRACING === 'true' ||
+    process.env.OTEL_TRACES_EXPORTER === 'otlp';
+  if (!tracingEnabled) return undefined;
 
   // Optional diagnostics
   if (process.env.OTEL_DEBUG === 'true') {
@@ -27,9 +32,10 @@ export function initOpenTelemetry(): NodeSDK | undefined {
       ? undefined
       : new OTLPTraceExporter({
           url:
+            process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
+            process.env.OTEL_EXPORTER_OTLP_ENDPOINT?.replace(/\/?$/, '') + '/v1/traces' ||
             process.env.SIGNOZ_ENDPOINT ||
             process.env.DATADOG_OTLP_ENDPOINT ||
-            process.env.OTEL_EXPORTER_OTLP_ENDPOINT ||
             'http://localhost:4318/v1/traces',
           headers: parseHeaders(process.env.OTEL_EXPORTER_OTLP_HEADERS),
         });
@@ -45,9 +51,16 @@ export function initOpenTelemetry(): NodeSDK | undefined {
       host: process.env.PROMETHEUS_HOST || '0.0.0.0',
     });
     metricReader = prometheus as any;
-  } else if (process.env.OTEL_METRICS_EXPORTER === 'otlp') {
+  } else if (
+    process.env.OTEL_METRICS_EXPORTER === 'otlp' ||
+    process.env.ENABLE_PROMETHEUS_METRICS !== 'true'
+  ) {
     const otlpMetrics = new OTLPMetricExporter({
-      url: `${process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318'}/v1/metrics`,
+      url: `${
+        process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT ||
+        process.env.OTEL_EXPORTER_OTLP_ENDPOINT ||
+        'http://localhost:4318'
+      }/v1/metrics`,
       headers: parseHeaders(process.env.OTEL_EXPORTER_OTLP_HEADERS),
     });
     metricReader = new PeriodicExportingMetricReader({ exporter: otlpMetrics });

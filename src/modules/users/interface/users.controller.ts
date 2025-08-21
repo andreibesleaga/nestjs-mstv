@@ -10,7 +10,6 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
-  ParseUUIDPipe,
   ValidationPipe,
   NotFoundException,
   ConflictException,
@@ -101,7 +100,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getUser(@Param('id', ParseUUIDPipe) id: string): Promise<UserResponseDto> {
+  async getUser(@Param('id') id: string): Promise<UserResponseDto> {
     const user = await this.usersService.getById(id);
 
     if (!user) {
@@ -174,7 +173,7 @@ export class UsersController {
   @ApiResponse({ status: 409, description: 'Conflict - email already exists' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async updateUser(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body(ValidationPipe) updateUserDto: UpdateUserDto
   ): Promise<UserResponseDto> {
     try {
@@ -220,7 +219,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 404, description: 'User not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async deleteUser(@Param('id', ParseUUIDPipe) id: string): Promise<void> {
+  async deleteUser(@Param('id') id: string): Promise<void> {
     try {
       await this.usersService.deleteUser(id);
     } catch (error) {

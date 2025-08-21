@@ -264,11 +264,27 @@ export class AuthService {
         throw new InvalidTokenError('Token has been revoked');
       }
 
-      // Find refresh token in database
-      const tokenRecord = await this.prisma.refreshToken.findFirst({
-        where: { token: refreshToken, revoked: false },
-        include: { user: true },
-      });
+      // Support both legacy (raw token match) and new (JWT with tokenId) formats
+      let tokenRecord = null as any;
+      try {
+        const { verify } = await import('jsonwebtoken');
+        const decoded: any = verify(refreshToken, this.jwtSecret());
+        if (decoded?.tokenId) {
+          tokenRecord = await this.prisma.refreshToken.findUnique({
+            where: { id: decoded.tokenId },
+            include: { user: true },
+          });
+        }
+      } catch {
+        // ignore decode errors; will fallback to raw token lookup
+      }
+
+      if (!tokenRecord) {
+        tokenRecord = await this.prisma.refreshToken.findFirst({
+          where: { token: refreshToken, revoked: false },
+          include: { user: true },
+        });
+      }
 
       if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
         throw new InvalidTokenError('Invalid or expired refresh token');

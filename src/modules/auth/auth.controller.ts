@@ -1,4 +1,13 @@
-import { Controller, Post, Body, UseGuards, Get, Request, UsePipes } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Request,
+  UsePipes,
+  HttpCode,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { CheckPolicies, PoliciesGuard } from './policies.guard';
@@ -148,7 +157,9 @@ export class AuthController {
         updatedAt: user.updatedAt,
       },
     };
-  }  @Post('refresh')
+  }
+  @Post('refresh')
+  @HttpCode(200)
   @UsePipes(new ZodValidationPipe(RefreshTokenSchema))
   @ApiOperation({
     summary: 'Refresh access token',
@@ -184,6 +195,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @HttpCode(200)
   @UsePipes(new ZodValidationPipe(RefreshTokenSchema))
   @ApiOperation({
     summary: 'User logout',

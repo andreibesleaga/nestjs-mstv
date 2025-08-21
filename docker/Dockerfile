@@ -23,5 +23,9 @@ COPY . .
 # Generate Prisma client
 RUN pnpm prisma:generate
 
+# Run as non-root user for better security
+RUN addgroup -S app && adduser -S app -G app
+USER app
+
 # Default command - this will be overridden by docker-compose
 CMD [ "pnpm", "start:dev" ]

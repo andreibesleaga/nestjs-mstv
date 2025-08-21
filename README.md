@@ -3,7 +3,6 @@
 A clean, maintainable NestJS microservice template implementing essential microservice patterns with optional advanced features. Designed for rapid development with production-ready defaults.
 You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 
-
 **🎯 Philosophy:** Simple by default, scalable by choice. Enable only what you need.
 
 ## ⚡ **Core Features**
@@ -16,12 +15,11 @@ You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 - **📊 Performance Monitoring** - Optional performance interceptors and metrics
 - **🔧 Environment-Specific Configs** - Different feature sets for dev/test/prod
 
-
-## 🏗️ **Architecture** 
+## 🏗️ **Architecture**
 
 - **Clean Services** - Single responsibility focused managers
 - **Protocol Support** - HTTP/REST, GraphQL, WebSocket, MQTT (gRPC optional)
-- **Microservice Ready** - Optional TCP, Redis, NATS, RabbitMQ transports  
+- **Microservice Ready** - Optional TCP, Redis, NATS, RabbitMQ transports
 - **Configuration Diet** - Essential configs only, no complexity bloat
 - **SOLID Principles** - Maintainable and extensible codebase
 - **Event-Driven Architecture** - Kafka integration for scalable messaging
@@ -60,7 +58,7 @@ You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 - **Message Queues** - Optional Kafka/BullMQ for async tasks
 - **Real-time** - WebSocket support for live updates
 
-## 🔧 **Optional Advanced Features** 
+## 🔧 **Optional Advanced Features**
 
 All features disabled by default - enable what you need:
 
@@ -90,7 +88,6 @@ All features disabled by default - enable what you need:
 - **Environment Management** - Development, staging, and production configs
 
 ## 🚀 **Quick Start**
-
 
 ### 1. Required Environment Setup
 
@@ -228,7 +225,7 @@ pnpm install
 # Basic services (PostgreSQL, Redis, Kafka)
 pnpm docker:up
 
-# Full stack with MongoDB, Consul, Jaeger
+# Full stack with MongoDB, Consul, Jaeger (OTel enabled)
 pnpm docker:full
 ```
 
@@ -261,11 +258,14 @@ pnpm start:dev
 # Unit tests only
 pnpm test:unit
 
-# All tests (unit + e2e)
+# All tests (unit + e2e with mocked DB)
 pnpm test:all
 
-# Full test suite (requires databases running)
+# Full test suite (unit + integration + E2E mocked DB)
 pnpm test:full
+
+# Full REAL E2E (hits Postgres/Redis/Kafka from docker:full)
+pnpm test:e2e:real
 ```
 
 ## 🗄️ **Database Configuration**
@@ -1270,7 +1270,6 @@ These diagrams illustrate how this template can be used in different setups. The
 
 ![Orchestration (Temporal)](diagrams/svg/orchestration_temporal.svg)
 
-
 ## 🔧 **Microservice Implementation Summary**
 
 ### Overview
@@ -1278,6 +1277,7 @@ These diagrams illustrate how this template can be used in different setups. The
 Comprehensive microservice service in `/src/common/microservice/` enables all NestJS microservice protocols and implementations including RPC, Pub/Sub, AMQP, cron scheduling, and streaming.
 
 #### Core Service Files
+
 - **`microservice.service.ts`** - Main service implementing all microservice protocols
 - **`microservice-config.service.ts`** - Configuration management for all transports
 - **`microservice.controller.ts`** - HTTP API endpoints for microservice operations
@@ -1287,11 +1287,13 @@ Comprehensive microservice service in `/src/common/microservice/` enables all Ne
 - **`README.md`** - Comprehensive documentation
 
 #### Test Files
+
 - **`test/microservice.integration.spec.ts`** - Integration tests with 29 passing test cases
 
 ### Microservice Features Implemented
 
 #### Supported Transports
+
 ✅ **TCP** - Simple TCP-based communication  
 ✅ **Redis** - Redis as message broker  
 ✅ **NATS** - NATS messaging system  
@@ -1299,25 +1301,28 @@ Comprehensive microservice service in `/src/common/microservice/` enables all Ne
 ✅ **gRPC** - High-performance RPC framework  
 ✅ **Kafka** - Distributed streaming platform (integrated with existing KafkaService)  
 ✅ **MQTT** - Lightweight messaging protocol (integrated with existing MqttService)  
-✅ **BullMQ** - Job queue system (integrated with existing BullMQService)  
+✅ **BullMQ** - Job queue system (integrated with existing BullMQService)
 
 #### Additional Features
+
 ✅ **Real-time Streaming** - Server-Sent Events with multiple channels  
 ✅ **Cron Scheduling** - Full cron job management with @nestjs/schedule  
 ✅ **Health Monitoring** - Automatic health checks for all transports  
 ✅ **Circuit Breaker** - Fault tolerance configuration  
 ✅ **Retry Logic** - Configurable retry mechanisms  
-✅ **Comprehensive Configuration** - Environment-based configuration for all features  
+✅ **Comprehensive Configuration** - Environment-based configuration for all features
 
 ### Microservice API Endpoints
 
 #### Status & Health
+
 - `GET /microservice/status` - Service status and available transports
 - `GET /microservice/health` - Comprehensive health check
 - `GET /microservice/metrics` - System and service metrics
 - `GET /microservice/config` - Configuration overview
 
 #### Messaging Operations
+
 - `POST /microservice/message` - Send message via any transport
 - `POST /microservice/event` - Emit event via any transport
 - `POST /microservice/kafka/message` - Send Kafka message
@@ -1325,21 +1330,25 @@ Comprehensive microservice service in `/src/common/microservice/` enables all Ne
 - `POST /microservice/queue/job` - Add job to BullMQ queue
 
 #### Streaming Operations
+
 - `POST /microservice/stream` - Stream data to channel
 - `GET /microservice/stream/channels` - List available channels
 - `GET /microservice/stream/:channel` - Subscribe to stream (SSE)
 - `GET /microservice/status/live` - Live status updates (SSE)
 
 #### Scheduling Operations
+
 - `POST /microservice/cron` - Add cron job
 - `POST /microservice/cron/:name/remove` - Remove cron job
 
 #### Testing
+
 - `POST /microservice/test/:transport` - Test transport connectivity
 
 ### Microservice Configuration
 
 #### Environment Variables Added
+
 ```bash
 # Microservice Transports
 ENABLE_TCP_MICROSERVICE=false
@@ -1369,17 +1378,20 @@ METRICS_COLLECTION_CRON=*/5 * * * *
 ### Microservice Integration
 
 #### Module Integration
+
 - Added `MicroserviceModule` to `src/apps/api-gateway/app.module.ts`
 - Added `MicroserviceController` to expose HTTP endpoints
 - Integrated with existing `MessagingModule` and `ProtocolsModule`
 
 #### Dependencies Added
+
 - `@nestjs/schedule` - For cron job management
 - `cron` - For cron expression parsing
 
 ### Microservice Usage Examples
 
 #### Programmatic Usage
+
 ```typescript
 // Inject the service
 constructor(private readonly microserviceService: MicroserviceService) {}
@@ -1400,15 +1412,16 @@ microserviceService.subscribeToStream('notifications').subscribe(msg => {
 ```
 
 #### HTTP API Usage
+
 ```bash
 # Send a Redis message
-curl -X POST http://localhost:3000/microservice/message 
-  -H "Content-Type: application/json" 
+curl -X POST http://localhost:3000/microservice/message
+  -H "Content-Type: application/json"
   -d '{"transport": "redis", "pattern": "user.create", "data": {"name": "John"}}'
 
 # Stream data
-curl -X POST http://localhost:3000/microservice/stream 
-  -H "Content-Type: application/json" 
+curl -X POST http://localhost:3000/microservice/stream
+  -H "Content-Type: application/json"
   -d '{"channel": "user-events", "data": {"event": "user_login"}}'
 
 # Subscribe to stream (SSE)
@@ -1418,6 +1431,7 @@ curl http://localhost:3000/microservice/stream/user-events
 ### Microservice Testing
 
 ✅ **29 passing test cases** covering:
+
 - Service initialization and configuration
 - All transport configurations
 - Streaming functionality
@@ -1557,3 +1571,4 @@ This template provides a complete production-ready foundation for building scala
 | **Testing**        | 42 Tests (Unit + E2E + Integration + Performance + Docker) | Complete |
 | **DevOps**         | Docker + Kubernetes + Helm + CI/CD                         | Complete |
 | **Code Quality**   | ESLint + Prettier + Pre-commit Hooks + Zero Lint Issues    | Complete |
+```

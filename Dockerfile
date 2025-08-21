@@ -24,4 +24,8 @@ RUN pnpm prisma:generate
 # Build the application
 RUN pnpm build
 
+# Run as non-root user for better security
+RUN addgroup -S app && adduser -S app -G app
+USER app
+
 CMD [ "node", "dist/src/apps/api-gateway/main.js" ]
