@@ -16,14 +16,14 @@ export interface MicroserviceConfig {
   enabled: boolean;
 }
 
-export { StreamingMessage };
+export type { StreamingMessage };
 
 @Injectable()
 export class MicroserviceService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(MicroserviceService.name);
   private isInitialized = false;
-  private readonly statusSubject = new BehaviorSubject<{ 
-    status: string; 
+  private readonly statusSubject = new BehaviorSubject<{
+    status: string;
     transports: string[];
     streaming: boolean;
     scheduler: boolean;
@@ -44,7 +44,7 @@ export class MicroserviceService implements OnModuleInit, OnModuleDestroy {
     private readonly transportManager: TransportManager,
     private readonly streamingManager: StreamingManager,
     private readonly schedulerManager: SchedulerManager,
-    private readonly cacheManager: CacheManager,
+    private readonly cacheManager: CacheManager
   ) {}
 
   async onModuleInit() {
@@ -75,7 +75,7 @@ export class MicroserviceService implements OnModuleInit, OnModuleDestroy {
       await this.cacheManager.initialize();
       await this.streamingManager.initialize();
       await this.schedulerManager.initialize();
-      
+
       this.statusSubject.next({
         status: 'ready',
         transports: ['test-mode'],
@@ -83,7 +83,7 @@ export class MicroserviceService implements OnModuleInit, OnModuleDestroy {
         scheduler: true,
         cache: true,
       });
-      
+
       this.isInitialized = true;
       this.logger.log('MicroserviceService initialized for testing');
     }
@@ -135,7 +135,7 @@ export class MicroserviceService implements OnModuleInit, OnModuleDestroy {
       await this.streamingManager.destroy();
       await this.cacheManager.destroy();
       await this.transportManager.destroy();
-      
+
       this.statusSubject.complete();
       this.logger.log('MicroserviceService destroyed successfully');
     } catch (error) {
@@ -164,8 +164,8 @@ export class MicroserviceService implements OnModuleInit, OnModuleDestroy {
   // ============================================================================
 
   publishToStream<T extends Record<string, unknown> = Record<string, unknown>>(
-    channel: string, 
-    data: T, 
+    channel: string,
+    data: T,
     source = 'system'
   ): void {
     this.streamingManager.publish(channel, data, source);
