@@ -8,7 +8,7 @@ The NestJS MSTV (Microservices Template Variant) is a NestJs/Node.js based templ
 
 - **Clean Architecture**: Clear separation of concerns with domain, application, infrastructure, and interface layers
 - **CQRS (Command Query Responsibility Segregation)**: Separate read and write operations for better scalability
-- **Domain-Driven Design**: Business logic encapsulated in domain entities and services
+- **Domain-Driven Design**: Basic Business logic encapsulated
 - **Microservices Ready**: Built-in service discovery, distributed tracing, and inter-service communication
 - **Protocol Agnostic**: Support for HTTP/REST, GraphQL, WebSockets, gRPC, MQTT, and HTTPS
 
