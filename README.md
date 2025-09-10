@@ -1,9 +1,9 @@
 # NestJS Microservice Template Variant
 
-A clean, maintainable NestJS microservice template implementing essential microservice patterns with optional advanced features. Designed for rapid development with production-ready defaults.
+A clean, extensible, maintainable, NestJS extended microservice template implementing essential microservice design patterns with optional advanced features. Designed for rapid development with production-ready defaults.
 You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 
-**🎯 Philosophy:** Simple by default, scalable by choice. Enable only what you need.
+Simple by default, scalable by choice. Enable only what you need.
 
 ## ⚡ **Core Features**
 
@@ -21,7 +21,7 @@ You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
 - **Protocol Support** - HTTP/REST, GraphQL, WebSocket, MQTT (gRPC optional)
 - **Microservice Ready** - Optional TCP, Redis, NATS, RabbitMQ transports
 - **Configuration Diet** - Essential configs only, no complexity bloat
-- **SOLID Principles** - Maintainable and extensible codebase
+- **SOLID Principles** - Maintainable and extensible codebase with basic DDD concept
 - **Event-Driven Architecture** - Kafka integration for scalable messaging
 
 ## 🗄️ **Database & Persistence**
