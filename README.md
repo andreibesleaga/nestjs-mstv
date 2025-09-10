@@ -1,4 +1,4 @@
-# NestJS Microservice Template Variant
+# Microservice Template Variant based on NestJs and Node.js
 
 A clean, extensible, maintainable, NestJS extended microservice template implementing essential microservice design patterns with optional advanced features. Designed for rapid development with production-ready defaults.
 You can view the [ARCHITECTURE.md](ARCHITECTURE.md) file for more details.
