@@ -39,7 +39,7 @@ export class HttpsService {
   }
 
   async makeSecureRequest<T = Record<string, unknown>>(
-    url: string, 
+    url: string,
     data?: Record<string, unknown>,
     options: HttpsRequestOptions = {}
   ): Promise<HttpsResponse<T> | null> {
@@ -95,7 +95,7 @@ export class HttpsService {
       if (data) {
         req.write(JSON.stringify(data));
       }
-      
+
       req.end();
     });
   }

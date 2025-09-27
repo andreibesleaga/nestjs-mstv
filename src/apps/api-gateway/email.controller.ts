@@ -28,10 +28,10 @@ export class EmailController {
       type: 'object',
       properties: {
         to: { type: 'string', format: 'email' },
-        name: { type: 'string' }
+        name: { type: 'string' },
       },
-      required: ['to', 'name']
-    }
+      required: ['to', 'name'],
+    },
   })
   @ApiResponse({ status: 200, description: 'Email queued successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request data' })
@@ -42,14 +42,14 @@ export class EmailController {
     }
 
     const messageId = `mock-welcome-${Date.now()}`;
-    
+
     return {
       success: true,
       messageId,
       recipient: emailData.to,
       template: 'welcome',
       status: 'queued',
-      message: 'Welcome email queued successfully'
+      message: 'Welcome email queued successfully',
     };
   }
 
@@ -62,10 +62,10 @@ export class EmailController {
     schema: {
       type: 'object',
       properties: {
-        email: { type: 'string', format: 'email' }
+        email: { type: 'string', format: 'email' },
       },
-      required: ['email']
-    }
+      required: ['email'],
+    },
   })
   @ApiResponse({ status: 200, description: 'Password reset email queued successfully' })
   @ApiResponse({ status: 400, description: 'Invalid email address' })
@@ -77,12 +77,12 @@ export class EmailController {
     const resetToken = 'dummy-reset-token-' + Date.now();
     const messageId = `mock-reset-${Date.now()}`;
 
-    return { 
+    return {
       messageId,
       resetToken,
       recipient: emailData.email,
       status: 'queued',
-      message: 'Password reset email queued successfully'
+      message: 'Password reset email queued successfully',
     };
   }
 
@@ -100,10 +100,10 @@ export class EmailController {
       properties: {
         to: { type: 'string', format: 'email' },
         subject: { type: 'string' },
-        message: { type: 'string' }
+        message: { type: 'string' },
       },
-      required: ['to', 'subject', 'message']
-    }
+      required: ['to', 'subject', 'message'],
+    },
   })
   @ApiResponse({ status: 200, description: 'Notification email queued successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request data' })
@@ -115,12 +115,12 @@ export class EmailController {
 
     const messageId = `mock-notification-${Date.now()}`;
 
-    return { 
+    return {
       messageId,
       recipient: emailData.to,
       subject: emailData.subject,
       status: 'queued',
-      message: 'Notification email queued successfully'
+      message: 'Notification email queued successfully',
     };
   }
 
@@ -140,7 +140,7 @@ export class EmailController {
       processing: 0,
       completed: 10,
       failed: 0,
-      status: 'ok'
+      status: 'ok',
     };
   }
 
@@ -156,10 +156,10 @@ export class EmailController {
   @ApiResponse({ status: 404, description: 'Email not found in queue' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async deleteEmailFromQueue(@Param('messageId') messageId: string) {
-    return { 
-      success: true, 
+    return {
+      success: true,
       messageId,
-      message: 'Email deleted from queue successfully'
+      message: 'Email deleted from queue successfully',
     };
   }
 }

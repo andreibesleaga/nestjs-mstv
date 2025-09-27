@@ -156,7 +156,7 @@ jest.mock('bcrypt', () => ({
     const validPasswords = ['password123', 'TestPassword123!'];
     const isValidPassword = validPasswords.includes(plaintext);
     const isHashedPassword = hash === 'hashedPassword';
-    
+
     return Promise.resolve(isValidPassword && isHashedPassword);
   }),
 }));

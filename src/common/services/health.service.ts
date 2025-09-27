@@ -3,7 +3,6 @@ import { PrismaService } from './prisma.service';
 import { MongoDbService } from './mongodb.service';
 import { RedisClient } from '../../modules/auth/redis.client';
 import { DatabaseConfig } from '../config/database.config';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class HealthService {
@@ -19,14 +18,14 @@ export class HealthService {
     const start = Date.now();
     try {
       if ((DatabaseConfig.isPostgreSQL() || DatabaseConfig.isMySQL()) && this.prisma) {
-        await this.prisma.$queryRaw(Prisma.sql`SELECT 1`);
+        await this.prisma.$queryRaw`SELECT 1`;
       } else if (DatabaseConfig.isMongoDb() && this.mongodb) {
         await this.mongodb.getDb().command({ ping: 1 });
       } else if (process.env.MONGODB_URL && this.mongodb) {
         await this.mongodb.getDb().command({ ping: 1 });
       } else if (this.prisma) {
         // Fallback to Prisma if available
-        await this.prisma.$queryRaw(Prisma.sql`SELECT 1`);
+        await this.prisma.$queryRaw`SELECT 1`;
       } else {
         // No database service available
         this.logger.warn('No database service available for health check');

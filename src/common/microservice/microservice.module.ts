@@ -12,12 +12,7 @@ import { MessagingModule } from '../messaging/messaging.module';
 import { ProtocolsModule } from '../../protocols/protocols.module';
 
 @Module({
-  imports: [
-    ConfigModule,
-    ScheduleModule.forRoot(),
-    MessagingModule,
-    ProtocolsModule,
-  ],
+  imports: [ConfigModule, ScheduleModule.forRoot(), MessagingModule, ProtocolsModule],
   providers: [
     MicroserviceService,
     MicroserviceConfigService,
