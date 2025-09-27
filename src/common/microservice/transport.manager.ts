@@ -21,7 +21,7 @@ export class TransportManager {
 
   async initialize(): Promise<void> {
     const transports = this.getEnabledTransports();
-    
+
     for (const transport of transports) {
       try {
         await this.initializeTransport(transport);
@@ -71,7 +71,7 @@ export class TransportManager {
   }
 
   getMetrics() {
-    const transports = Array.from(this.clients.values()).map(client => ({
+    const transports = Array.from(this.clients.values()).map((client) => ({
       name: client.name,
       transport: client.transport,
       connected: client.isConnected,
@@ -79,17 +79,17 @@ export class TransportManager {
 
     return {
       totalTransports: this.clients.size,
-      connectedTransports: transports.filter(t => t.connected).length,
+      connectedTransports: transports.filter((t) => t.connected).length,
       transports,
     };
   }
 
   getConnectedTransports(): TransportClient[] {
-    return Array.from(this.clients.values()).filter(t => t.isConnected);
+    return Array.from(this.clients.values()).filter((t) => t.isConnected);
   }
 
   getTransportStatus(): { name: string; connected: boolean; transport: Transport }[] {
-    return Array.from(this.clients.values()).map(t => ({
+    return Array.from(this.clients.values()).map((t) => ({
       name: t.name,
       connected: t.isConnected,
       transport: t.transport,
@@ -98,7 +98,7 @@ export class TransportManager {
 
   private getEnabledTransports(): string[] {
     const transports: string[] = [];
-    
+
     if (this.configService.get<boolean>('ENABLE_TCP_MICROSERVICE')) {
       transports.push('tcp');
     }
@@ -111,7 +111,7 @@ export class TransportManager {
     if (this.configService.get<boolean>('ENABLE_RABBITMQ_MICROSERVICE')) {
       transports.push('rabbitmq');
     }
-    
+
     return transports;
   }
 
@@ -158,7 +158,7 @@ export class TransportManager {
 
   private async initializeRedis(): Promise<void> {
     const redisUrl = this.configService.get<string>('REDIS_URL', 'redis://localhost:6379');
-    
+
     const client = ClientProxyFactory.create({
       transport: Transport.REDIS,
       options: {
@@ -182,7 +182,7 @@ export class TransportManager {
 
   private async initializeNATS(): Promise<void> {
     const natsServers = this.configService.get<string>('NATS_SERVERS', 'nats://localhost:4222');
-    
+
     const client = ClientProxyFactory.create({
       transport: Transport.NATS,
       options: {
@@ -206,7 +206,7 @@ export class TransportManager {
 
   private async initializeRabbitMQ(): Promise<void> {
     const rabbitUrl = this.configService.get<string>('RABBITMQ_URL', 'amqp://localhost:5672');
-    
+
     const client = ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
@@ -243,7 +243,7 @@ export class TransportManager {
   ): Promise<void> {
     try {
       await client.connect();
-      
+
       const transportClient: TransportClient = {
         name,
         transport,
@@ -251,12 +251,12 @@ export class TransportManager {
         config,
         isConnected: true,
       };
-      
+
       this.clients.set(name, transportClient);
       this.logger.log(`${name.toUpperCase()} transport connected successfully`);
     } catch (error) {
       this.logger.error(`Failed to connect ${name} transport:`, error);
-      
+
       const transportClient: TransportClient = {
         name,
         transport,
@@ -264,7 +264,7 @@ export class TransportManager {
         config,
         isConnected: false,
       };
-      
+
       this.clients.set(name, transportClient);
     }
   }

@@ -13,18 +13,21 @@ export class SchedulerManager {
   private readonly logger = new Logger(SchedulerManager.name);
   private jobs: Map<string, JobWrapper> = new Map();
   private isEnabled = false;
-  private executionStats: Map<string, {
-    runs: number;
-    lastRun?: Date;
-    lastError?: string;
-    averageExecutionTime: number;
-  }> = new Map();
+  private executionStats: Map<
+    string,
+    {
+      runs: number;
+      lastRun?: Date;
+      lastError?: string;
+      averageExecutionTime: number;
+    }
+  > = new Map();
 
   constructor(private readonly configService: ConfigService) {}
 
   async initialize(): Promise<void> {
     this.isEnabled = this.configService.get<boolean>('ENABLE_SCHEDULER', true);
-    
+
     if (!this.isEnabled) {
       this.logger.log('Scheduler is disabled by configuration');
       return;
@@ -32,7 +35,7 @@ export class SchedulerManager {
 
     // Initialize default jobs
     this.initializeDefaultJobs();
-    
+
     this.logger.log('Scheduler initialized');
   }
 
@@ -41,7 +44,7 @@ export class SchedulerManager {
       jobWrapper.cronJob.stop();
       this.logger.debug(`Stopped job: ${name}`);
     });
-    
+
     this.jobs.clear();
     this.executionStats.clear();
     this.logger.log('Scheduler manager destroyed');
@@ -68,7 +71,7 @@ export class SchedulerManager {
     }
 
     const wrappedTask = this.wrapTask(name, task, options.maxRetries || 3);
-    
+
     const job = new CronJob(
       cronPattern,
       wrappedTask,
@@ -90,16 +93,11 @@ export class SchedulerManager {
   }
 
   addJobFromConfig(config: CronJobConfig): void {
-    this.addJob(
-      config.name,
-      config.cronPattern,
-      config.task,
-      {
-        timezone: config.timezone,
-        startNow: config.startNow,
-        maxRetries: config.maxRetries,
-      }
-    );
+    this.addJob(config.name, config.cronPattern, config.task, {
+      timezone: config.timezone,
+      startNow: config.startNow,
+      maxRetries: config.maxRetries,
+    });
   }
 
   removeJob(name: string): boolean {
@@ -111,7 +109,7 @@ export class SchedulerManager {
       this.logger.log(`Removed job: ${name}`);
       return true;
     }
-    
+
     this.logger.warn(`Job ${name} not found`);
     return false;
   }
@@ -124,7 +122,7 @@ export class SchedulerManager {
       this.logger.log(`Started job: ${name}`);
       return true;
     }
-    
+
     this.logger.warn(`Job ${name} not found`);
     return false;
   }
@@ -137,7 +135,7 @@ export class SchedulerManager {
       this.logger.log(`Stopped job: ${name}`);
       return true;
     }
-    
+
     this.logger.warn(`Job ${name} not found`);
     return false;
   }
@@ -156,7 +154,7 @@ export class SchedulerManager {
   getJobStatus(name: string): SchedulerStatus | null {
     const jobWrapper = this.jobs.get(name);
     const stats = this.executionStats.get(name);
-    
+
     if (!jobWrapper || !stats) {
       return null;
     }
@@ -175,14 +173,14 @@ export class SchedulerManager {
 
   getAllJobStatuses(): SchedulerStatus[] {
     const statuses: SchedulerStatus[] = [];
-    
+
     this.jobs.forEach((_, name) => {
       const status = this.getJobStatus(name);
       if (status) {
         statuses.push(status);
       }
     });
-    
+
     return statuses;
   }
 
@@ -222,9 +220,11 @@ export class SchedulerManager {
     return {
       enabled: this.isEnabled,
       totalJobs: this.jobs.size,
-      runningJobs: jobs.filter(job => job.running).length,
-      totalExecutions: Array.from(this.executionStats.values())
-        .reduce((sum, stats) => sum + stats.runs, 0),
+      runningJobs: jobs.filter((job) => job.running).length,
+      totalExecutions: Array.from(this.executionStats.values()).reduce(
+        (sum, stats) => sum + stats.runs,
+        0
+      ),
       jobs,
     };
   }
@@ -237,29 +237,28 @@ export class SchedulerManager {
     return async () => {
       const startTime = Date.now();
       let retries = 0;
-      
+
       while (retries <= maxRetries) {
         try {
           await task();
-          
+
           // Update stats on success
           this.updateExecutionStats(name, Date.now() - startTime);
           this.logger.debug(`Job ${name} completed successfully`);
           return;
-          
         } catch (error) {
           retries++;
           const errorMessage = error instanceof Error ? error.message : String(error);
-          
+
           this.logger.error(
             `Job ${name} failed (attempt ${retries}/${maxRetries + 1}): ${errorMessage}`
           );
-          
+
           if (retries > maxRetries) {
             this.updateExecutionStats(name, Date.now() - startTime, errorMessage);
             throw error;
           }
-          
+
           // Wait before retry (exponential backoff)
           await this.delay(Math.pow(2, retries) * 1000);
         }
@@ -272,7 +271,7 @@ export class SchedulerManager {
     if (stats) {
       const newRuns = stats.runs + 1;
       const newAverage = (stats.averageExecutionTime * stats.runs + executionTime) / newRuns;
-      
+
       this.executionStats.set(name, {
         runs: newRuns,
         lastRun: new Date(),
@@ -317,6 +316,6 @@ export class SchedulerManager {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
