@@ -1,13 +1,13 @@
-import { 
-  Controller, 
-  Post, 
-  Get, 
-  Body, 
-  Param, 
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Param,
   Logger,
   BadRequestException,
   NotFoundException,
-  Sse
+  Sse,
 } from '@nestjs/common';
 import { Observable, interval, map, switchMap } from 'rxjs';
 import { MicroserviceService, StreamingMessage } from './microservice.service';
@@ -49,7 +49,7 @@ export class MicroserviceController {
 
   constructor(
     private readonly microserviceService: MicroserviceService,
-    private readonly configService: MicroserviceConfigService,
+    private readonly configService: MicroserviceConfigService
   ) {}
 
   /**
@@ -96,9 +96,9 @@ export class MicroserviceController {
         request.pattern,
         request.data
       );
-      
+
       this.logger.log(`Message sent via ${request.transport}: ${request.pattern}`);
-      
+
       return {
         success: true,
         transport: request.transport,
@@ -118,14 +118,10 @@ export class MicroserviceController {
   @Post('event')
   async emitEvent(@Body() request: EventRequest) {
     try {
-      await this.microserviceService.emitEvent(
-        request.transport,
-        request.pattern,
-        request.data
-      );
-      
+      await this.microserviceService.emitEvent(request.transport, request.pattern, request.data);
+
       this.logger.log(`Event emitted via ${request.transport}: ${request.pattern}`);
-      
+
       return {
         success: true,
         transport: request.transport,
@@ -145,9 +141,9 @@ export class MicroserviceController {
   async sendKafkaMessage(@Body() request: { topic: string; data: any }) {
     try {
       await this.microserviceService.sendKafkaMessage(request.topic, request.data);
-      
+
       this.logger.log(`Kafka message sent to topic: ${request.topic}`);
-      
+
       return {
         success: true,
         transport: 'kafka',
@@ -172,9 +168,9 @@ export class MicroserviceController {
         request.data,
         request.options
       );
-      
+
       this.logger.log(`Job added to queue ${request.queueName}: ${request.jobName}`);
-      
+
       return {
         success: true,
         queueName: request.queueName,
@@ -194,9 +190,9 @@ export class MicroserviceController {
   async publishMqttMessage(@Body() request: { topic: string; message: Record<string, unknown> }) {
     try {
       await this.microserviceService.publishMqttMessage(request.topic, request.message);
-      
+
       this.logger.log(`MQTT message published to topic: ${request.topic}`);
-      
+
       return {
         success: true,
         transport: 'mqtt',
@@ -216,9 +212,9 @@ export class MicroserviceController {
   async streamData(@Body() request: StreamRequest) {
     try {
       this.microserviceService.streamData(request.channel, request.data);
-      
+
       this.logger.log(`Data streamed to channel: ${request.channel}`);
-      
+
       return {
         success: true,
         channel: request.channel,
@@ -272,7 +268,7 @@ export class MicroserviceController {
       };
 
       this.microserviceService.addCronJob(request.name, request.cronTime, callback);
-      
+
       return {
         success: true,
         name: request.name,
@@ -293,7 +289,7 @@ export class MicroserviceController {
   async removeCronJob(@Param('name') name: string) {
     try {
       this.microserviceService.removeCronJob(name);
-      
+
       return {
         success: true,
         name,
@@ -326,7 +322,7 @@ export class MicroserviceController {
   async healthCheck() {
     const transports = this.microserviceService.getAvailableTransports();
     const channels = this.microserviceService.getStreamingChannels();
-    
+
     return {
       status: 'healthy',
       service: 'microservice',
@@ -374,14 +370,10 @@ export class MicroserviceController {
   async testTransport(@Param('transport') transport: string) {
     try {
       const testData = { test: true, timestamp: new Date().toISOString() };
-      
+
       // Send a test message
-      const result = await this.microserviceService.sendMessage(
-        'test.ping',
-        testData,
-        transport
-      );
-      
+      const result = await this.microserviceService.sendMessage('test.ping', testData, transport);
+
       return {
         success: true,
         transport,

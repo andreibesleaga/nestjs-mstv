@@ -25,7 +25,7 @@ export class StreamingManager {
 
   async initialize(): Promise<void> {
     this.isEnabled = this.configService.get<boolean>('ENABLE_STREAMING', true);
-    
+
     if (!this.isEnabled) {
       this.logger.log('Streaming is disabled by configuration');
       return;
@@ -33,7 +33,7 @@ export class StreamingManager {
 
     const channels = this.getConfiguredChannels();
     this.initializeChannels(channels);
-    
+
     this.updateStatus();
     this.logger.log(`Streaming initialized with ${channels.length} channels`);
   }
@@ -43,15 +43,15 @@ export class StreamingManager {
       subject.complete();
       this.logger.debug(`Streaming channel ${channel} closed`);
     });
-    
+
     this.streamingSubjects.clear();
     this.statusSubject.complete();
     this.logger.log('Streaming manager destroyed');
   }
 
   publish<T extends Record<string, unknown> = Record<string, unknown>>(
-    channel: string, 
-    data: T, 
+    channel: string,
+    data: T,
     source = 'system'
   ): void {
     if (!this.isEnabled) {
@@ -76,7 +76,7 @@ export class StreamingManager {
     subject.next(message);
     this.messageCount++;
     this.updateStatus();
-    
+
     this.logger.debug(`Message published to channel ${channel}`, { messageId: message.id });
   }
 
@@ -85,13 +85,13 @@ export class StreamingManager {
   ): Observable<StreamingMessage<T>> {
     if (!this.isEnabled) {
       this.logger.warn('Streaming is disabled');
-      return new Observable(subscriber => subscriber.complete());
+      return new Observable((subscriber) => subscriber.complete());
     }
 
     const subject = this.streamingSubjects.get(channel);
     if (!subject) {
       this.logger.error(`Channel ${channel} does not exist`);
-      return new Observable(subscriber => subscriber.complete());
+      return new Observable((subscriber) => subscriber.complete());
     }
 
     return subject.asObservable() as Observable<StreamingMessage<T>>;
@@ -114,7 +114,7 @@ export class StreamingManager {
   getChannelData<T extends Record<string, unknown> = Record<string, unknown>>(
     channel: string
   ): Observable<T> {
-    return this.subscribe<T>(channel).pipe(map(message => message.data));
+    return this.subscribe<T>(channel).pipe(map((message) => message.data));
   }
 
   createChannel(channel: string): void {
@@ -164,7 +164,7 @@ export class StreamingManager {
       enabled: this.isEnabled,
       totalChannels: this.streamingSubjects.size,
       totalMessages: this.messageCount,
-      channels: this.getChannels().map(name => ({
+      channels: this.getChannels().map((name) => ({
         name,
         active: this.isChannelActive(name),
       })),
@@ -176,15 +176,15 @@ export class StreamingManager {
       'STREAMING_CHANNELS',
       'user-events,system-metrics,audit-logs,notifications,real-time-data'
     );
-    
+
     return channelsConfig
       .split(',')
-      .map(channel => channel.trim())
-      .filter(channel => channel.length > 0);
+      .map((channel) => channel.trim())
+      .filter((channel) => channel.length > 0);
   }
 
   private initializeChannels(channels: string[]): void {
-    channels.forEach(channel => {
+    channels.forEach((channel) => {
       this.streamingSubjects.set(channel, new Subject<StreamingMessage>());
       this.logger.debug(`Initialized streaming channel: ${channel}`);
     });

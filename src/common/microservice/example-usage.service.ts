@@ -32,15 +32,12 @@ export class ExampleMicroserviceUsageService {
       );
 
       // 3. Send Kafka message for analytics
-      await this.microserviceService.sendKafkaMessage(
-        'user-events',
-        {
-          event: 'user_registered',
-          userId: userCreated.id,
-          timestamp: new Date(),
-          metadata: { source: 'api', version: '1.0' }
-        }
-      );
+      await this.microserviceService.sendKafkaMessage('user-events', {
+        event: 'user_registered',
+        userId: userCreated.id,
+        timestamp: new Date(),
+        metadata: { source: 'api', version: '1.0' },
+      });
 
       // 4. Queue welcome email job
       await this.microserviceService.addQueueJob(
@@ -49,37 +46,30 @@ export class ExampleMicroserviceUsageService {
         {
           userId: userCreated.id,
           email: userData.email,
-          name: userData.name
+          name: userData.name,
         },
         { delay: 2000 } // Delay 2 seconds
       );
 
       // 5. Stream real-time notification
-      this.microserviceService.streamData(
-        'notifications',
-        {
-          type: 'user_registered',
-          userId: userCreated.id,
-          message: `Welcome ${userData.name}!`
-        }
-      );
+      this.microserviceService.streamData('notifications', {
+        type: 'user_registered',
+        userId: userCreated.id,
+        message: `Welcome ${userData.name}!`,
+      });
 
       this.logger.log(`User registration completed for: ${userData.email}`);
       return userCreated;
-
     } catch (error) {
       this.logger.error('User registration failed', error);
-      
+
       // Stream error notification
-      this.microserviceService.streamData(
-        'notifications',
-        {
-          type: 'error',
-          message: 'User registration failed',
-          error: error.message
-        }
-      );
-      
+      this.microserviceService.streamData('notifications', {
+        type: 'error',
+        message: 'User registration failed',
+        error: error.message,
+      });
+
       throw error;
     }
   }
@@ -124,31 +114,24 @@ export class ExampleMicroserviceUsageService {
 
       // 3. Publish to IoT devices via MQTT (if enabled)
       try {
-        await this.microserviceService.publishMqttMessage(
-          `warehouse/orders/${orderResult.id}`,
-          {
-            action: 'prepare_shipment',
-            orderId: orderResult.id,
-            priority: orderData.priority || 'normal'
-          }
-        );
+        await this.microserviceService.publishMqttMessage(`warehouse/orders/${orderResult.id}`, {
+          action: 'prepare_shipment',
+          orderId: orderResult.id,
+          priority: orderData.priority || 'normal',
+        });
       } catch (error) {
         this.logger.warn('MQTT not available for warehouse notification', error);
       }
 
       // 4. Stream real-time order updates
-      this.microserviceService.streamData(
-        'real-time-data',
-        {
-          type: 'order_processing',
-          orderId: orderResult.id,
-          status: 'processing',
-          timestamp: new Date()
-        }
-      );
+      this.microserviceService.streamData('real-time-data', {
+        type: 'order_processing',
+        orderId: orderResult.id,
+        status: 'processing',
+        timestamp: new Date(),
+      });
 
       return orderResult;
-
     } catch (error) {
       this.logger.error('Order processing failed', error);
       throw error;
@@ -167,7 +150,7 @@ export class ExampleMicroserviceUsageService {
 
       // Check each transport
       const transports = this.microserviceService.getAvailableTransports();
-      
+
       for (const transport of transports) {
         try {
           await this.microserviceService.sendMessage(
@@ -185,11 +168,10 @@ export class ExampleMicroserviceUsageService {
       // Stream health status
       this.microserviceService.streamData('system-metrics', {
         type: 'health_check',
-        data: healthData
+        data: healthData,
       });
 
       return healthData;
-
     } catch (error) {
       this.logger.error('Health check failed', error);
       throw error;
@@ -204,43 +186,26 @@ export class ExampleMicroserviceUsageService {
       this.logger.log('Starting data synchronization...');
 
       // 1. Get data from multiple sources
-      const userData = await this.microserviceService.sendMessage(
-        'user.getAll',
-        {},
-        'redis'
-      );
+      const userData = await this.microserviceService.sendMessage('user.getAll', {}, 'redis');
 
-      const orderData = await this.microserviceService.sendMessage(
-        'order.getAll',
-        {},
-        'tcp'
-      );
+      const orderData = await this.microserviceService.sendMessage('order.getAll', {}, 'tcp');
 
       // 2. Send to analytics service via Kafka
-      await this.microserviceService.sendKafkaMessage(
-        'data-sync',
-        {
-          event: 'sync_batch',
-          users: userData.length,
-          orders: orderData.length,
-          timestamp: new Date()
-        }
-      );
+      await this.microserviceService.sendKafkaMessage('data-sync', {
+        event: 'sync_batch',
+        users: userData.length,
+        orders: orderData.length,
+        timestamp: new Date(),
+      });
 
       // 3. Queue data processing jobs
-      await this.microserviceService.addQueueJob(
-        'data-processing',
-        'sync-users',
-        userData,
-        { priority: 'high' }
-      );
+      await this.microserviceService.addQueueJob('data-processing', 'sync-users', userData, {
+        priority: 'high',
+      });
 
-      await this.microserviceService.addQueueJob(
-        'data-processing',
-        'sync-orders',
-        orderData,
-        { priority: 'high' }
-      );
+      await this.microserviceService.addQueueJob('data-processing', 'sync-orders', orderData, {
+        priority: 'high',
+      });
 
       // 4. Stream progress updates
       this.microserviceService.streamData('system-metrics', {
@@ -248,20 +213,19 @@ export class ExampleMicroserviceUsageService {
         status: 'completed',
         usersProcessed: userData.length,
         ordersProcessed: orderData.length,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
 
       this.logger.log('Data synchronization completed');
-
     } catch (error) {
       this.logger.error('Data synchronization failed', error);
-      
+
       // Stream error notification
       this.microserviceService.streamData('system-metrics', {
         type: 'data_sync',
         status: 'failed',
         error: error.message,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
   }
@@ -285,7 +249,7 @@ export class ExampleMicroserviceUsageService {
       this.microserviceService.streamData('system-metrics', {
         type: 'backup',
         status: 'started',
-        timestamp: new Date()
+        timestamp: new Date(),
       });
 
       // 3. Queue backup jobs for different data types
@@ -304,26 +268,22 @@ export class ExampleMicroserviceUsageService {
       );
 
       // 4. Send completion notification via Kafka
-      await this.microserviceService.sendKafkaMessage(
-        'system-events',
-        {
-          event: 'backup_scheduled',
-          timestamp: new Date(),
-          jobs: ['backup-users', 'backup-orders']
-        }
-      );
+      await this.microserviceService.sendKafkaMessage('system-events', {
+        event: 'backup_scheduled',
+        timestamp: new Date(),
+        jobs: ['backup-users', 'backup-orders'],
+      });
 
       this.logger.log('Backup jobs scheduled successfully');
-
     } catch (error) {
       this.logger.error('Backup scheduling failed', error);
-      
+
       // Stream error notification
       this.microserviceService.streamData('system-metrics', {
         type: 'backup',
         status: 'failed',
         error: error.message,
-        timestamp: new Date()
+        timestamp: new Date(),
       });
     }
   }
@@ -344,31 +304,23 @@ export class ExampleMicroserviceUsageService {
         transports: {
           active: this.microserviceService.getAvailableTransports().length,
           channels: this.microserviceService.getStreamingChannels().length,
-        }
+        },
       };
 
       // 1. Send to metrics service
-      await this.microserviceService.sendMessage(
-        'metrics.collect',
-        metrics,
-        'redis'
-      );
+      await this.microserviceService.sendMessage('metrics.collect', metrics, 'redis');
 
       // 2. Stream real-time metrics
       this.microserviceService.streamData('system-metrics', {
         type: 'metrics_collection',
-        data: metrics
+        data: metrics,
       });
 
       // 3. Send to analytics via Kafka
-      await this.microserviceService.sendKafkaMessage(
-        'metrics',
-        {
-          event: 'metrics_collected',
-          data: metrics
-        }
-      );
-
+      await this.microserviceService.sendKafkaMessage('metrics', {
+        event: 'metrics_collected',
+        data: metrics,
+      });
     } catch (error) {
       this.logger.error('Metrics collection failed', error);
     }
@@ -381,7 +333,7 @@ export class ExampleMicroserviceUsageService {
     const subscription = this.microserviceService.subscribeToStream('user-events').subscribe({
       next: (message) => {
         this.logger.log(`Received user event: ${JSON.stringify(message)}`);
-        
+
         // React to different event types
         switch (message.data.type) {
           case 'user_registered':
@@ -397,7 +349,7 @@ export class ExampleMicroserviceUsageService {
       },
       error: (error) => {
         this.logger.error('Error in user events stream', error);
-      }
+      },
     });
 
     return subscription;
@@ -405,28 +357,16 @@ export class ExampleMicroserviceUsageService {
 
   private async handleNewUserWelcome(data: any) {
     // Send welcome notification via queue
-    await this.microserviceService.addQueueJob(
-      'notifications',
-      'send-welcome-notification',
-      data
-    );
+    await this.microserviceService.addQueueJob('notifications', 'send-welcome-notification', data);
   }
 
   private async handleUserLogin(data: any) {
     // Update user activity via Redis
-    await this.microserviceService.emitEvent(
-      'user.activity.login',
-      data,
-      'redis'
-    );
+    await this.microserviceService.emitEvent('user.activity.login', data, 'redis');
   }
 
   private async handleUserLogout(data: any) {
     // Update user activity via Redis
-    await this.microserviceService.emitEvent(
-      'user.activity.logout',
-      data,
-      'redis'
-    );
+    await this.microserviceService.emitEvent('user.activity.logout', data, 'redis');
   }
 }
