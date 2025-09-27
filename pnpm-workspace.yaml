@@ -5,7 +5,14 @@ packages:
   - coordination
 
 onlyBuiltDependencies:
+  - '@apollo/protobufjs'
   - '@nestjs/core'
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - '@swc/core'
   - '@temporalio/core-bridge'
   - bcrypt
+  - msgpackr-extract
+  - prisma
   - protobufjs

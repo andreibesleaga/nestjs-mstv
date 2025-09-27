@@ -1,6 +1,13 @@
 import { LoggerService } from '@nestjs/common';
 import pino from 'pino';
-import { getTraceId, getRequestId, getUserId, getMethod, getUrl, getIp } from '../middlewares/request-context';
+import {
+  getTraceId,
+  getRequestId,
+  getUserId,
+  getMethod,
+  getUrl,
+  getIp,
+} from '../middlewares/request-context';
 
 export class CustomLogger implements LoggerService {
   private logger: pino.Logger;

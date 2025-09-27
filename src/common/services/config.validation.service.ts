@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SimplifiedEnvironmentSchema, type SimplifiedEnvironmentConfig } from '../types/validation.schemas';
+import {
+  SimplifiedEnvironmentSchema,
+  type SimplifiedEnvironmentConfig,
+} from '../types/validation.schemas';
 
 @Injectable()
 export class ConfigValidationService {
@@ -28,7 +31,7 @@ export class ConfigValidationService {
         MYSQL_URL: process.env.MYSQL_URL,
         JWT_SECRET: process.env.JWT_SECRET,
         REDIS_URL: process.env.REDIS_URL,
-        
+
         // Storage
         ENABLE_STORAGE: process.env.ENABLE_STORAGE,
         STORAGE_PROVIDER: process.env.STORAGE_PROVIDER,
@@ -231,18 +234,17 @@ export class ConfigValidationService {
 
       // Validate using Zod schema
       this.validatedConfig = SimplifiedEnvironmentSchema.parse(rawConfig);
-      
+
       this.logger.log('Environment configuration validated successfully');
       return this.validatedConfig;
-
     } catch (error) {
       this.logger.error('Environment configuration validation failed:', error);
-      
+
       if (error instanceof Error && 'errors' in error) {
         const zodErrors = (error as any).errors;
         this.logger.error('Validation errors:', zodErrors);
       }
-      
+
       throw new Error(`Invalid environment configuration: ${error.message}`);
     }
   }

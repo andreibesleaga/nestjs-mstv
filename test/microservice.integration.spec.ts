@@ -30,8 +30,12 @@ const mockMqttService = {
 const mockTransportManager = {
   initialize: jest.fn().mockResolvedValue(undefined),
   destroy: jest.fn().mockResolvedValue(undefined),
-  send: jest.fn().mockReturnValue({ pipe: jest.fn().mockReturnValue({ toPromise: jest.fn().mockResolvedValue(undefined) }) }),
-  emit: jest.fn().mockReturnValue({ pipe: jest.fn().mockReturnValue({ toPromise: jest.fn().mockResolvedValue(undefined) }) }),
+  send: jest.fn().mockReturnValue({
+    pipe: jest.fn().mockReturnValue({ toPromise: jest.fn().mockResolvedValue(undefined) }),
+  }),
+  emit: jest.fn().mockReturnValue({
+    pipe: jest.fn().mockReturnValue({ toPromise: jest.fn().mockResolvedValue(undefined) }),
+  }),
   getTransportNames: jest.fn().mockReturnValue(['tcp', 'redis']),
 };
 
@@ -42,7 +46,9 @@ const mockStreamingManager = {
   subscribe: jest.fn().mockReturnValue({ subscribe: jest.fn(() => ({ unsubscribe: jest.fn() })) }),
   createChannel: jest.fn(),
   getChannels: jest.fn().mockReturnValue(['user-events', 'system-metrics', 'notifications']),
-  getMetrics: jest.fn().mockReturnValue({ enabled: true, totalChannels: 3, totalMessages: 0, channels: [] }),
+  getMetrics: jest
+    .fn()
+    .mockReturnValue({ enabled: true, totalChannels: 3, totalMessages: 0, channels: [] }),
 };
 
 const mockSchedulerManager = {
@@ -53,7 +59,9 @@ const mockSchedulerManager = {
   startJob: jest.fn().mockReturnValue(true),
   stopJob: jest.fn().mockReturnValue(true),
   getJobNames: jest.fn().mockReturnValue(['test-job']),
-  getMetrics: jest.fn().mockReturnValue({ enabled: true, totalJobs: 1, runningJobs: 0, totalExecutions: 0, jobs: [] }),
+  getMetrics: jest
+    .fn()
+    .mockReturnValue({ enabled: true, totalJobs: 1, runningJobs: 0, totalExecutions: 0, jobs: [] }),
 };
 
 const mockCacheManager = {
@@ -117,7 +125,7 @@ describe('MicroserviceService Integration', () => {
 
     service = module.get<MicroserviceService>(MicroserviceService);
     configService = module.get<MicroserviceConfigService>(MicroserviceConfigService);
-    
+
     // Initialize the service for testing
     await service['initializeForTesting']();
   });
@@ -194,7 +202,7 @@ describe('MicroserviceService Integration', () => {
       const config = configService.getSchedulerConfig();
       expect(config).toBeDefined();
       expect(typeof config).toBe('object');
-      
+
       // Check for default scheduled tasks
       expect(config['health-check']).toBeDefined();
       expect(config['health-check']).toHaveProperty('enabled');
@@ -207,7 +215,7 @@ describe('MicroserviceService Integration', () => {
       const channels = service.getStreamingChannels();
       expect(Array.isArray(channels)).toBe(true);
       expect(channels.length).toBeGreaterThan(0);
-      
+
       // Check for default channels
       expect(channels).toContain('user-events');
       expect(channels).toContain('system-metrics');
@@ -216,7 +224,7 @@ describe('MicroserviceService Integration', () => {
 
     it('should stream data to a channel', () => {
       const testData = { test: true, timestamp: new Date() };
-      
+
       expect(() => {
         service.streamData('user-events', testData);
       }).not.toThrow();
@@ -241,7 +249,7 @@ describe('MicroserviceService Integration', () => {
       const data = { test: true };
 
       await service.sendKafkaMessage(topic, data);
-      
+
       expect(mockKafkaService.publishMessage).toHaveBeenCalledWith(topic, data);
     });
 
@@ -252,7 +260,7 @@ describe('MicroserviceService Integration', () => {
       const options = { delay: 1000 };
 
       await service.addQueueJob(queueName, jobName, data, options);
-      
+
       expect(mockBullMQService.addJob).toHaveBeenCalledWith(queueName, jobName, data, options);
     });
 
@@ -324,12 +332,16 @@ describe('MicroserviceService Integration', () => {
     it('should handle BullMQ service errors gracefully', async () => {
       mockBullMQService.addJob.mockRejectedValueOnce(new Error('Queue error'));
 
-      await expect(service.addQueueJob('test-queue', 'test-job', {})).rejects.toThrow('Queue error');
+      await expect(service.addQueueJob('test-queue', 'test-job', {})).rejects.toThrow(
+        'Queue error'
+      );
     });
 
     it('should handle MQTT service errors gracefully', async () => {
       mockMqttService.publishUserEvent.mockRejectedValueOnce(new Error('MQTT error'));
-      await expect(service.publishMqttMessage('test/topic', { message: 'test content' })).rejects.toThrow('MQTT error');
+      await expect(
+        service.publishMqttMessage('test/topic', { message: 'test content' })
+      ).rejects.toThrow('MQTT error');
     });
   });
 });

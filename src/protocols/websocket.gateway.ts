@@ -57,7 +57,7 @@ export class AppWebSocketGateway
 
   @SubscribeMessage('message')
   handleMessage(
-    @MessageBody() data: WebSocketMessage, 
+    @MessageBody() data: WebSocketMessage,
     @ConnectedSocket() client: Socket
   ): WebSocketResponse<string> {
     if (!this.isEnabled) return this.createErrorResponse<string>('WebSocket service is disabled');
@@ -67,8 +67,12 @@ export class AppWebSocketGateway
   }
 
   @SubscribeMessage('join-room')
-  handleJoinRoom(@MessageBody() room: string, @ConnectedSocket() client: Socket): WebSocketResponse<{ room: string }> {
-    if (!this.isEnabled) return this.createErrorResponse<{ room: string }>('WebSocket service is disabled');
+  handleJoinRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket
+  ): WebSocketResponse<{ room: string }> {
+    if (!this.isEnabled)
+      return this.createErrorResponse<{ room: string }>('WebSocket service is disabled');
 
     client.join(room);
     client.emit('joined-room', { room });
@@ -89,7 +93,7 @@ export class AppWebSocketGateway
   }
 
   private createSuccessResponse<T = Record<string, unknown>>(
-    data: T, 
+    data: T,
     _type = 'response'
   ): WebSocketResponse<T> {
     return {

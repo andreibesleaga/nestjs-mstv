@@ -27,7 +27,7 @@ export class MicroserviceConfigService {
         port: this.configService.get<number>('TCP_PORT', 3001),
         retryAttempts: this.configService.get<number>('TCP_RETRY_ATTEMPTS', 5),
         retryDelay: this.configService.get<number>('TCP_RETRY_DELAY', 3000),
-      }
+      },
     };
   }
 
@@ -44,7 +44,7 @@ export class MicroserviceConfigService {
         db: this.configService.get<number>('REDIS_DB', 0),
         retryAttempts: this.configService.get<number>('REDIS_RETRY_ATTEMPTS', 5),
         retryDelay: this.configService.get<number>('REDIS_RETRY_DELAY', 3000),
-      }
+      },
     };
   }
 
@@ -62,7 +62,7 @@ export class MicroserviceConfigService {
         token: this.configService.get<string>('NATS_TOKEN'),
         retryAttempts: this.configService.get<number>('NATS_RETRY_ATTEMPTS', 5),
         retryDelay: this.configService.get<number>('NATS_RETRY_DELAY', 3000),
-      }
+      },
     };
   }
 
@@ -86,7 +86,7 @@ export class MicroserviceConfigService {
         },
         retryAttempts: this.configService.get<number>('RABBITMQ_RETRY_ATTEMPTS', 5),
         retryDelay: this.configService.get<number>('RABBITMQ_RETRY_DELAY', 3000),
-      }
+      },
     };
   }
 
@@ -100,11 +100,17 @@ export class MicroserviceConfigService {
         package: this.configService.get<string>('GRPC_PACKAGE', 'nestjs'),
         protoPath: this.configService.get<string>('GRPC_PROTO_PATH', './src/schemas/user.proto'),
         url: `${this.configService.get<string>('GRPC_HOST', 'localhost')}:${this.configService.get<number>('GRPC_PORT', 5000)}`,
-        maxSendMessageLength: this.configService.get<number>('GRPC_MAX_SEND_MESSAGE_LENGTH', 4 * 1024 * 1024),
-        maxReceiveMessageLength: this.configService.get<number>('GRPC_MAX_RECEIVE_MESSAGE_LENGTH', 4 * 1024 * 1024),
+        maxSendMessageLength: this.configService.get<number>(
+          'GRPC_MAX_SEND_MESSAGE_LENGTH',
+          4 * 1024 * 1024
+        ),
+        maxReceiveMessageLength: this.configService.get<number>(
+          'GRPC_MAX_RECEIVE_MESSAGE_LENGTH',
+          4 * 1024 * 1024
+        ),
         retryAttempts: this.configService.get<number>('GRPC_RETRY_ATTEMPTS', 5),
         retryDelay: this.configService.get<number>('GRPC_RETRY_DELAY', 3000),
-      }
+      },
     };
   }
 
@@ -168,7 +174,12 @@ export class MicroserviceConfigService {
   getStreamingConfig() {
     return {
       enabled: this.configService.get<boolean>('ENABLE_STREAMING', true),
-      channels: this.configService.get<string>('STREAMING_CHANNELS', 'user-events,system-metrics,audit-logs,notifications,real-time-data').split(','),
+      channels: this.configService
+        .get<string>(
+          'STREAMING_CHANNELS',
+          'user-events,system-metrics,audit-logs,notifications,real-time-data'
+        )
+        .split(','),
       bufferSize: this.configService.get<number>('STREAMING_BUFFER_SIZE', 1000),
       timeout: this.configService.get<number>('STREAMING_TIMEOUT', 30000),
     };
@@ -189,7 +200,7 @@ export class MicroserviceConfigService {
         cronExpression: this.configService.get<string>('METRICS_COLLECTION_CRON', '*/5 * * * *'),
         description: 'Collect and report system metrics',
       },
-      'cleanup': {
+      cleanup: {
         enabled: this.configService.get<boolean>('ENABLE_CLEANUP_CRON', false),
         cronExpression: this.configService.get<string>('CLEANUP_CRON', '0 2 * * *'),
         description: 'Daily cleanup of temporary resources',
@@ -199,7 +210,7 @@ export class MicroserviceConfigService {
         cronExpression: this.configService.get<string>('DATA_SYNC_CRON', '0 */6 * * *'),
         description: 'Periodic data synchronization between services',
       },
-      'backup': {
+      backup: {
         enabled: this.configService.get<boolean>('ENABLE_BACKUP_CRON', false),
         cronExpression: this.configService.get<string>('BACKUP_CRON', '0 1 * * *'),
         description: 'Daily backup operations',

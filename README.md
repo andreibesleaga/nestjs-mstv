@@ -458,7 +458,7 @@ export class FilesController {
 
 ### Testing
 
-- **Unit tests**: `pnpm test:unit` - 52 tests with full mocking
+- **Unit tests**: `pnpm test:unit` - 90 tests with full mocking
 - **E2E tests**: `pnpm test:e2e` - Application startup and endpoint tests
 - **All tests**: `pnpm test:all` - Test suite for CI/CD
 - **Coverage**: Add `--coverage` flag to any test command for coverage reports
@@ -718,7 +718,7 @@ Comprehensive testing strategy with multiple test types and environments.
 ### Unit Tests
 
 - **Command**: `pnpm test:unit`
-- **Coverage**: 17 tests covering core business logic
+- **Coverage**: 90 tests covering core business logic
 - **Mocks**: All external dependencies (Prisma, Redis, Kafka, BullMQ)
 - **Speed**: Fast execution for development feedback
 

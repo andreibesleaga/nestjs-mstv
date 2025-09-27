@@ -15,12 +15,6 @@ import { FeatureFlagsService } from '../common/services/feature-flags.service';
     AppWebSocketGateway,
     GrpcUserService, // Available but disabled by default
   ],
-  exports: [
-    FeatureFlagsService,
-    HttpsService,
-    MqttService,
-    AppWebSocketGateway,
-    GrpcUserService,
-  ],
+  exports: [FeatureFlagsService, HttpsService, MqttService, AppWebSocketGateway, GrpcUserService],
 })
 export class ProtocolsModule {}

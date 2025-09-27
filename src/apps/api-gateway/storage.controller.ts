@@ -1,15 +1,15 @@
-import { 
-  Controller, 
-  Post, 
-  Get, 
-  Delete, 
-  Body, 
-  Param, 
-  UseGuards, 
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
   StreamableFile,
   Response,
   BadRequestException,
-  NotFoundException
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CheckPolicies, PoliciesGuard } from '../../modules/auth/policies.guard';
@@ -45,10 +45,10 @@ export class StorageController {
       properties: {
         filename: { type: 'string' },
         contentType: { type: 'string' },
-        content: { type: 'string', description: 'Base64 encoded file content' }
+        content: { type: 'string', description: 'Base64 encoded file content' },
       },
-      required: ['filename', 'contentType', 'content']
-    }
+      required: ['filename', 'contentType', 'content'],
+    },
   })
   @ApiResponse({ status: 201, description: 'File uploaded successfully' })
   @ApiResponse({ status: 400, description: 'Invalid file data' })
@@ -97,10 +97,10 @@ export class StorageController {
       // Mock download implementation
       const mockContent = `Mock file content for ${fileId}`;
       const buffer = Buffer.from(mockContent, 'utf-8');
-      
+
       reply.header('Content-Type', 'application/octet-stream');
       reply.header('Content-Disposition', `attachment; filename="${fileId}"`);
-      
+
       return new StreamableFile(buffer);
     } catch {
       throw new NotFoundException(`File with ID ${fileId} not found`);
@@ -122,7 +122,7 @@ export class StorageController {
     try {
       // Mock metadata check
       console.log(`Mock checking metadata for file ${fileId}`);
-      
+
       return {
         fileId,
         filename: `file-${fileId}`,
@@ -149,7 +149,7 @@ export class StorageController {
     try {
       // Mock delete implementation
       console.log(`Mock deleting file ${fileId}`);
-      
+
       return {
         message: `File ${fileId} deleted successfully`,
         fileId,
@@ -172,10 +172,10 @@ export class StorageController {
       type: 'object',
       properties: {
         filename: { type: 'string' },
-        contentType: { type: 'string' }
+        contentType: { type: 'string' },
       },
-      required: ['filename', 'contentType']
-    }
+      required: ['filename', 'contentType'],
+    },
   })
   @ApiResponse({ status: 201, description: 'Presigned URL generated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request data' })

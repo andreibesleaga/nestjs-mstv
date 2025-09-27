@@ -56,7 +56,7 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   private publish(topic: string, payload: MqttPublishPayload): void {
     if (!this.client || !this.isEnabled) return;
-    
+
     this.client.publish(topic, JSON.stringify(payload), (error) => {
       if (error) {
         this.logger.error(`Failed to publish to ${topic}:`, error);
@@ -80,26 +80,26 @@ export class MqttService implements OnModuleInit, OnModuleDestroy {
 
   publishUserEvent(userId: string, event: string, data: Record<string, unknown>): void {
     if (!this.isEnabled) return;
-    
+
     const payload: MqttUserEventData = {
       userId,
       event,
       data,
       timestamp: new Date().toISOString(),
     };
-    
+
     this.publish(`users/${userId}/${event}`, payload);
   }
 
   publishSystemAlert(level: 'info' | 'warning' | 'error' | 'critical', message: string): void {
     if (!this.isEnabled) return;
-    
+
     const payload: MqttSystemAlert = {
       level,
       message,
       timestamp: new Date().toISOString(),
     };
-    
+
     this.publish(`system/alerts/${level}`, payload);
   }
 }
