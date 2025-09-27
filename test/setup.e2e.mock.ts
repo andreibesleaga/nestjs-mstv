@@ -133,7 +133,7 @@ const mockPrismaClient = {
     // Mock common database queries
     if (typeof query === 'string' || query?.strings) {
       const queryStr = typeof query === 'string' ? query : query.strings.join('');
-      
+
       if (queryStr.includes('SELECT 1')) {
         return Promise.resolve([{ result: 1 }]);
       }

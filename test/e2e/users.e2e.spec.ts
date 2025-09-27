@@ -10,7 +10,11 @@ describe('Users E2E', () => {
   let app: NestFastifyApplication;
 
   // Helper function to get authentication token
-  async function getAuthToken(email = `test-${Date.now()}@example.com`, password = 'password123', role = 'admin') {
+  async function getAuthToken(
+    email = `test-${Date.now()}@example.com`,
+    password = 'password123',
+    role = 'admin'
+  ) {
     // Register user with admin role for testing
     await request(app.getHttpServer()).post('/auth/register').send({
       email,
@@ -166,7 +170,7 @@ describe('Users E2E', () => {
       // Create a user and get auth token for admin
       const uniqueEmail = `test-${Date.now()}@example.com`;
       const authToken = await getAuthToken(`admin-${Date.now()}@example.com`);
-      
+
       // Register a test user to fetch
       const registerRes = await request(app.getHttpServer()).post('/auth/register').send({
         email: uniqueEmail,
@@ -190,7 +194,7 @@ describe('Users E2E', () => {
     it('should return 404 for non-existent user', async () => {
       // Get auth token for admin
       const authToken = await getAuthToken();
-      
+
       // Use a valid UUID format that doesn't exist in our mock
       const nonExistentUUID = '123e4567-e89b-12d3-a456-426614174999';
       return request(app.getHttpServer())
