@@ -94,7 +94,7 @@
     "@aws-sdk/client-s3": "^3.864.0",
     "@aws-sdk/s3-request-presigner": "^3.864.0",
     "@azure/storage-blob": "^12.28.0",
-    "@casl/ability": "^6.7.0",
+    "@casl/ability": "^6.7.5",
     "@fastify/circuit-breaker": "^3.2.0",
     "@fastify/compress": "^7.0.3",
     "@fastify/cors": "^9.0.1",
