@@ -109,7 +109,7 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.18",
     "@nestjs/graphql": "^12.2.2",
-    "@nestjs/microservices": "^10.0.0",
+    "@nestjs/microservices": "^11.1.19",
     "@nestjs/platform-fastify": "^11.1.16",
     "@nestjs/platform-socket.io": "^10.0.0",
     "@nestjs/schedule": "^6.0.0",
