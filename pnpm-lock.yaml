@@ -16,7 +16,7 @@ importers:
         version: 5.5.0(graphql@16.11.0)
       '@as-integrations/fastify':
         specifier: ^2.1.1
-        version: 2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.4)
+        version: 2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.5)
       '@aws-sdk/client-s3':
         specifier: ^3.864.0
         version: 3.864.0
@@ -58,7 +58,7 @@ importers:
         version: 0.7.15
       '@nestjs/apollo':
         specifier: ^12.2.2
-        version: 12.2.2(@apollo/gateway@2.13.2(encoding@0.1.13)(graphql@16.11.0))(@apollo/server@5.5.0(graphql@16.11.0))(@as-integrations/fastify@2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.4))(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.18)(@nestjs/graphql@12.2.2(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.18)(class-transformer@0.5.1)(class-validator@0.14.2)(graphql@16.11.0)(reflect-metadata@0.1.14)(ts-morph@26.0.0))(graphql@16.11.0)
+        version: 12.2.2(@apollo/gateway@2.13.2(encoding@0.1.13)(graphql@16.11.0))(@apollo/server@5.5.0(graphql@16.11.0))(@as-integrations/fastify@2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.5))(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.18)(@nestjs/graphql@12.2.2(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.18)(class-transformer@0.5.1)(class-validator@0.14.2)(graphql@16.11.0)(reflect-metadata@0.1.14)(ts-morph@26.0.0))(graphql@16.11.0)
       '@nestjs/common':
         specifier: ^10.0.0
         version: 10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2)
@@ -135,8 +135,8 @@ importers:
         specifier: ^4.3.3
         version: 4.3.3
       fastify:
-        specifier: ^5.8.4
-        version: 5.8.4
+        specifier: ^5.8.5
+        version: 5.8.5
       graphql:
         specifier: ^16.11.0
         version: 16.11.0
@@ -280,8 +280,8 @@ importers:
         specifier: ^16.4.5
         version: 16.4.7
       undici:
-        specifier: ^8.1.0
-        version: 8.1.0
+        specifier: ^6.24.0
+        version: 6.25.0
       zod:
         specifier: ^3.23.8
         version: 3.25.76
@@ -3587,8 +3587,8 @@ packages:
   fastify@5.7.4:
     resolution: {integrity: sha512-e6l5NsRdaEP8rdD8VR0ErJASeyaRbzXYpmkrpr2SuvuMq6Si3lvsaVy5C+7gLanEkvjpMDzBXWE5HPeb/hgTxA==}
 
-  fastify@5.8.4:
-    resolution: {integrity: sha512-sa42J1xylbBAYUWALSBoyXKPDUvM3OoNOibIefA+Oha57FryXKKCZarA1iDntOCWp3O35voZLuDg2mdODXtPzQ==}
+  fastify@5.8.5:
+    resolution: {integrity: sha512-Yqptv59pQzPgQUSIm87hMqHJmdkb1+GPxdE6vW6FRyVE9G86mt7rOghitiU4JHRaTyDUk9pfeKmDeu70lAwM4Q==}
 
   fastq@1.19.1:
     resolution: {integrity: sha512-GwLTyxkCXjXbxqIhTsMI2Nui8huMPtnxg7krajPJAjnEG/iiOS7i+zCtWGZR9G0NBKbXKh6X9m9UIsYX/N6vvQ==}
@@ -5694,9 +5694,9 @@ packages:
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
-  undici@8.1.0:
-    resolution: {integrity: sha512-E9MkTS4xXLnRPYqxH2e6Hr2/49e7WFDKczKcCaFH4VaZs2iNvHMqeIkyUAD9vM8kujy9TjVrRlQ5KkdEJxB2pw==}
-    engines: {node: '>=22.19.0'}
+  undici@6.25.0:
+    resolution: {integrity: sha512-ZgpWDC5gmNiuY9CnLVXEH8rl50xhRCuLNA97fAUnKi8RRuV4E6KG31pDTsLVUKnohJE0I3XDrTeEydAXRw47xg==}
+    engines: {node: '>=18.17'}
 
   unionfs@4.6.0:
     resolution: {integrity: sha512-fJAy3gTHjFi5S3TP5EGdjs/OUMFFvI/ady3T8qVuZfkv8Qi8prV/Q8BuFEgODJslhZTT2z2qdD2lGdee9qjEnA==}
@@ -6182,10 +6182,10 @@ snapshots:
     dependencies:
       xss: 1.0.15
 
-  '@as-integrations/fastify@2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.4)':
+  '@as-integrations/fastify@2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.5)':
     dependencies:
       '@apollo/server': 5.5.0(graphql@16.11.0)
-      fastify: 5.8.4
+      fastify: 5.8.5
       fastify-plugin: 4.5.1
 
   '@aws-crypto/crc32@5.2.0':
@@ -7565,7 +7565,7 @@ snapshots:
   '@msgpackr-extract/msgpackr-extract-win32-x64@3.0.3':
     optional: true
 
-  '@nestjs/apollo@12.2.2(@apollo/gateway@2.13.2(encoding@0.1.13)(graphql@16.11.0))(@apollo/server@5.5.0(graphql@16.11.0))(@as-integrations/fastify@2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.4))(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.18)(@nestjs/graphql@12.2.2(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.18)(class-transformer@0.5.1)(class-validator@0.14.2)(graphql@16.11.0)(reflect-metadata@0.1.14)(ts-morph@26.0.0))(graphql@16.11.0)':
+  '@nestjs/apollo@12.2.2(@apollo/gateway@2.13.2(encoding@0.1.13)(graphql@16.11.0))(@apollo/server@5.5.0(graphql@16.11.0))(@as-integrations/fastify@2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.5))(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.18)(@nestjs/graphql@12.2.2(@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@11.1.18)(class-transformer@0.5.1)(class-validator@0.14.2)(graphql@16.11.0)(reflect-metadata@0.1.14)(ts-morph@26.0.0))(graphql@16.11.0)':
     dependencies:
       '@apollo/server': 5.5.0(graphql@16.11.0)
       '@apollo/server-plugin-landing-page-graphql-playground': 4.0.0(@apollo/server@5.5.0(graphql@16.11.0))
@@ -7578,7 +7578,7 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@apollo/gateway': 2.13.2(encoding@0.1.13)(graphql@16.11.0)
-      '@as-integrations/fastify': 2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.4)
+      '@as-integrations/fastify': 2.1.1(@apollo/server@5.5.0(graphql@16.11.0))(fastify@5.8.5)
 
   '@nestjs/common@10.4.20(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2)':
     dependencies:
@@ -10438,7 +10438,7 @@ snapshots:
       semver: 7.7.4
       toad-cache: 3.7.0
 
-  fastify@5.8.4:
+  fastify@5.8.5:
     dependencies:
       '@fastify/ajv-compiler': 4.0.5
       '@fastify/error': 4.2.0
@@ -12821,7 +12821,7 @@ snapshots:
 
   undici-types@6.21.0: {}
 
-  undici@8.1.0: {}
+  undici@6.25.0: {}
 
   unionfs@4.6.0:
     dependencies:
