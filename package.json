@@ -138,7 +138,7 @@
     "kafkajs": "^2.2.4",
     "mongodb": "^6.18.0",
     "mqtt": "^5.0.0",
-    "nodemailer": "^8.0.9",
+    "nodemailer": "^9.0.1",
     "pino": "^8.0.0",
     "prisma": "^5.0.0",
     "reflect-metadata": "^0.1.13",
